@@ -1,0 +1,55 @@
+{
+  "schemaVersion": "0.1.0",
+  "system": {
+    "name": "ControlSystem-WIP-2020-09-04",
+    "code_folder_path": "src",
+    "code_entry_file": "main.py",
+    "layout_folder_path": "layout",
+    "sound_folder_path": "sound",
+    "system_id": "6705",
+    "author": {
+      "name": "joelc@synapse.com"
+    },
+    "version": "0.0.34",
+    "primary_device_alias": "ExtronProcessor"
+  },
+  "devices": [
+    {
+      "name": "IPCP Pro 350M : 192.168.254.250",
+      "part_number": "60-1460-01",
+      "alias": "ExtronProcessor",
+      "network": {
+        "interfaces": [
+          {
+            "lab-address": "192.168.254.250",
+            "address": "172.16.200.250",
+            "type": "LAN"
+          }
+        ]
+      }
+    },
+    {
+      "name": "TLI Pro 101 : 192.168.254.252",
+      "part_number": "60-1083-01",
+      "alias": "ExtronPanel",
+      "network": {
+        "host_network_type": "LAN",
+        "interfaces": [
+          {
+            "lab-address": "192.168.254.252",
+            "address": "172.16.200.240",
+            "type": "LAN"
+          }
+        ]
+      },
+      "ui": {
+        "layout_file": "24in - TLI Pro 101-ross-video-layout.gdl",
+        "enable_click_sound": true,
+        "click_sound_file": "touch.wav",
+        "press_feedback": "none",
+        "thumb_change_report_interval": 0.1,
+        "thumb_to_fill_sync_time": 0.5
+      }
+    }
+  ]
+}
