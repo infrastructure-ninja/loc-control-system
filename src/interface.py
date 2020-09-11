@@ -52,26 +52,27 @@ def Initialize():
     devices.TouchPanel.ShowPage('Main Page')
     devices.TouchPanel.ShowPopup('POP - Default Home Popup')
 
-
-
-@event(lstPTZButtons, 'Pressed')
-def PTZButtonsPressed(button, state):
-    if   button is btnCAM1_PTZ:
-        devices.TouchPanel.ShowPopup('POP - CAM1-Control')
-        
-    elif button is btnCAM2_PTZ:
-        devices.TouchPanel.ShowPopup('POP - CAM2-Control')
-        
-    elif button is btnCAM3_PTZ:
-        devices.TouchPanel.ShowPopup('POP - CAM3-Control')
-        
-    elif button is btnCAM4_PTZ:
-        devices.TouchPanel.ShowPopup('POP - CAM4-Control')
+ActivePopup = None
+def ShowPopup(PopupName):
+    global ActivePopup
+    devices.TouchPanel.ShowPopup(PopupName)
+    ActivePopup = PopupName
 
 
 @event(btnPlaybackControls, 'Pressed')
-def btnPlaybackControlsPressed(button, state):
-    devices.TouchPanel.ShowPopup('POP - Playback Control')
+@event(lstPTZButtons, 'Pressed')
+def PTZButtonsPressed(button, state):
+    
+    PopupMap = {
+            btnCAM1_PTZ : 'POP - CAM1-Control',
+            btnCAM2_PTZ : 'POP - CAM2-Control',
+            btnCAM3_PTZ : 'POP - CAM3-Control',
+            btnCAM4_PTZ : 'POP - CAM4-Control',
+            btnPlaybackControls : 'POP - Playback Control'
+        }
+
+    ShowPopup(PopupMap[button])
+
 
 
 @event([btnMIX, btnCUT], 'Pressed')
@@ -95,44 +96,24 @@ def PreviewButtonsPressed(button, state):
         btnIN6_Preview  : 'HDMI 2'
     }
 
-    devices.carbonite.Set('MLEPresetSource', PresetSource)
+    devices.carbonite.Set('MLEPresetSource', PresetSource[button])
 
 
-    if   button is btnCAM1_Preview:
-        devices.carbonite.Set('MLEPresetSource', 'Cam 1')
-    
-    elif button is btnCAM2_Preview:
-        devices.carbonite.Set('MLEPresetSource', 'Cam 2')
-
-    elif button is btnCAM3_Preview:
-        devices.carbonite.Set('MLEPresetSource', 'Cam 3')
-
-    elif button is btnCAM4_Preview:
-        devices.carbonite.Set('MLEPresetSource', 'Cam 4')
-
-    elif button is btnIN5_Preview:
-        devices.carbonite.Set('MLEPresetSource', 'HDMI 1')
-
-    elif button is btnIN6_Preview:
-        devices.carbonite.Set('MLEPresetSource', 'HDMI 2')
 
 
 @event(lstAuxButtons, 'Pressed')
 def AUXButtonsPressed(button, state):
-    if   button is btnCAM1_AUX:
-        pass
-        
-    elif button is btnCAM2_AUX:
-        pass
-        
-    elif button is btnCAM3_AUX:
-        pass
-        
-    elif button is btnCAM4_AUX:
-        pass
-        
-    elif button is btnIN5_AUX:
-        pass
+
+    AUXSource = {
+        btnCAM1_AUX     : 'Cam 1',
+        btnCAM2_AUX     : 'Cam 2',
+        btnCAM4_AUX     : 'Cam 3',
+        btnCAM4_Preview : 'Cam 4',
+        btnIN5_AUX      : 'HDMI 1',
+    }
+
+    devices.carbonite.Set('MLEPresetSource', AUXSource[button])
+
 
 @event(btnPreview_KeyOFF, 'Pressed')
 def btnPreview_KeyOFFPressed(button, state):

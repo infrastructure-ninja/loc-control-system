@@ -1,19 +1,10 @@
-## Begin ControlScript Import --------------------------------------------------
-from extronlib import event, Version
-from extronlib.device import eBUSDevice, ProcessorDevice, UIDevice
-from extronlib.interface import (CircuitBreakerInterface, ContactInterface,
-    DigitalInputInterface, DigitalIOInterface, EthernetClientInterface,
-    EthernetServerInterfaceEx, FlexIOInterface, IRInterface, PoEInterface,
-    RelayInterface, SerialInterface, SWACReceptacleInterface, SWPowerInterface,
-    VolumeInterface)
-from extronlib.ui import Button, Knob, Label, Level, Slider
-from extronlib.system import Clock, MESet, Timer, Wait
+from extronlib import Version
 
 import devices
-#import interface
+import interface
 from utilities import DebugPrint
 
-print ('Light of Christ Control System v1.0 .. booting up! (ControlScript v{})'.format(Version()))
+DebugPrint ('main.py', 'Light of Christ Control System v1.0 .. booting up! (ControlScript v{})'.format(Version()), 'Info')
 
 def Initialize():
     devices.InitializeAll()
@@ -24,5 +15,5 @@ def Initialize():
 
 Initialize()
 
-print ('Finished booting .. Have a great rest of your day!')
+DebugPrint ('main.py', 'Finished booting .. Have a great rest of your day!', 'Info')
     

@@ -29,26 +29,72 @@ class DeviceClass:
         # These video source IDs are used in a lot of the switcher commands.
         # Putting them here keeps future updates easier.
         self.VideoSourceIDsByName = {
-            'Black'     :    0,
-            'Cam 1'     : 1000,
-            'Cam 2'     : 1001,
-            'Cam 3'     : 1002,
-            'Cam 4'     : 1003,
-            'Cam 5'     : 1004,
-            'Cam 6'     : 1005,
-            'HDMI 1'    : 1006,
-            'HDMI 2'    : 1007,
-            'HDMI 3'    : 1008,
-            'Media 1'   :  100,
-            'Media 2'   :  101,
-            'Media 3'   :  102,
-            'Media 4'   :  103,
-            'ClipPlayer': 1009,
-            'Background':   10
+            'Black'     :      0,
+            'No Source' :      9,
+            'Background':     10,
+            'Cam 1'     :   1000,
+            'Cam 2'     :   1001,
+            'Cam 3'     :   1002,
+            'Cam 4'     :   1003,
+            'Cam 5'     :   1004,
+            'Cam 6'     :   1005,
+            'HDMI 1'    :   1006,
+            'HDMI 2'    :   1007,
+            'HDMI 3'    :   1008,
+            'ClipPlyr'  :   1009,
+            'M1'        :    100,
+            'M2'        :    101,
+            'M3'        :    102,
+            'M4'        :    103,
+            'ME1MW'     :  11004,
+            'ME1MWA'    :  11005,
+            'Aux 1'     :   9000,
+            'Aux 2'     :   9001,
+            'Aux 3'     :   9002,
+            'Aux 4'     :   9003,
+            'Aux 5'     :   9004,
+            'Aux 6'     :   9005,
+            'Aux 7'     :   9006,
+            'Aux 8'     :   9007,
+            'Aux 9'     :   9008,
+            'Aux 10'    :   9009,
+            'Aux 11'    :   9010,
+            'Aux 12'    :   9011,
+            'Aux 13'    :   9012,
+            'Aux 14'    :   9013,
+            'Aux 15'    :   9014,
+            'Aux 16'    :   9015,
+            'MinME1'    :  25000,
+            'MinME2'    :  25100,
+            'ME1Bg'     :  60000,
+            'ME1Pst'    :  60001,
+            'ME1K1V'    :  60010,
+            'ME1K1A'    :  60011,
+            'ME1K2V'    :  60020,
+            'ME1K2A'    :  60021,
+            'ME1K3V'    :  60030,
+            'ME1K3A'    :  60031,
+            'ME1K4V'    :  60040,
+            'ME1K4A'    :  60041,
+            'MM1Bg'     :  80000,
+            'MM1Pst'    :  80001,
+            'MM1K1V'    :  80010,
+            'MM1K2V'    :  80020,
+            'MM1K2A'    :  80021,
+            'MM2Bg'     :  80210,
+            'MM2Pst'    :  80211,
+            'MM2K1V'    :  80220,
+            'MM2K2V'    :  80230,
+            'MM2K2A'    :  80231,
+            'MS1Bg '    : 100000,
+            'MS1Pst'    : 100001,
+            'MS1K1V'    : 100010,
+            'MS1K2V'    : 100020,
+            'MS1K2A'    : 100021
         }
 
-        # This creates an inverse dictionary for looking up the "friendly name"
-        # of the video source from it's ID number.
+        # This creates an reverse-lookup dictionary for looking up the 
+        # "friendly name" of the video source from its ID number.
         self.VideoSourceNamesByID = {}
         for key, value in self.VideoSourceIDsByName.items():
             self.VideoSourceNamesByID.update ( {value : key } )
@@ -68,7 +114,9 @@ class DeviceClass:
             'AuxSource': {'Parameters': ['Aux Bus'], 'Status': {}},
             'MLEBackgroundSource': {'Parameters': ['Source'], 'Status': {}},
             'MLEPresetSource': {'Parameters': ['Source'], 'Status': {}},
-            'Transition': {'Parameters': ['Style','Background', 'Key 1', 'Key 2', 'Key 3', 'Key4'], 'Status': {}},
+            #'NextTransition': {'Parameters': ['Style','Background', 'Key 1', 'Key 2', 'Key 3', 'Key4'], 'Status': {}},
+            'NextTransitionLayers': {'Parameters': ['Layer'], 'Status': {}},
+            
             
             #'ClipProgress': {'Status': {}},
         }
@@ -80,12 +128,13 @@ class DeviceClass:
             self.AddMatchString(re.compile(b'\xba\xd2\xac\xe5\x10\x00[\xc9\xca]\x00\x08\x00\x0e\x07\x04([\x00-\xFF]{4})'), self.__MatchMLEPresetSource, None)
             self.AddMatchString(re.compile(b'\xba\xd2\xac\xe5\x10\x00[\xc9\xca]\x00\x08\x00(\x0d[\xf6\xf7\xf8\xf9])\x04([\x00-\xFF]{4})'), self.__MatchKeySource, None)
             self.AddMatchString(re.compile(b'\xba\xd2\xac\xe5\x10\x00[\xc9\xca]\x00\x08\x00(\x0D\xFE|\x0D\xFF|\x0E\x00|\x0E\x01|\x0E\x02|\x0E\x03)\x04([\x00-\xFF]{4})'), self.__MatchAuxSource, None)
-            self.AddMatchString(re.compile(b'\xba\xd2\xac\xe5\x10\x00[\xc9\xca][\x00-\xFF][\x00-\xFF]\x00\x1e\xe6([\x00-\xFF])(.*)'), self.__MatchProductName, None)
             self.AddMatchString(re.compile(b'\xba\xd2\xac\xe5\x10\x00[\xc9\xca]\x00\x08\x00(\x09\x92|\x09\x96|\x09\x9a|\x09\x9e)\x04([\x00-\xFF]{4})'), self.__MatchKeyerStatus, None)
 
-            self.AddMatchString(re.compile(b'\xba\xd2\xac\xe5\x10\x00[\xc9\xca]\x00\x08\x00(\x09\x92|\x09\x96|\x09\x9a|\x09\x9e)\x04([\x00-\xFF]{4})'), self.__MatchTransition, None)
-
-
+            #self.AddMatchString(re.compile(b'\xba\xd2\xac\xe5\x10\x00[\xc9\xca]\x00\x08\x00(\x09\x8d|\x09\x95|\x09\x99|\x09\x9d|\x09\xa1)\x04([\x00-\xFF]{4})'), self.__MatchNextTransitionLayers, None)
+            self.AddMatchString(re.compile(b'\xba\xd2\xac\xe5\x10\x00\xcd\x00\x0a\x00\x09\x90(\x00[\x00-\x04])\x04([\x00-\xFF]{4})'), self.__MatchNextTransitionLayers, None)
+                       
+            #self.AddMatchString(re.compile(b'\xba\xd2\xac\xe5\x10\x00[\xc9\xca][\x00-\xFF][\x00-\xFF]\x00\x1e\xe6([\x00-\xFF])([\x00-\xFF]{0,254})\x00(\xba\xd2){0,1}'), self.__MatchProductName, None)
+            self.AddMatchString(re.compile(b'\xba\xd2\xac\xe5\x10\x00[\xc9\xca][\x00-\xFF][\x00-\xFF]\x00\x1e\xe6([\x00-\xFF])([\x20-\x7f]*?)\x00(\xba\xd2){0,1}'), self.__MatchProductName, None)
 
     def SetAuto(self, value, qualifier):
         AutoCmdString = pack('>HHBBBHBHBl', 0xBAD2, 0xACE5, 0x00, 0x10, 0x4A, 0x0008, 0x00, 0x98D, 0x04, 0x1)
@@ -286,25 +335,24 @@ class DeviceClass:
 
 
 
-    def SetTransition(self, value, qualifier):
+    def SetNextTransitionLayers(self, value, qualifier):
 
         try:
-            KeyerNumber = qualifier['Keyer']
-            KeyerOID = {1: 0x992, 2: 0x996, 3: 0x99A, 4: 0x99E}[KeyerNumber]
+            KeyerIndex = {'BG': 0x0, 'Key 1': 0x1, 'Key 2': 0x2, 'Key 3': 0x3, 'Key 4': 0x4}[qualifier['Layer']]
         except KeyError:
-            ProgramLog('[SetKeyerStatus] Invalid keyer number specified.', 'error')
+            ProgramLog('[SetNextTransitionLayers] Invalid keyer number specified.', 'error')
             return False
 
         try:
-             KeyerStatus = {'Off-Air': 0x00, 'On-Air': 0x01}[value]
-        except:
-            ProgramLog('[SetKeyerStatus] Invalid keyer status specified.', 'error')
+             KeyerStatus = {'Off': 0x00, 'On': 0x01}[value]
+        except KeyError:
+            ProgramLog('[SetNextTransitionLayers] Invalid keyer status specified.', 'error')
             return False
- 
-        SetTransitionCmdString = pack('>HHBBBHBHBl', 0xBAD2, 0xACE5, 0x00, 0x10, 0x4A, 0x0008, 0x00, KeyerOID, 0x04, KeyerStatus)
-        self.__SetHelper('Transition', SetTransitionCmdString, value, {'Keyer' : KeyerNumber})
 
-    #def UpdateTransition(self, value, qualifier):
+        SetNextTransitionLayersCmdString = pack('>HHBBBHBHHBl', 0xBAD2, 0xACE5, 0x00, 0x10, 0x4D, 0x000A, 0x00, 0x990, KeyerIndex, 0x04, KeyerStatus)
+        self.__SetHelper('NextTransitionLayers', SetNextTransitionLayersCmdString, value, {'Layer' : value})
+
+    #def UpdateNextTransitionLayers(self, value, qualifier):
         #
         #try:
             #KeyerNumber = qualifier['Keyer']
@@ -317,22 +365,39 @@ class DeviceClass:
         #self.__UpdateHelper('KeyerStatus', UpdateKeyerStatus, value, qualifier)
 #
 #
-    #def __MatchTransition(self, match, tag):
+    def __MatchNextTransitionLayers(self, match, tag):
 #
+#\xca\x00\x08\x00\t\x95\x04\x00\x00\x00\x00
+#\xca\x00\x08\x00\t\x99\x04\x00\x00\x00\x02
+#\xca\x00\x08\x00\t\x9d\x04\x00\x00\x00\x00
+#\xca\x00\x08\x00\t\xa1\x04\x00\x00\x00\x02
+#\xca\x00\x08\x00\t\x8d\x04\x00\x00\x00\x00
+
+        #print('NEXT TRANSITION ->', match.group(1), 'VALUE ->', match.group(2))
+        #print('MATCHED: ->', match.group(1))
+        #print('VALUE  ->', match.group(2))
         #KeyerOID = unpack('>H', match.group(1))[0]
-        #KeyerNumber = {0x992: 1, 0x996: 2, 0x99A: 3, 0x99E: 4}[KeyerOID]
-#
-        #value = unpack('>l', match.group(2))[0]
-        #KeyerStatus = {0x00: 'Off-Air', 0x01: 'On-Air'}[value]
-        #
-        #self.WriteStatus('KeyerStatus', KeyerStatus, {'Keyer': KeyerNumber})
-#
+        LayerName = {0x0: 'BG', 0x1: 'Key 1', 0x2: 'Key 2', 0x3: 'Key 3', 0x4: 'Key 4'}[unpack('>H', match.group(1))[0]]
+        LayerState = {0x00: 'Off', 0x01: 'On'}[unpack('>l', match.group(2))[0]]
+        #print('LAYER NAME ->', LayerName)
+        #print('LAYER STATE ->', LayerState)
+        
+        #value = 
+        #try:
+        #except KeyError:
+        #    print('DID NOT WORK! value: ', value)
+        
+        
+        
+        self.WriteStatus('NextTransitionLayers', LayerState, {'Layer': LayerName})
+
 ####################
 
     def __KeepAliveTimerHandler(self):
         print('Staying alive...')
-        self.KeepAliveTimerObject.Restart()
-        self.UpdateProductName(None, None)
+        if self.connectionFlag:
+            self.KeepAliveTimerObject.Restart()
+            self.UpdateProductName(None, None)
 
     def UpdateProductName(self, value, qualifier):
         ProductNameOID = 0x1EE6
@@ -340,9 +405,23 @@ class DeviceClass:
         self.__UpdateHelper('ProductName', UpdateProductNameString, value, qualifier)
 
     def __MatchProductName(self, match, tag):
-        ProductName = match.group(2).decode().rstrip('\x00')
+        EncodedProductName = match.group(2)   #.decode() #.rstrip('\x00')
+        #BinaryProductName = unpack('>' + 'c'*len(EncodedProductName) , match.group(2))  #.decode() #.rstrip('\x00')
+        
+        #tmp = b''
+        #tmp.join (BinaryProductName)
+        try:
+            ProductName = EncodedProductName.decode('ascii')
+        
+        except:
+            print('COULD NOT DECODE THIS: [{}]'.format(EncodedProductName))
+        
+            ProductName = 'COULD NOT DECODE'
+        
+        #ProgramLog(ProductName, 'info')
         self.WriteStatus('ProductName', ProductName)
-
+#        except:
+#            ProgramLog('COULD NOT PARSE PRODUCTNAME!', 'error')
 ################################
 ## STUFF BELOW THIS LINE IS PROBABLY VESTIGIAL?
 
@@ -363,7 +442,7 @@ class DeviceClass:
         if self.HandshakeCompleted is False:
             HandshakeCmdString = b'\xba\xd2\xac\xe5\x00\x10\x4A\x00\x08\x00\xff\x03\x04\x00\x00\x00\x00'
 
-            print('SENDING HANDSHAKE TO SWITCHER->', HandshakeCmdString)    
+            #print('SENDING HANDSHAKE TO SWITCHER->', HandshakeCmdString)    
             self.Send(HandshakeCmdString)
             self.HandshakeCompleted = True                               
         
@@ -399,13 +478,13 @@ class DeviceClass:
         self.WriteStatus('ConnectionStatus', 'Connected')
         self.counter = 0
         
-        self.KeepAliveTimerObject = Wait(self.__KeepAliveSeconds, self.__KeepAliveTimerHandler) 
+        #self.KeepAliveTimerObject = Wait(self.__KeepAliveSeconds, self.__KeepAliveTimerHandler) 
 
     def OnDisconnected(self):
         self.WriteStatus('ConnectionStatus', 'Disconnected')
         self.connectionFlag = False
         self.HandshakeCompleted = False
-        self.KeepAliveTimerObject.Cancel()
+        #self.KeepAliveTimerObject.Cancel()
 
     ######################################################
     # RECOMMENDED not to modify the code below this point
@@ -517,6 +596,8 @@ class DeviceClass:
         if self.CheckMatchedString() and len(self._ReceiveBuffer) > 10000:
             self._ReceiveBuffer = b''
 
+        #print('RCV->', self._ReceiveBuffer)
+        
     # Add regular expression so that it can be check on incoming data from device.
     def AddMatchString(self, regex_string, callback, arg):
         if regex_string not in self._compile_list:
