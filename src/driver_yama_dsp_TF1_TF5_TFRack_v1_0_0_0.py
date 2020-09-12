@@ -34,10 +34,10 @@ class DeviceClass:
 
         
         if self.Unidirectional == 'False':
-            self.AddMatchString(re.compile(b'OK devinfo version (V[\.\d]+)\n'), self.__MatchFirmware, None)
-            self.AddMatchString(re.compile(b'(?:OK|Notify|OKm) (?:setn|getn) MIXER:Current/InCh/Fader/Level ([0-9]{1,2}) 0 (\d{1,4})\n'), self.__MatchInputLevel, None)
+            self.AddMatchString(re.compile(b'OK devinfo version \"(V[\.\d]+)\"\n'), self.__MatchFirmware, None)
+            self.AddMatchString(re.compile(b'(?:OK|NOTIFY|OKm) (?:setn|getn|set|get) MIXER:Current/InCh/Fader/Level ([0-9]{1,2}) 0 ([\-\d]{1,4}) \"[\-\.\d]+\"\n'), self.__MatchInputLevel, None)
             self.AddMatchString(re.compile(b'(?:OK|Notify|OKm) (?:setn|getn) MIXER:Current/Mix/Fader/Level ([0-9]{1,2}) 0 (\d{1,4})\n'), self.__MatchOutputLevel, None)
-            self.AddMatchString(re.compile(b'(?:OK|Notify) (?:set|get) MIXER:Current/InCh/Fader/On ([0-9]{1,2}) 0 (1|0)\n'), self.__MatchInputMute, None)
+            self.AddMatchString(re.compile(b'(?:OK|NOTIFY) (?:set|get) MIXER:Current/InCh/Fader/On ([0-9]{1,2}) 0 (1|0) \"(ON|OFF)\"\n'), self.__MatchInputMute, None)
             self.AddMatchString(re.compile(b'(?:OK|Notify) (?:set|get) MIXER:Current/Mix/Fader/On ([0-9]{1,2}) 0 (1|0)\n'), self.__MatchOutputMute, None)
             self.AddMatchString(re.compile(b'(ERROR get InvalidArgument|ERROR unknown UnknownCommand)'), self.__MatchError, None)
 
@@ -174,7 +174,8 @@ class DeviceClass:
             CmdString = 'ss{0}_ex scene_{1} {2}\x0A'.format(ActionStates[action],SceneStates[scene],value)
             self.__SetHelper('Preset', CmdString, value, qualifier)
 
-    def __SetHelper(self, command, commandstring, value, qualifier):        self.Debug = True
+    def __SetHelper(self, command, commandstring, value, qualifier):
+        self.Debug = True
         self.Send(commandstring)
 
     def __UpdateHelper(self, command, commandstring, value, qualifier):
@@ -318,6 +319,8 @@ class DeviceClass:
         # check incoming data if it matched any expected data from device module
         if self.CheckMatchedString() and len(self._ReceiveBuffer) > 10000:
             self._ReceiveBuffer = b''
+        #FIXME - testing only!
+        print('YAMAHA RCV ->', data)
 
     # Add regular expression so that it can be check on incoming data from device.
     def AddMatchString(self, regex_string, callback, arg):

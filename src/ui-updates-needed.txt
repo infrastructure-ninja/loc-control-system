@@ -1,0 +1,17 @@
+Implement menu button and associated popup ( and better logo? :) )
+
+Playback Control Popup:
+
+Current State: -> Label needs more height
+Current Playlist: -> Label needs to be smaller (font)
+Current Clip: -> Label needs to be smaller (font)
+
+
+SMD101 driver - freaks out when playlist is empty
+File "/driver_extr_sm_SMD101_SMD202_v1_11_4_0.py", line 1706, in __ReceiveData
+    CurrentMatch['callback'](result, CurrentMatch['para'])
+  File "/driver_extr_sm_SMD101_SMD202_v1_11_4_0.py", line 321, in __MatchCurrentPlaylistTrackList
+    value = jsonData[int(self.CurrentTrackNumber)-1]['location'][0] # use self.CurrentTrackNumber as index to get current playing track
+IndexError: list index out of range
+
+

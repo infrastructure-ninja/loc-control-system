@@ -11,4 +11,14 @@ def DebugPrint(strFunctionName, strMessage, strMessageLevel = 'Debug' ):
     
     except KeyError:
         return False
-    
+#end function (DebugPrint)
+
+def ConvertTimecodeToSeconds(timecode):
+
+    try:
+        hours, minutes, seconds = timecode.split(':')
+        seconds = (int(hours) * 60 * 60) + (int(minutes) * 60) + int(seconds)
+        return seconds
+    except:
+        return 0
+#end function (ConvertTimecodeToSeconds)

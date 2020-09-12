@@ -225,15 +225,22 @@ class DeviceClass:
         self.__SetHelper('KeySource', SetKeyVideoSourceCmdString, value, qualifier)
 
     def UpdateKeySource(self, value, qualifier):
-        
-        try:
-            KeyerOID = {1: 0xDF6, 2: 0xDF7, 3: 0xDF8, 4: 0xDF9}[qualifier['Keyer']]
-        except KeyError:
-            ProgramLog('[UpdateKeySource] Invalid Keyer number specified.', 'error')
-            return False
 
-        UpdateKeySourceCmdString =   pack('>HHHBHBH', 0xBAD2, 0xACE5, 0x0010, 0x49, 0x0003, 0x00, KeyerOID)
-        self.__UpdateHelper('KeySource', UpdateKeySourceCmdString, value, qualifier)
+        KeyerOIDDictionary = {1: 0xDF6, 2: 0xDF7, 3: 0xDF8, 4: 0xDF9}
+
+        if qualifier is None:
+            for key in KeyerOIDDictionary.keys():
+                self.Update('KeySource', {'Keyer' : key})
+
+        else:
+            try:
+                KeyerOID = {1: 0xDF6, 2: 0xDF7, 3: 0xDF8, 4: 0xDF9}[qualifier['Keyer']]
+            except KeyError:
+                ProgramLog('[UpdateKeySource] Invalid Keyer number specified.', 'error')
+                return False
+
+            UpdateKeySourceCmdString =   pack('>HHHBHBH', 0xBAD2, 0xACE5, 0x0010, 0x49, 0x0003, 0x00, KeyerOID)
+            self.__UpdateHelper('KeySource', UpdateKeySourceCmdString, value, qualifier)
 
     def __MatchKeySource(self, match, tag):
         
@@ -267,15 +274,22 @@ class DeviceClass:
         self.__SetHelper('AuxSource', SetAuxSourceCmdString, value, qualifier)
 
     def UpdateAuxSource(self, value, qualifier):
-        
-        try:
-            AuxBusOID = {0xDFE: 1, 0xDFF: 2, 0xE00: 3, 0xE01: 4, 0xE02: 5, 0xE03: 6}[qualifier['Keyer']]
-        except KeyError:
-            ProgramLog('[UpdateAuxSource] Invalid Aux bus number specified.', 'error')
-            return False
 
-        UpdateAuxSourceCmdString =   pack('>HHHBHBH', 0xBAD2, 0xACE5, 0x0010, 0x49, 0x0003, 0x00, AuxBusOID)
-        self.__UpdateHelper('AuxSource', UpdateAuxSourceCmdString, value, qualifier)
+        AuxBusOID = {0xDFE: 1, 0xDFF: 2, 0xE00: 3, 0xE01: 4, 0xE02: 5, 0xE03: 6}
+
+        if qualifier is None:
+            for key in AuxBusOID.keys():
+                self.Update('AuxSource', {'Keyer' : key})
+        else:
+
+            try:
+                AuxBusOID = {0xDFE: 1, 0xDFF: 2, 0xE00: 3, 0xE01: 4, 0xE02: 5, 0xE03: 6}[qualifier['Keyer']]
+            except KeyError:
+                ProgramLog('[UpdateAuxSource] Invalid Aux bus number specified.', 'error')
+                return False
+
+            UpdateAuxSourceCmdString =   pack('>HHHBHBH', 0xBAD2, 0xACE5, 0x0010, 0x49, 0x0003, 0x00, AuxBusOID)
+            self.__UpdateHelper('AuxSource', UpdateAuxSourceCmdString, value, qualifier)
 
     def __MatchAuxSource(self, match, tag):
         
@@ -311,16 +325,24 @@ class DeviceClass:
         self.__SetHelper('KeyerStatus', SetKeyerStatusCmdString, value, {'Keyer' : KeyerNumber})
 
     def UpdateKeyerStatus(self, value, qualifier):
-        
-        try:
-            KeyerNumber = qualifier['Keyer']
-            KeyerOID = {1: 0x992, 2: 0x996, 3: 0x99A, 4: 0x99E}[KeyerNumber]
-        except KeyError:
-            ProgramLog('[UpdateKeyerStatus] Invalid keyer number specified.', 'error')
-            return False
-            
-        UpdateKeyerStatus =   pack('>HHHBHBH', 0xBAD2, 0xACE5, 0x0010, 0x49, 0x0003, 0x00, KeyerOID)
-        self.__UpdateHelper('KeyerStatus', UpdateKeyerStatus, value, qualifier)
+
+        KeyerOIDDictionary = {1: 0x992, 2: 0x996, 3: 0x99A, 4: 0x99E}
+
+        if qualifier is None:
+            for key in KeyerOIDDictionary.keys():
+                self.Update('KeyerStatus', {'Keyer' : key})
+
+        else:
+
+            try:
+                KeyerOID = KeyerOIDDictionary[qualifier['Keyer']]
+
+            except KeyError:
+                ProgramLog('[UpdateKeyerStatus] Invalid keyer number specified.', 'error')
+                return False
+
+            UpdateKeyerStatus =   pack('>HHHBHBH', 0xBAD2, 0xACE5, 0x0010, 0x49, 0x0003, 0x00, KeyerOID)
+            self.__UpdateHelper('KeyerStatus', UpdateKeyerStatus, value, qualifier)
 
 
     def __MatchKeyerStatus(self, match, tag):
@@ -372,7 +394,7 @@ class DeviceClass:
 #\xca\x00\x08\x00\t\x9d\x04\x00\x00\x00\x00
 #\xca\x00\x08\x00\t\xa1\x04\x00\x00\x00\x02
 #\xca\x00\x08\x00\t\x8d\x04\x00\x00\x00\x00
-
+        
         #print('NEXT TRANSITION ->', match.group(1), 'VALUE ->', match.group(2))
         #print('MATCHED: ->', match.group(1))
         #print('VALUE  ->', match.group(2))

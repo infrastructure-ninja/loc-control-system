@@ -1,11 +1,11 @@
 from extronlib.device import ProcessorDevice, UIDevice
-from extronlib import event, Version
-from extronlib.system import Wait
+from extronlib import event
+from extronlib.system import Wait, Timer
 
 from helper_connectionhandler import GetConnectionHandler
 
-
 from utilities import DebugPrint
+import utilities
 
 ControlProcessor = ProcessorDevice('ExtronProcessor')
 TouchPanel = UIDevice('ExtronPanel')
@@ -56,21 +56,24 @@ def CarboniteReceivedDataHandler(command, value, qualifier):
   if command == 'ConnectionStatus':
     if   value == 'Connected':
       DebugPrint('devices.py/CarboniteReceivedDataHandler', 'Carbonite has been successfully connected', 'Info')
-    
+
+      for update in lstCarboniteStatusSubscriptions:
+        if update == 'ConnectionStatus': continue  # ConnectionStatus does not support Updates
+        carbonite.Update(update)
+
     elif value == 'Disconnected':
       DebugPrint('devices.py/CarboniteReceivedDataHandler', 'Carbonite has been disconnected from the system. Will attempt reconnection..', 'Error')
 
   else:
-    print('Received Carbonite Driver Data: [{0}] [{1}] [{2}]'.format(command, value, qualifier))
+    DebugPrint('devices.py/CarboniteReceivedDataHandler', 'Unhandled Carbonite Driver Data: [{0}] [{1}] [{2}]'.format(command, value, qualifier), 'Debug')
 
 #end function (CarboniteReceivedDataHandler)
 
-carbonite.SubscribeStatus('ConnectionStatus', None, CarboniteReceivedDataHandler)
-carbonite.SubscribeStatus('MLEBackgroundSource', None, CarboniteReceivedDataHandler)
-carbonite.SubscribeStatus('MLEPresetSource', None, CarboniteReceivedDataHandler)
-carbonite.SubscribeStatus('KeySource', None, CarboniteReceivedDataHandler)
-carbonite.SubscribeStatus('AuxSource', None, CarboniteReceivedDataHandler)
-carbonite.SubscribeStatus('ProductName', None, CarboniteReceivedDataHandler)
+lstCarboniteStatusSubscriptions = ['ConnectionStatus', 'MLEBackgroundSource', 'MLEPresetSource',
+                                'KeySource', 'AuxSource', 'ProductName','NextTransitionLayers',
+                                'KeyerStatus']
+for status in lstCarboniteStatusSubscriptions:
+  carbonite.SubscribeStatus(status, None, CarboniteReceivedDataHandler)
 
 
 
@@ -107,26 +110,72 @@ matrix.SubscribeStatus('OutputTieStatus', None, MatrixReceivedDataHandler)
 ################################################
 def SMD101ReceivedDataHandler(command, value, qualifier):
 
+  DebugPrint('devices.py/SMD101ReceivedDataHandler',
+             'Received SMD101 Driver Data: [{0}] [{1}] [{2}]'.format(command, value, qualifier), 'Debug')
+
   if command == 'ConnectionStatus':
     if   value == 'Connected':
       DebugPrint('devices.py/SMD101ReceivedDataHandler', 'SMD101 has been successfully connected', 'Info')
-    
+
+      for update in lstSMD101statusSubscriptions:
+        if update == 'ConnectionStatus': continue # ConnectionStatus does not support Updates
+        smd101.Update(update)
+
+      tmrSMD101_poll_timer.Resume()
+
     elif value == 'Disconnected':
       DebugPrint('devices.py/SMD101ReceivedDataHandler', 'SMD101 has been disconnected from the system. Will attempt reconnection..', 'Error')
+      tmrSMD101_poll_timer.Pause()
+
+  elif command == 'CurrentClipLength':
+    interface.lblPlayback_CurrentClipLength.SetText(value)
+
+    timecode_in_seconds = utilities.ConvertTimecodeToSeconds(value)
+    if timecode_in_seconds <= 0:
+      interface.lvlPlayback_ClipPosition.SetVisible(False)
+      interface.lvlPlayback_ClipPosition.SetRange(0, 1)
+
+    else:
+      interface.lvlPlayback_ClipPosition.SetVisible(True)
+      interface.lvlPlayback_ClipPosition.SetRange(0, timecode_in_seconds)
+
+  elif command == 'CurrentTimecode':
+    interface.lblPlayback_CurrentTimeCode.SetText(value)
+
+    timecode_in_seconds = utilities.ConvertTimecodeToSeconds(value)
+    interface.lvlPlayback_ClipPosition.SetLevel(timecode_in_seconds)
+
+  elif command == 'CurrentPlaylistTrack':
+    interface.lblPlayback_CurrentPlaylist.SetText(value)
+
+  elif command == 'CurrentSourceItem':
+    interface.lblPlayback_CurrentSourceItem.SetText(value)
+
+  elif command == 'Playback':
+    interface.lblPlayback_CurrentState.SetText(value)
 
   else:
-    print('Received SMD101 Driver Data: [{0}] [{1}] [{2}]'.format(command, value, qualifier))
+    DebugPrint('devices.py/SMD101ReceivedDataHandler',
+               'Unhandled SMD101 Driver Data: [{0}] [{1}] [{2}]'.format(command, value, qualifier), 'Warn')
 
 #end function (SMD101ReceivedDataHandler)
 
-smd101.SubscribeStatus('ConnectionStatus', None, SMD101ReceivedDataHandler)
-smd101.SubscribeStatus('Playback', None, SMD101ReceivedDataHandler)
-smd101.SubscribeStatus('CurrentTimecode', None, SMD101ReceivedDataHandler)
-smd101.SubscribeStatus('CurrentSourceItem', None, SMD101ReceivedDataHandler)
-smd101.SubscribeStatus('CurrentPlaylistTrack', None, SMD101ReceivedDataHandler)
-smd101.SubscribeStatus('CurrentTimecode', None, SMD101ReceivedDataHandler)
-smd101.SubscribeStatus('CurrentClipLength', None, SMD101ReceivedDataHandler)
+lstSMD101statusSubscriptions = ['ConnectionStatus', 'Playback', 'CurrentTimecode', 'CurrentSourceItem',
+                                'CurrentPlaylistTrack', 'CurrentTimecode', 'CurrentClipLength']
 
+for status in lstSMD101statusSubscriptions:
+  smd101.SubscribeStatus(status, None, SMD101ReceivedDataHandler)
+
+def SMD101_poll_function(timer, count):
+  smd101.Update('CurrentClipLength')
+  smd101.Update('CurrentPlaylistTrack')
+  smd101.Update('CurrentSourceItem')
+  smd101.Update('CurrentTimecode')
+#end function(SMD101_poll_function)
+
+
+tmrSMD101_poll_timer = Timer(1, SMD101_poll_function)
+tmrSMD101_poll_timer.Stop()
 
 
 ################################################
