@@ -1,9 +1,7 @@
-import datetime
-
 from extronlib import Version
 
-import devices
-import interface
+import datetime
+
 from utilities import DebugPrint
 
 DebugPrint('main.py', '==========================================================================', 'Info')
@@ -12,10 +10,12 @@ DebugPrint('main.py', ' - designed, engineered, and implemented by Joel D. Catur
 DebugPrint('main.py', 'System initializing at {}'.format(datetime.datetime.now()), 'Info')
 DebugPrint('main.py', '==========================================================================', 'Info')
 
+import devices
+import interface
 
 def initialize():
     devices.InitializeAll()
-    interface.InitializeAll()
+    interface.initialize_all()
 # end function (Initialize)
 
 

@@ -4,6 +4,7 @@ from extronlib.system import Wait, Timer
 
 from helper_connectionhandler import GetConnectionHandler
 
+from utilities import DummyDriver
 from utilities import DebugPrint
 import utilities
 
@@ -13,34 +14,79 @@ TouchPanel = UIDevice('ExtronPanel')
 import interface
 
 
-import ross_carbonite_solo_frame as CarboniteSolo109
-carbonite = GetConnectionHandler(
-    CarboniteSolo109.EthernetClass('172.16.200.220', 5253, Model='Carbonite Black Solo 109'),
-    'ProductName')
+if utilities.config.get_value('devices/switcher/enabled', cast_as='boolean'):
+  import ross_carbonite_solo_frame as CarboniteSolo109
+  carbonite = GetConnectionHandler(
+    CarboniteSolo109.EthernetClass(
+      utilities.config.get_value('devices/switcher/ipaddress'),
+      utilities.config.get_value('devices/switcher/port', cast_as='integer'),
+      Model='Carbonite Black Solo 109'), 'ProductName')
+else:
+  carbonite = DummyDriver('Carbonite Black Solo 109')
 
-import driver_extr_matrix_DXPHD4k_Series_v1_3_3_0 as MatrixDriver
-matrix = GetConnectionHandler(
-    MatrixDriver.EthernetClass('172.16.200.254', 23, Model='DXP 88 HD 4K'),
-    'Temperature')
 
-import driver_extr_sm_SMD101_SMD202_v1_11_4_0 as SMD101Driver
-smd101 = GetConnectionHandler(
-    SMD101Driver.SSHClass('172.16.200.253', 22023, Credentials=('admin','extron')),
-    'Temperature')
+if utilities.config.get_value('devices/matrix/enabled', cast_as='boolean'):
+  import driver_extr_matrix_DXPHD4k_Series_v1_3_3_0 as MatrixDriver
+  matrix = GetConnectionHandler(
+    MatrixDriver.EthernetClass(
+      utilities.config.get_value('devices/matrix/ipaddress'),
+      utilities.config.get_value('devices/matrix/port', cast_as='integer'),
+      Model='DXP 88 HD 4K'), 'Temperature')
+else:
+  matrix = DummyDriver('Extron DXP 88 HD 4K Matrix')
+
+
+if utilities.config.get_value('devices/playback/enabled', cast_as='boolean'):
+  import driver_extr_sm_SMD101_SMD202_v1_11_4_0 as SMD101Driver
+  smd101 = GetConnectionHandler(
+    SMD101Driver.SSHClass(
+      utilities.config.get_value('devices/playback/ipaddress'),
+      utilities.config.get_value('devices/playback/port', cast_as='integer'),
+      Credentials=(
+        utilities.config.get_value('devices/playback/username'),
+        utilities.config.get_value('devices/playback/password'),
+      )), 'Temperature')
+else:
+  smd101 = DummyDriver('Extron SMD101 Playback Unit')
+
 
 import driver_extr_sm_SMP_300_Series_v1_16_3_0 as SMP351Driver
 smp351 = GetConnectionHandler(
     SMP351Driver.SerialClass(ControlProcessor, 'COM1', Baud=38400, Model='SMP 351'),
     'Alarm')
 
-import driver_yama_dsp_TF1_TF5_TFRack_v1_0_0_0 as SoundboardDriver
-soundboard = GetConnectionHandler(
-    SoundboardDriver.EthernetClass('172.16.200.5', 49280, Model='TF5'),
-    'Firmware')
 
-import driver_vadd_controller_QuickConnectUSB_v1_3_0_1 as CameraDriver
-cam1 = GetConnectionHandler(CameraDriver.EthernetClass('172.16.200.247', 23), 'StreamingMode')
-cam2 = GetConnectionHandler(CameraDriver.EthernetClass('172.16.200.248', 23), 'StreamingMode')
+if utilities.config.get_value('devices/playback/enabled', cast_as='boolean'):
+  import driver_yama_dsp_TF1_TF5_TFRack_v1_0_0_0 as SoundboardDriver
+  soundboard = GetConnectionHandler(
+    SoundboardDriver.EthernetClass(
+      utilities.config.get_value('devices/soundboard/ipaddress'),
+      utilities.config.get_value('devices/soundboard/port', cast_as='integer'),
+      Model='TF5'), 'Firmware')
+else:
+  soundboard = DummyDriver('Yamaha TF5 Sound Console')
+
+
+if utilities.config.get_value('devices/cam1/enabled', cast_as='boolean'):
+  import driver_vadd_controller_QuickConnectUSB_v1_3_0_1 as CameraDriver
+  cam1 = GetConnectionHandler(
+    CameraDriver.EthernetClass(
+      utilities.config.get_value('devices/cam1/ipaddress'),
+      utilities.config.get_value('devices/cam1/port', cast_as='integer'),
+      ), 'StreamingMode')
+else:
+  cam1 = DummyDriver('Vaddio USB Quick-Connect (CAM1)')
+
+
+if utilities.config.get_value('devices/cam2/enabled', cast_as='boolean'):
+  import driver_vadd_controller_QuickConnectUSB_v1_3_0_1 as CameraDriver
+  cam2 = GetConnectionHandler(
+    CameraDriver.EthernetClass(
+      utilities.config.get_value('devices/cam2/ipaddress'),
+      utilities.config.get_value('devices/cam2/port', cast_as='integer'),
+      ), 'StreamingMode')
+else:
+  cam2 = DummyDriver('Vaddio USB Quick-Connect (CAM2)')
 
 
 
@@ -63,6 +109,57 @@ def CarboniteReceivedDataHandler(command, value, qualifier):
 
     elif value == 'Disconnected':
       DebugPrint('devices.py/CarboniteReceivedDataHandler', 'Carbonite has been disconnected from the system. Will attempt reconnection..', 'Error')
+
+  elif command == 'MLEPresetSource':
+    DebugPrint('devices.py/CarboniteReceivedDataHandler',
+                'Received Carbonite Driver Update: [{0}] [{1}] [{2}]'.format(command, value, qualifier), 'Debug')
+
+    mle_preset_source_map = {
+      'Cam 1': interface.btnCAM1_Preview, 'Cam 2': interface.btnCAM2_Preview,
+      'Cam 3': interface.btnCAM3_Preview, 'Cam 4': interface.btnCAM4_Preview,
+      'HDMI 1': interface.btnIN5_Preview, 'HDMI 2': interface.btnIN6_Preview
+      }
+
+    # Set all buttons to normal state
+    for input_name, button in mle_preset_source_map.items():
+      button.SetState(0)
+
+    # Set our selected button to slow flash
+    if value in mle_preset_source_map:
+      mle_preset_source_map[value].SetState(2)
+      mle_preset_source_map[value].SetBlinking('Slow', [2,0])
+
+  # Set our "Key 1" and "Key 2" buttons to show what keys are active for the next transition
+  # We use blinking (SetBlinking) to make sure they're noticeable on the screen.
+  elif command == 'NextTransitionLayers':
+    DebugPrint('devices.py/CarboniteReceivedDataHandler',
+                'Received Carbonite Driver Update: [{0}] [{1}] [{2}]'.format(command, value, qualifier), 'Debug')
+
+    carbonite.Update('KeyerStatus')
+
+    #FIXME - this seems vestigial?
+    # This dict map allows for easy adjustment of additional/different button states
+    #keyer_button_state_map = {'Off': 0, 'On': 2}
+
+    if ('Layer' in qualifier) and qualifier['Layer'] == 'Key 1':
+      if value == 'On':
+        interface.btnPreview_Key1.SetState(1)
+        interface.btnPreview_Key1.SetBlinking('Fast', [0, 1])
+      else:
+        interface.btnPreview_Key1.SetState(0)
+
+    elif ('Layer' in qualifier) and qualifier['Layer'] == 'Key 2':
+      if value == 'On':
+        interface.btnPreview_Key2.SetState(1)
+        interface.btnPreview_Key2.SetBlinking('Fast', [0, 1])
+      else:
+        interface.btnPreview_Key2.SetState(0)
+
+  elif command == 'KeyerStatus':
+    DebugPrint('devices.py/CarboniteReceivedDataHandler',
+                'Received Carbonite Driver Update: [{0}] [{1}] [{2}]'.format(command, value, qualifier), 'Debug')
+
+    carbonite.Update('NextTransitionLayers')
 
   else:
     DebugPrint('devices.py/CarboniteReceivedDataHandler', 'Unhandled Carbonite Driver Data: [{0}] [{1}] [{2}]'.format(command, value, qualifier), 'Debug')
@@ -134,16 +231,22 @@ def SMD101ReceivedDataHandler(command, value, qualifier):
     if timecode_in_seconds <= 0:
       interface.lvlPlayback_ClipPosition.SetVisible(False)
       interface.lvlPlayback_ClipPosition.SetRange(0, 1)
+      interface.lblPlaybackTimeCodeRemaining.SetVisible(False)
 
     else:
       interface.lvlPlayback_ClipPosition.SetVisible(True)
       interface.lvlPlayback_ClipPosition.SetRange(0, timecode_in_seconds)
+      interface.lblPlaybackTimeCodeRemaining.SetVisible(True)
 
   elif command == 'CurrentTimecode':
     interface.lblPlayback_CurrentTimeCode.SetText(value)
 
     timecode_in_seconds = utilities.ConvertTimecodeToSeconds(value)
     interface.lvlPlayback_ClipPosition.SetLevel(timecode_in_seconds)
+    current_clip_length = utilities.ConvertTimecodeToSeconds(smd101.ReadStatus('CurrentClipLength'))
+
+    remaining_seconds = current_clip_length - timecode_in_seconds
+    interface.lblPlaybackTimeCodeRemaining.SetText('(-{})'.format(utilities.ConvertSecondsToTimeCode(remaining_seconds)))
 
   elif command == 'CurrentPlaylistTrack':
     interface.lblPlayback_CurrentPlaylist.SetText(value)
@@ -152,7 +255,8 @@ def SMD101ReceivedDataHandler(command, value, qualifier):
     interface.lblPlayback_CurrentSourceItem.SetText(value)
 
   elif command == 'Playback':
-    interface.lblPlayback_CurrentState.SetText(value)
+    value_text = {'Play': 'Playing', 'Pause': 'Paused', 'Stop': 'Stopped'}[value]
+    interface.lblPlayback_CurrentState.SetText(value_text)
 
   else:
     DebugPrint('devices.py/SMD101ReceivedDataHandler',

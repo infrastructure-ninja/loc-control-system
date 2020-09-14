@@ -320,7 +320,7 @@ class DeviceClass:
         if self.CheckMatchedString() and len(self._ReceiveBuffer) > 10000:
             self._ReceiveBuffer = b''
         #FIXME - testing only!
-        print('YAMAHA RCV ->', data)
+        #print('YAMAHA RCV ->', data)
 
     # Add regular expression so that it can be check on incoming data from device.
     def AddMatchString(self, regex_string, callback, arg):

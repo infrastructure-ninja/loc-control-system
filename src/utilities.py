@@ -1,5 +1,11 @@
+import datetime
+
+from helper_configmgr import ConfigManager
 
 DebugLevel = 0
+
+config = ConfigManager('configuration.json')
+
 
 def DebugPrint(strFunctionName, strMessage, strMessageLevel = 'Debug' ):
 
@@ -22,3 +28,32 @@ def ConvertTimecodeToSeconds(timecode):
     except:
         return 0
 #end function (ConvertTimecodeToSeconds)
+
+
+def ConvertSecondsToTimeCode(seconds):
+    try:
+        return str(datetime.timedelta(seconds=seconds))
+    except:
+        return '00:00:00'
+#end function (ConvertSecondsToTimeCode)
+
+
+class DummyDriver:
+    def __init__(self, friendly_name):
+        self.friendly_name = friendly_name
+        print('DUMMY DRIVER INITIALIZING: ', self.friendly_name)
+
+    def Connect(self, *args, **kwargs):
+        pass
+
+    def Set(self, *args, **kwargs):
+        pass
+
+    def Update(self, *args, **kwargs):
+        pass
+
+    def SubscribeStatus(self, *args, **kwargs):
+        pass
+
+    def ReadStatus(self, *args, **kwargs):
+        pass

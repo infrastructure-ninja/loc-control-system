@@ -1,0 +1,116 @@
+{
+    "data": {
+        "interface": {
+            "quickbuttons": {
+                "button_1_enabled": false,
+                "button_1_name": "Quick Button A",
+                "button_1_function": "device:command:value",
+                "button_2_enabled": false,
+                "button_2_name": "Quick Button B",
+                "button_2_function": "ui:popup:<name>",
+                "button_3_enabled": false,
+                "button_3_name": "Quick Button C",
+                "button_3_function": "macro:<name>",
+                "button_4_enabled": false,
+                "button_4_name": "Quick Button D",
+                "button_4_function": "undefined"
+            }
+        },
+        "devices": {
+            "switcher": {
+                "enabled": true,
+                "ipaddress": "172.16.200.220",
+                "port": "5253"
+            },
+            "matrix": {
+                "enabled": false,
+                "ipaddress": "172.16.200.254",
+                "port": "23"
+            },
+            "soundboard": {
+                "enabled": false,
+                "ipaddress": "172.16.200.5",
+                "port": "49280"
+            },
+            "playback": {
+                "enabled": false,
+                "ipaddress": "172.16.200.253",
+                "port": "22023",
+                "username": "admin",
+                "password": "extron",
+                "playlist_1_name": "INTRO",
+                "playlist_1_filename": "intro.m3u",
+                "playlist_2_name": "Playlist #2",
+                "playlist_2_filename": "music2.m3u",
+                "playlist_3_name": "Playlist #3",
+                "playlist_3_filename": "music3.m3u",
+                "playlist_4_name": "Playlist #4",
+                "playlist_4_filename": "music4.m3u",
+                "playlist_5_name": "Playlist #5",
+                "playlist_5_filename": "music5.m3u",
+                "playlist_6_name": "OUTRO",
+                "playlist_6_filename": "outro.m3u"
+            },
+            "smp351": {
+                "enabled": false,
+                "ipaddress": "None",
+                "port": "None",
+                "serial_port": "COM1",
+                "serial_baud": "38400"
+            },
+            "cam1": {
+                "enabled": true,
+                "ipaddress": "172.16.200.247",
+                "port": "23",
+                "preset_1_name": "Extreme Wide",
+                "preset_2_name": "Podium A",
+                "preset_3_name": "Podium B",
+                "preset_4_name": "Altar",
+                "preset_5_name": "Readings",
+                "preset_6_name": "Cross",
+                "preset_7_name": "",
+                "preset_8_name": ""
+            },
+            "cam2": {
+                "enabled": true,
+                "ipaddress": "172.16.200.248",
+                "port": "23",
+                "preset_1_name": "Extreme Wide",
+                "preset_2_name": "Podium A",
+                "preset_3_name": "Podium B",
+                "preset_4_name": "Altar",
+                "preset_5_name": "Flowers",
+                "preset_6_name": "Readings",
+                "preset_7_name": "",
+                "preset_8_name": ""
+            },
+            "cam3": {
+                "enabled": false,
+                "ipaddress": "192.168.1.2",
+                "port": "23",
+                "preset_1_name": "Preset A",
+                "preset_2_name": "Preset B",
+                "preset_3_name": "Preset C",
+                "preset_4_name": "Preset D",
+                "preset_5_name": "Preset E",
+                "preset_6_name": "Preset F",
+                "preset_7_name": "Preset G",
+                "preset_8_name": "Preset H"
+            },
+            "cam4": {
+                "enabled": false,
+                "ipaddress": "192.168.1.1",
+                "port": "23",
+                "preset_1_name": "Preset A",
+                "preset_2_name": "Preset B",
+                "preset_3_name": "Preset C",
+                "preset_4_name": "Preset D",
+                "preset_5_name": "Preset E",
+                "preset_6_name": "Preset F",
+                "preset_7_name": "Preset G",
+                "preset_8_name": "Preset H"
+            }
+
+        }
+    }
+}

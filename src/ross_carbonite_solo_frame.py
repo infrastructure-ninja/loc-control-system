@@ -131,9 +131,10 @@ class DeviceClass:
             self.AddMatchString(re.compile(b'\xba\xd2\xac\xe5\x10\x00[\xc9\xca]\x00\x08\x00(\x09\x92|\x09\x96|\x09\x9a|\x09\x9e)\x04([\x00-\xFF]{4})'), self.__MatchKeyerStatus, None)
 
             #self.AddMatchString(re.compile(b'\xba\xd2\xac\xe5\x10\x00[\xc9\xca]\x00\x08\x00(\x09\x8d|\x09\x95|\x09\x99|\x09\x9d|\x09\xa1)\x04([\x00-\xFF]{4})'), self.__MatchNextTransitionLayers, None)
-            self.AddMatchString(re.compile(b'\xba\xd2\xac\xe5\x10\x00\xcd\x00\x0a\x00\x09\x90(\x00[\x00-\x04])\x04([\x00-\xFF]{4})'), self.__MatchNextTransitionLayers, None)
-                       
-            #self.AddMatchString(re.compile(b'\xba\xd2\xac\xe5\x10\x00[\xc9\xca][\x00-\xFF][\x00-\xFF]\x00\x1e\xe6([\x00-\xFF])([\x00-\xFF]{0,254})\x00(\xba\xd2){0,1}'), self.__MatchProductName, None)
+
+            self.AddMatchString(re.compile(b'\xba\xd2\xac\xe5\x10\x00\xcd\x00\x0a\x00\x09\x90(\x00[\x00-\x04])\x04\x00\x00\x00([\x00-\xFF])'), self.__MatchNextTransitionLayers, 'SingleLayer')
+            self.AddMatchString(re.compile(b'\xba\xd2\xac\xe5\x10\x00\xca\x00\x18\x00\x09\x90\x14\x00\x00\x00([\x00-x01])\x00\x00\x00([\x00-x01])\x00\x00\x00([\x00-x01])\x00\x00\x00([\x00-x01])\x00\x00\x00([\x00-x01])'), self.__MatchNextTransitionLayers, 'AllLayers')
+
             self.AddMatchString(re.compile(b'\xba\xd2\xac\xe5\x10\x00[\xc9\xca][\x00-\xFF][\x00-\xFF]\x00\x1e\xe6([\x00-\xFF])([\x20-\x7f]*?)\x00(\xba\xd2){0,1}'), self.__MatchProductName, None)
 
     def SetAuto(self, value, qualifier):
@@ -333,7 +334,6 @@ class DeviceClass:
                 self.Update('KeyerStatus', {'Keyer' : key})
 
         else:
-
             try:
                 KeyerOID = KeyerOIDDictionary[qualifier['Keyer']]
 
@@ -356,7 +356,6 @@ class DeviceClass:
         self.WriteStatus('KeyerStatus', KeyerStatus, {'Keyer': KeyerNumber})
 
 
-
     def SetNextTransitionLayers(self, value, qualifier):
 
         try:
@@ -374,44 +373,57 @@ class DeviceClass:
         SetNextTransitionLayersCmdString = pack('>HHBBBHBHHBl', 0xBAD2, 0xACE5, 0x00, 0x10, 0x4D, 0x000A, 0x00, 0x990, KeyerIndex, 0x04, KeyerStatus)
         self.__SetHelper('NextTransitionLayers', SetNextTransitionLayersCmdString, value, {'Layer' : value})
 
-    #def UpdateNextTransitionLayers(self, value, qualifier):
-        #
-        #try:
-            #KeyerNumber = qualifier['Keyer']
-            #KeyerOID = {1: 0x992, 2: 0x996, 3: 0x99A, 4: 0x99E}[KeyerNumber]
-        #except KeyError:
-            #ProgramLog('[UpdateKeyerStatus] Invalid keyer number specified.', 'error')
-            #return False
-            #
-        #UpdateKeyerStatus =   pack('>HHHBHBH', 0xBAD2, 0xACE5, 0x0010, 0x49, 0x0003, 0x00, KeyerOID)
-        #self.__UpdateHelper('KeyerStatus', UpdateKeyerStatus, value, qualifier)
-#
-#
+
+    def UpdateNextTransitionLayers(self, value, qualifier):
+        UpdateTransitionLayersCmd =   pack('>HHHBHBH', 0xBAD2, 0xACE5, 0x0010, 0x49, 0x0003, 0x00, 0x990)
+        self.__UpdateHelper('NextTransitionLayers', UpdateTransitionLayersCmd, value, qualifier)
+
+
     def __MatchNextTransitionLayers(self, match, tag):
-#
-#\xca\x00\x08\x00\t\x95\x04\x00\x00\x00\x00
-#\xca\x00\x08\x00\t\x99\x04\x00\x00\x00\x02
-#\xca\x00\x08\x00\t\x9d\x04\x00\x00\x00\x00
-#\xca\x00\x08\x00\t\xa1\x04\x00\x00\x00\x02
-#\xca\x00\x08\x00\t\x8d\x04\x00\x00\x00\x00
-        
-        #print('NEXT TRANSITION ->', match.group(1), 'VALUE ->', match.group(2))
-        #print('MATCHED: ->', match.group(1))
-        #print('VALUE  ->', match.group(2))
-        #KeyerOID = unpack('>H', match.group(1))[0]
-        LayerName = {0x0: 'BG', 0x1: 'Key 1', 0x2: 'Key 2', 0x3: 'Key 3', 0x4: 'Key 4'}[unpack('>H', match.group(1))[0]]
-        LayerState = {0x00: 'Off', 0x01: 'On'}[unpack('>l', match.group(2))[0]]
-        #print('LAYER NAME ->', LayerName)
-        #print('LAYER STATE ->', LayerState)
-        
-        #value = 
-        #try:
-        #except KeyError:
-        #    print('DID NOT WORK! value: ', value)
-        
-        
-        
-        self.WriteStatus('NextTransitionLayers', LayerState, {'Layer': LayerName})
+
+        layer_state_map = {
+            ('On-Air', 0x01): 'Off', ('Off-Air', 0x01): 'On',
+            ('On-Air', 0x00): 'On', ('Off-Air', 0x00): 'Off'
+            }
+        layer_key_name_map = {0x0: 'BG', 0x1: 'Key 1', 0x2: 'Key 2', 0x3: 'Key 3', 0x4: 'Key 4'}
+
+        if tag == 'SingleLayer':
+            #print('SINGLE LAYER -> MATCH GROUP 1: ->', match.group(1), '2 ->', match.group(2))
+            layer_id = unpack('>H', match.group(1))[0]
+            layer_value = unpack('>B', match.group(2))[0]
+            layer_value_swapped = {0: 1, 1: 0}[layer_value]
+            print('SINGLE PARAMETER MATCH! LAYER ID: [{}] LAYER VALUE: [{}]'.format(layer_id, layer_value, layer_value_swapped))
+
+            keyer_onair_status = self.ReadStatus('KeyerStatus', {'Keyer': layer_id})
+            layer_state = layer_state_map[(keyer_onair_status, layer_value_swapped)]
+
+            self.WriteStatus('NextTransitionLayers', layer_state, {'Layer': layer_key_name_map[layer_id]})
+
+        elif tag == 'AllLayers':
+           # bg_value   = layer_state_map[unpack('>B', match.group(1))[0]]
+
+            keyer1_next_transition_value = unpack('>B', match.group(2))[0]
+            keyer2_next_transition_value = unpack('>B', match.group(3))[0]
+            keyer3_next_transition_value = unpack('>B', match.group(4))[0]
+            keyer4_next_transition_value = unpack('>B', match.group(5))[0]
+
+            keyer1_onair_status = self.ReadStatus('KeyerStatus', {'Keyer': 1})
+            keyer2_onair_status = self.ReadStatus('KeyerStatus', {'Keyer': 2})
+            keyer3_onair_status = self.ReadStatus('KeyerStatus', {'Keyer': 3})
+            keyer4_onair_status = self.ReadStatus('KeyerStatus', {'Keyer': 4})
+
+            key1_value = layer_state_map[(keyer1_onair_status, keyer1_next_transition_value)]
+            key2_value = layer_state_map[(keyer2_onair_status, keyer2_next_transition_value)]
+            key3_value = layer_state_map[(keyer3_onair_status, keyer3_next_transition_value)]
+            key4_value = layer_state_map[(keyer4_onair_status, keyer4_next_transition_value)]
+
+            #self.WriteStatus('NextTransitionLayers', bg_value, {'Layer': 'BG'})
+            self.WriteStatus('NextTransitionLayers', key1_value, {'Layer': 'Key 1'})
+            self.WriteStatus('NextTransitionLayers', key2_value, {'Layer': 'Key 2'})
+            self.WriteStatus('NextTransitionLayers', key3_value, {'Layer': 'Key 3'})
+            self.WriteStatus('NextTransitionLayers', key4_value, {'Layer': 'Key 4'})
+
+
 
 ####################
 
