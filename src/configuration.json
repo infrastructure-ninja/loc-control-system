@@ -2,18 +2,22 @@
     "data": {
         "interface": {
             "quickbuttons": {
-                "button_1_enabled": false,
-                "button_1_name": "Quick Button A",
-                "button_1_function": "device:command:value",
-                "button_2_enabled": false,
-                "button_2_name": "Quick Button B",
-                "button_2_function": "ui:popup:<name>",
-                "button_3_enabled": false,
-                "button_3_name": "Quick Button C",
-                "button_3_function": "macro:<name>",
-                "button_4_enabled": false,
-                "button_4_name": "Quick Button D",
-                "button_4_function": "undefined"
+                "button_1_enabled": true,
+                "button_1_name": "CUT",
+                "button_1_function": "device:carbonite:Cut:none",
+                "button_1_color": "blue",
+                "button_2_enabled": true,
+                "button_2_name": "PGM to BARS",
+                "button_2_function": "device:carbonite:MLEBackgroundSource:M4",
+                "button_2_color": "blue",
+                "button_3_enabled": true,
+                "button_3_name": "CAM 1 Control",
+                "button_3_function": "ui:popup:POP - CAM1-Control",
+                "button_3_color": "blue",
+                "button_4_enabled": true,
+                "button_4_name": "CAM 2 Control",
+                "button_4_function": "ui:popup:POP - CAM2-Control",
+                "button_4_color": "red"
             }
         },
         "devices": {
@@ -47,7 +51,7 @@
                 "playlist_4_name": "Playlist #4",
                 "playlist_4_filename": "music4.m3u",
                 "playlist_5_name": "Playlist #5",
-                "playlist_5_filename": "music5.m3u",
+                "playlist_5_filename": "",
                 "playlist_6_name": "OUTRO",
                 "playlist_6_filename": "outro.m3u"
             },
@@ -69,7 +73,17 @@
                 "preset_5_name": "Readings",
                 "preset_6_name": "Cross",
                 "preset_7_name": "",
-                "preset_8_name": ""
+                "preset_8_name": "",
+                "default_speed": "Slow",
+                "speed_pan_slow": "7",
+                "speed_pan_medium": "14",
+                "speed_pan_fast": "24",
+                "speed_tilt_slow": "5",
+                "speed_tilt_medium": "10",
+                "speed_tilt_fast": "20",
+                "speed_zoom_slow": "1",
+                "speed_zoom_medium": "4",
+                "speed_zoom_fast": "7"
             },
             "cam2": {
                 "enabled": true,
@@ -82,7 +96,17 @@
                 "preset_5_name": "Flowers",
                 "preset_6_name": "Readings",
                 "preset_7_name": "",
-                "preset_8_name": ""
+                "preset_8_name": "",
+                "default_speed": "Fast",
+                "speed_pan_slow": "7",
+                "speed_pan_medium": "14",
+                "speed_pan_fast": "24",
+                "speed_tilt_slow": "5",
+                "speed_tilt_medium": "10",
+                "speed_tilt_fast": "20",
+                "speed_zoom_slow": "1",
+                "speed_zoom_medium": "4",
+                "speed_zoom_fast": "7"
             },
             "cam3": {
                 "enabled": false,
@@ -95,7 +119,16 @@
                 "preset_5_name": "Preset E",
                 "preset_6_name": "Preset F",
                 "preset_7_name": "Preset G",
-                "preset_8_name": "Preset H"
+                "preset_8_name": "Preset H",
+                "speed_pan_slow": "7",
+                "speed_pan_medium": "14",
+                "speed_pan_fast": "24",
+                "speed_tilt_slow": "5",
+                "speed_tilt_medium": "10",
+                "speed_tilt_fast": "20",
+                "speed_zoom_slow": "1",
+                "speed_zoom_medium": "4",
+                "speed_zoom_fast": "7"
             },
             "cam4": {
                 "enabled": false,
@@ -108,7 +141,16 @@
                 "preset_5_name": "Preset E",
                 "preset_6_name": "Preset F",
                 "preset_7_name": "Preset G",
-                "preset_8_name": "Preset H"
+                "preset_8_name": "Preset H",
+                "speed_pan_slow": "7",
+                "speed_pan_medium": "14",
+                "speed_pan_fast": "24",
+                "speed_tilt_slow": "5",
+                "speed_tilt_medium": "10",
+                "speed_tilt_fast": "20",
+                "speed_zoom_slow": "1",
+                "speed_zoom_medium": "4",
+                "speed_zoom_fast": "7"
             }
 
         }

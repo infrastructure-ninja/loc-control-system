@@ -13,6 +13,42 @@ TouchPanel = UIDevice('ExtronPanel')
 
 import interface
 
+device_objects = {}
+
+from helper_systemstate import DeviceClass
+system_states = DeviceClass()
+
+def SystemStatesCallbackHandler(command, value, qualifier):
+  #FIXME - this could be more compact and pythonic, when you get bored of everything else
+  if command == 'CameraSpeed' and qualifier['Camera Number'] == 1:
+    button_map = {
+      'Slow': interface.btnCAM1_Speed1,
+      'Medium': interface.btnCAM1_Speed2,
+      'Fast': interface.btnCAM1_Speed3
+    }
+
+    for single_button in button_map.values():
+      single_button.SetState(0)
+
+    button_map[value].SetState(1)
+
+  elif command == 'CameraSpeed' and qualifier['Camera Number'] == 2:
+    button_map = {
+      'Slow': interface.btnCAM2_Speed1,
+      'Medium': interface.btnCAM2_Speed2,
+      'Fast': interface.btnCAM2_Speed3
+    }
+
+    for single_button in button_map.values():
+      single_button.SetState(0)
+
+    button_map[value].SetState(1)
+
+#end function (SystemStatesCallbackHandler)
+
+system_states.SubscribeStatus('ActivePopup', None, SystemStatesCallbackHandler)
+system_states.SubscribeStatus('CameraSpeed', None, SystemStatesCallbackHandler)
+
 
 if utilities.config.get_value('devices/switcher/enabled', cast_as='boolean'):
   import ross_carbonite_solo_frame as CarboniteSolo109
@@ -24,6 +60,8 @@ if utilities.config.get_value('devices/switcher/enabled', cast_as='boolean'):
 else:
   carbonite = DummyDriver('Carbonite Black Solo 109')
 
+device_objects.update({'carbonite': carbonite})
+
 
 if utilities.config.get_value('devices/matrix/enabled', cast_as='boolean'):
   import driver_extr_matrix_DXPHD4k_Series_v1_3_3_0 as MatrixDriver
@@ -34,6 +72,8 @@ if utilities.config.get_value('devices/matrix/enabled', cast_as='boolean'):
       Model='DXP 88 HD 4K'), 'Temperature')
 else:
   matrix = DummyDriver('Extron DXP 88 HD 4K Matrix')
+
+device_objects.update({'matrix': matrix})
 
 
 if utilities.config.get_value('devices/playback/enabled', cast_as='boolean'):
@@ -49,11 +89,14 @@ if utilities.config.get_value('devices/playback/enabled', cast_as='boolean'):
 else:
   smd101 = DummyDriver('Extron SMD101 Playback Unit')
 
+device_objects.update({'smd101': smd101})
+
 
 import driver_extr_sm_SMP_300_Series_v1_16_3_0 as SMP351Driver
 smp351 = GetConnectionHandler(
     SMP351Driver.SerialClass(ControlProcessor, 'COM1', Baud=38400, Model='SMP 351'),
     'Alarm')
+device_objects.update({'smp351': smp351})
 
 
 if utilities.config.get_value('devices/playback/enabled', cast_as='boolean'):
@@ -66,6 +109,8 @@ if utilities.config.get_value('devices/playback/enabled', cast_as='boolean'):
 else:
   soundboard = DummyDriver('Yamaha TF5 Sound Console')
 
+device_objects.update({'soundboard': soundboard})
+
 
 if utilities.config.get_value('devices/cam1/enabled', cast_as='boolean'):
   import driver_vadd_controller_QuickConnectUSB_v1_3_0_1 as CameraDriver
@@ -76,6 +121,8 @@ if utilities.config.get_value('devices/cam1/enabled', cast_as='boolean'):
       ), 'StreamingMode')
 else:
   cam1 = DummyDriver('Vaddio USB Quick-Connect (CAM1)')
+
+device_objects.update({'cam1': cam1})
 
 
 if utilities.config.get_value('devices/cam2/enabled', cast_as='boolean'):
@@ -88,7 +135,7 @@ if utilities.config.get_value('devices/cam2/enabled', cast_as='boolean'):
 else:
   cam2 = DummyDriver('Vaddio USB Quick-Connect (CAM2)')
 
-
+device_objects.update({'cam2': cam2})
 
 ################################################
 
@@ -127,7 +174,27 @@ def CarboniteReceivedDataHandler(command, value, qualifier):
     # Set our selected button to slow flash
     if value in mle_preset_source_map:
       mle_preset_source_map[value].SetState(2)
-      mle_preset_source_map[value].SetBlinking('Slow', [2,0])
+      mle_preset_source_map[value].SetBlinking('Medium', [2,0])
+
+  elif (command == 'KeySource') and qualifier['Keyer'] == 1:
+    DebugPrint('devices.py/CarboniteReceivedDataHandler',
+                'Received Carbonite Driver Update: [{0}] [{1}] [{2}]'.format(command, value, qualifier), 'Debug')
+
+    keyer1_source_map = {
+      'Cam 1': interface.btnCAM1_AUX, 'Cam 2': interface.btnCAM2_AUX,
+      'Cam 3': interface.btnCAM3_AUX, 'Cam 4': interface.btnCAM4_AUX,
+      'HDMI 1': interface.btnIN5_AUX
+      }
+
+    # Set all buttons to normal state
+    for input_name, button in keyer1_source_map.items():
+      button.SetState(0)
+
+    # Set our selected button to slow flash
+    if value in keyer1_source_map:
+      keyer1_source_map[value].SetState(2)
+      keyer1_source_map[value].SetBlinking('Medium', [2,0])
+
 
   # Set our "Key 1" and "Key 2" buttons to show what keys are active for the next transition
   # We use blinking (SetBlinking) to make sure they're noticeable on the screen.
@@ -401,3 +468,21 @@ def InitializeAll():
 
   DebugPrint('devices.py/InitializeAll', 'Attempting to connect to Camera #2 device..', 'Debug')
   cam2.Connect()
+
+# Set our system state for the starting camera movement speed
+  system_states.Set('CameraSpeed',
+                    utilities.config.get_value('devices/cam1/default_speed', default_value='Slow'),
+                    {'Camera Number': 1})
+
+  system_states.Set('CameraSpeed',
+                    utilities.config.get_value('devices/cam2/default_speed', default_value='Slow'),
+                    {'Camera Number': 2})
+
+  system_states.Set('CameraSpeed',
+                    utilities.config.get_value('devices/cam3/default_speed', default_value='Slow'),
+                    {'Camera Number': 3})
+
+  system_states.Set('CameraSpeed',
+                    utilities.config.get_value('devices/cam4/default_speed', default_value='Slow'),
+                    {'Camera Number': 4})
+

@@ -2,6 +2,8 @@ from extronlib import event
 from extronlib.ui import Button, Label, Level  #,  Slider
 from extronlib.system import Wait
 
+import re
+
 import devices
 from utilities import DebugPrint
 import utilities
@@ -81,11 +83,45 @@ lstPlaybackTransportButtons = [btnPlayback_PLAY, btnPlayback_PAUSE, btnPlayback_
 lstPlayListButtons = [btnPlayback_Playlist1, btnPlayback_Playlist2, btnPlayback_Playlist3,
                       btnPlayback_Playlist4, btnPlayback_Playlist5,  btnPlayback_Playlist6]
 
+# Main Menu Buttons
+btnMainMenuR1C1 = Button(devices.TouchPanel, 1000)
+btnMainMenuR2C1 = Button(devices.TouchPanel, 1001)
+btnMainMenuR3C1 = Button(devices.TouchPanel, 1002)
+btnMainMenuR4C1 = Button(devices.TouchPanel, 1003)
+
+btnMainMenuR1C2 = Button(devices.TouchPanel, 1004)
+btnMainMenuR2C2 = Button(devices.TouchPanel, 1005)
+btnMainMenuR3C2 = Button(devices.TouchPanel, 1006)
+btnMainMenuR4C2 = Button(devices.TouchPanel, 1007)
+
+btnMainMenuR1C3 = Button(devices.TouchPanel, 1008)
+btnMainMenuR2C3 = Button(devices.TouchPanel, 1009)
+btnMainMenuR3C3 = Button(devices.TouchPanel, 1010)
+btnMainMenuR4C3 = Button(devices.TouchPanel, 1011)
+
+btnMainMenuR1C4 = Button(devices.TouchPanel, 1012)
+btnMainMenuR2C4 = Button(devices.TouchPanel, 1013)
+btnMainMenuR3C4 = Button(devices.TouchPanel, 1014)
+btnMainMenuR4C4 = Button(devices.TouchPanel, 1015)
+
+btnMainMenuR1C5 = Button(devices.TouchPanel, 1016)
+btnMainMenuR2C5 = Button(devices.TouchPanel, 1017)
+btnMainMenuR3C5 = Button(devices.TouchPanel, 1018)
+btnMainMenuR4C5 = Button(devices.TouchPanel, 1019)
+lstMainPopupButtons = [
+                    btnMainMenuR1C1, btnMainMenuR2C1, btnMainMenuR3C1, btnMainMenuR4C1,
+                    btnMainMenuR1C2, btnMainMenuR2C2, btnMainMenuR3C2, btnMainMenuR4C2,
+                    btnMainMenuR1C3, btnMainMenuR2C3, btnMainMenuR3C3, btnMainMenuR4C3,
+                    btnMainMenuR1C4, btnMainMenuR2C4, btnMainMenuR3C4, btnMainMenuR4C4,
+                    btnMainMenuR1C5, btnMainMenuR2C5, btnMainMenuR3C5, btnMainMenuR4C5
+                    ]
+
 def initialize_all():
     devices.TouchPanel.ShowPage('Main Page')
-    devices.TouchPanel.ShowPopup('POP - Default Home Popup')
+    devices.TouchPanel.ShowPopup('POP - Main Menu')
+    devices.system_states.Set('ActivePopup', 'POP - Main Menu')
 
-    # We want these things hidden until it's show by other code/events
+    # We want these things hidden until they are programmatically shown
     lvlPlayback_ClipPosition.SetVisible(False)
     lblPlaybackTimeCodeRemaining.SetVisible(False)
 
@@ -186,7 +222,6 @@ def initialize_all():
         devices.carbonite.Send(b'\xba\xd2\xac\xe5\x00\x10\x4a\x00\x08\x00\x0c\x8b\x04\x00\x00\x03\xeb') #MV Box4 Source (0xc8b)
         devices.carbonite.Send(b'\xba\xd2\xac\xe5\x00\x10\x4a\x00\x08\x00\x19\x1b\x04\x00\x00\x00\x01') #MV Box4 Border (0x191b)
 
-
 #end function (Initialize)
 
 
@@ -195,6 +230,8 @@ def ShowPopup(PopupName):
     global ActivePopup
     devices.TouchPanel.ShowPopup(PopupName)
     ActivePopup = PopupName
+    devices.system_states.Set('ActivePopup', PopupName)
+
 #end function (ShowPopup)
 
 
@@ -205,7 +242,8 @@ def MainMenuButtonsPressed(button, state):
     DebugPrint('interface/MainMenuButtonsPressed', 'Main Menu Button Pressed: [{}]'.format(button.Name), 'Debug')
 
     if button is btnMainMenu:
-        devices.Touchpanel.ShowPopup('POP - Main Menu')
+        devices.TouchPanel.ShowPopup('POP - Main Menu')
+        devices.system_states.Set('ActivePopup', 'POP - Main Menu')
 
     elif button is btnQuickButton1:
         execute_command(button, utilities.config.get_value(
@@ -226,19 +264,24 @@ def MainMenuButtonsPressed(button, state):
 #end function (MainMenuButtonsPressed)
 
 
+@event(lstMainPopupButtons, 'Pressed')
+def MainMenuPopupButtonsPressed(button,state):
+    DebugPrint('interface/MainMenuPopupButtonsPressed', 'Button was pressed: [{}]'.format(button.Name), 'Debug')
+
+#                    btnMainMenuR1C1, btnMainMenuR2C1, btnMainMenuR3C1, btnMainMenuR4C1,
+#                    btnMainMenuR1C2, btnMainMenuR2C2, btnMainMenuR3C2, btnMainMenuR4C2,
+#                    btnMainMenuR1C3, btnMainMenuR2C3, btnMainMenuR3C3, btnMainMenuR4C3,
+#                    btnMainMenuR1C4, btnMainMenuR2C4, btnMainMenuR3C4, btnMainMenuR4C4,
+#                    btnMainMenuR1C5, btnMainMenuR2C5, btnMainMenuR3C5, btnMainMenuR4C5
+
+    if button is btnMainMenuR4C5:
+        DebugPrint('interface/MainMenuPopupButtonsPressed', 'Running a re-initialize', 'Info')
+        utilities.config.reload()
+        initialize_all()
+
 @event(lstPlayListButtons, 'Pressed')
 @event(lstPlaybackTransportButtons, 'Pressed')
 def PlaybackButtonsPressed(button, state):
-
-    #FIXME - this should eventually come from a configuration file construct
-    PlaylistMap = {
-        btnPlayback_Playlist1 : 'intro.m3u',
-        btnPlayback_Playlist2 : 'music2.m3u',
-        btnPlayback_Playlist3 : 'music3.m3u',
-        btnPlayback_Playlist4 : 'music4.m3u',
-        btnPlayback_Playlist5 : 'music5.m3u',
-        btnPlayback_Playlist6 : 'outro.m3u'
-    }
 
     if   button is btnPlayback_PLAY:
         devices.smd101.Set('Playback', 'Play')
@@ -253,8 +296,20 @@ def PlaybackButtonsPressed(button, state):
         DebugPrint('interface/PlaybackButtonsPressed', 'Stop button activated', 'Debug')
 
     elif button in lstPlayListButtons:
-        devices.smd101.Set('LoadPlaylistCommand ', PlaylistMap[button])
-        DebugPrint('interface/PlaybackButtonsPressed', 'Loading playlist: [{}]'.format(PlaylistMap[button]), 'Debug')
+
+        playlist_button_map = {
+            btnPlayback_Playlist1: 'devices/playback/playlist_1_filename',
+            btnPlayback_Playlist2: 'devices/playback/playlist_2_filename',
+            btnPlayback_Playlist3: 'devices/playback/playlist_3_filename',
+            btnPlayback_Playlist4: 'devices/playback/playlist_4_filename',
+            btnPlayback_Playlist5: 'devices/playback/playlist_5_filename',
+            btnPlayback_Playlist6: 'devices/playback/playlist_6_filename'
+        }
+
+        playlist_name = utilities.config.get_value(playlist_button_map[button], default_value=None)
+        if playlist_name is not None:
+            devices.smd101.Set('LoadPlaylistCommand ', playlist_name)
+            DebugPrint('interface/PlaybackButtonsPressed', 'Loading playlist: [{}]'.format(playlist_name), 'Debug')
 
 #end function (PlaybackButtonsPressed)
 
@@ -318,7 +373,7 @@ def AUXButtonsPressed(button, state):
         btnCAM1_AUX     : 'Cam 1',
         btnCAM2_AUX     : 'Cam 2',
         btnCAM4_AUX     : 'Cam 3',
-        btnCAM4_Preview : 'Cam 4',
+        btnCAM4_AUX     : 'Cam 4',
         btnIN5_AUX      : 'HDMI 1',
     }
 
@@ -429,6 +484,7 @@ def get_cam2_zoom_speed():
 
 @event(lstCAM1_PresetBtns, 'Pressed')
 @event(lstCAM1_PTZBtns, ['Pressed', 'Released'])
+@event([btnCAM1_Speed1, btnCAM1_Speed2, btnCAM1_Speed3], 'Pressed')
 def cam1_buttons_pressed_released(button, state):
 
     DebugPrint('interface/Cam1ButtonsPressedAndReleased', 'CAM1 PTZ button: [{}] was [{}]'.
@@ -479,7 +535,8 @@ def cam1_buttons_pressed_released(button, state):
         devices.cam1.Set('PresetRecall', preset_btn_map[button])
 
     elif button in [btnCAM1_Speed1, btnCAM1_Speed2, btnCAM1_Speed3]:
-        pass
+        button_map = {btnCAM1_Speed1: 'Slow', btnCAM1_Speed2: 'Medium', btnCAM1_Speed3: 'Fast'}
+        devices.system_states.Set('CameraSpeed', button_map[button], {'Camera Number': 1})
 
 #end function (cam1_buttons_pressed_released)
 
@@ -509,6 +566,7 @@ lstCAM2_PresetBtns = [btnCAM2_Preset1, btnCAM2_Preset2, btnCAM2_Preset3, btnCAM2
 
 @event(lstCAM2_PresetBtns, 'Pressed')
 @event(lstCAM2_PTZBtns, ['Pressed', 'Released'])
+@event([btnCAM2_Speed1, btnCAM2_Speed2, btnCAM2_Speed3], 'Pressed')
 def cam2_buttons_pressed_released(button, state):
 
     DebugPrint('interface/Cam1ButtonsPressedAndReleased', 'CAM2 PTZ button: [{}] was [{}]'.
@@ -558,14 +616,51 @@ def cam2_buttons_pressed_released(button, state):
         devices.cam2.Set('PresetRecall', preset_btn_map[button])
 
     elif button in [btnCAM2_Speed1, btnCAM2_Speed2, btnCAM2_Speed3]:
-        pass
+        button_map = {btnCAM2_Speed1: 'Slow', btnCAM2_Speed2: 'Medium', btnCAM2_Speed3: 'Fast'}
+        devices.system_states.Set('CameraSpeed', button_map[button], {'Camera Number': 2})
 
 #end function (cam2_buttons_pressed_released)
 
 
 def execute_command(button, macro_string):
-#    device:command:value
-#    ui:popup:<name>
-#    macro:<name>
-    DebugPrint('execute_button_macro', 'Button: [{}] Running with: [{}]'.format(button.Name, macro_string), 'Debug')
+
+    #    device:<object>:<command>:<value>
+    #    ui:popup:<name>
+    #    macro:<name>
+    regex_ui = re.compile(r"^(ui:popup):(.*?)$")
+    regex_device = re.compile(r"^(device):(.*?):(.*?):(.*?)$")
+    regex_macro = re.compile(r"^(macro):(.*)$")
+
+    #ui:popup:POP - CAM1 - Control
+    if regex_ui.match(macro_string):
+        p = regex_ui.match(macro_string)
+        if p.group(2):
+            devices.TouchPanel.ShowPopup(p.group(2))
+        else:
+            DebugPrint('execute_button_macro/regex_ui', 'Attempted to handle a malformed command statement: [{}]'.format(macro_string),
+                       'Error')
+
+    # device:<obj>:<command>:<value>
+    elif regex_device.match(macro_string):
+        p = regex_device.match(macro_string)
+        if p.group(4):
+            try:
+                driver_object = devices.device_objects[p.group(2)]
+                driver_command = p.group(3)
+                driver_value = p.group(4)
+                driver_object.Set(driver_command, driver_value)
+            except:
+                DebugPrint('execute_button_macro/regex_device',
+                           'An error occurred sending a command to driver object. [{}]'.format(macro_string),
+                           'Error')
+
+        else:
+            DebugPrint('execute_button_macro/regex_device', 'Attempted to handle a malformed command statement: [{}]'.format(macro_string),
+                       'Error')
+
+    elif regex_macro.match(macro_string):
+        pass
+
+    else:
+        DebugPrint('execute_button_macro', 'UNRECOGNIZED MACRO STRING! Button: [{}] Running with: [{}]'.format(button.Name, macro_string), 'Error')
 #end function (execute_button_macro)
