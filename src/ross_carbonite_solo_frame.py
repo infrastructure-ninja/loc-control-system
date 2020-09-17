@@ -1,6 +1,5 @@
 from extronlib.interface import EthernetClientInterface
 from extronlib.system import ProgramLog
-from extronlib.system import Wait
 
 import re
 from struct import pack, unpack
@@ -138,6 +137,7 @@ class DeviceClass:
             self.AddMatchString(re.compile(b'\xba\xd2\xac\xe5\x10\x00[\xc9\xca][\x00-\xFF][\x00-\xFF]\x00\x1e\xe6([\x00-\xFF])([\x20-\x7f]*?)\x00(\xba\xd2){0,1}'), self.__MatchProductName, None)
 
     def SetAuto(self, value, qualifier):
+        # noinspection PyPep8Naming,SpellCheckingInspection
         AutoCmdString = pack('>HHBBBHBHBl', 0xBAD2, 0xACE5, 0x00, 0x10, 0x4A, 0x0008, 0x00, 0x98D, 0x04, 0x1)
         self.__SetHelper('Auto', AutoCmdString, value, qualifier)
 
@@ -212,7 +212,7 @@ class DeviceClass:
 
         try:
             KeyVideoSource = self.VideoSourceIDsByName[value]
-        except:
+        except KeyError:
             ProgramLog('[SetKeySource] Invalid source name specified.', 'error')
             return False
 
@@ -261,7 +261,7 @@ class DeviceClass:
 
         try:
             AuxVideoSource = self.VideoSourceIDsByName[value]
-        except:
+        except KeyError:
             ProgramLog('[SetAuxSource] Invalid source name specified.', 'error')
             return False
 
@@ -318,7 +318,7 @@ class DeviceClass:
 
         try:
              KeyerStatus = {'Off-Air': 0x00, 'On-Air': 0x01}[value]
-        except:
+        except KeyError:
             ProgramLog('[SetKeyerStatus] Invalid keyer status specified.', 'error')
             return False
  
@@ -392,7 +392,9 @@ class DeviceClass:
             layer_id = unpack('>H', match.group(1))[0]
             layer_value = unpack('>B', match.group(2))[0]
             layer_value_swapped = {0: 1, 1: 0}[layer_value]
-            print('SINGLE PARAMETER MATCH! LAYER ID: [{}] LAYER VALUE: [{}]'.format(layer_id, layer_value, layer_value_swapped))
+
+            #FIXME - debug printing
+            #print('SINGLE PARAMETER MATCH! LAYER ID: [{}] LAYER VALUE: [{}]'.format(layer_id, layer_value, layer_value_swapped))
 
             keyer_onair_status = self.ReadStatus('KeyerStatus', {'Keyer': layer_id})
             layer_state = layer_state_map[(keyer_onair_status, layer_value_swapped)]
@@ -427,11 +429,6 @@ class DeviceClass:
 
 ####################
 
-    def __KeepAliveTimerHandler(self):
-        print('Staying alive...')
-        if self.connectionFlag:
-            self.KeepAliveTimerObject.Restart()
-            self.UpdateProductName(None, None)
 
     def UpdateProductName(self, value, qualifier):
         ProductNameOID = 0x1EE6
@@ -439,9 +436,8 @@ class DeviceClass:
         self.__UpdateHelper('ProductName', UpdateProductNameString, value, qualifier)
 
     def __MatchProductName(self, match, tag):
-        EncodedProductName = match.group(2)   #.decode() #.rstrip('\x00')
-        #BinaryProductName = unpack('>' + 'c'*len(EncodedProductName) , match.group(2))  #.decode() #.rstrip('\x00')
-        
+        EncodedProductName = match.group(2)
+
         #tmp = b''
         #tmp.join (BinaryProductName)
         try:
@@ -455,18 +451,8 @@ class DeviceClass:
         #ProgramLog(ProductName, 'info')
         self.WriteStatus('ProductName', ProductName)
 #        except:
-#            ProgramLog('COULD NOT PARSE PRODUCTNAME!', 'error')
+#            ProgramLog('COULD NOT PARSE PRODUCT NAME!', 'error')
 ################################
-## STUFF BELOW THIS LINE IS PROBABLY VESTIGIAL?
-
-
-    def __MatchClipProgress(self, match, tag):
-        pass
-#################################        
-
-
-
-
 
     def SendHandshake(self):
         

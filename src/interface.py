@@ -1,6 +1,8 @@
 from extronlib import event
 from extronlib.ui import Button, Label, Level  #,  Slider
-from extronlib.system import Wait
+
+# UNUSED?
+#from extronlib.system import Wait
 
 import re
 
@@ -70,6 +72,7 @@ lblPlayback_CurrentSourceItem = Label(devices.TouchPanel, 132)
 lblPlayback_CurrentState      = Label(devices.TouchPanel, 150)
 lvlPlayback_ClipPosition      = Level(devices.TouchPanel, 116)
 
+btnPlayback_OnAir     = Button(devices.TouchPanel, 142)
 btnPlayback_PLAY      = Button(devices.TouchPanel, 125)
 btnPlayback_PAUSE     = Button(devices.TouchPanel, 126)
 btnPlayback_STOP      = Button(devices.TouchPanel, 124)
@@ -125,6 +128,13 @@ def initialize_all():
     lvlPlayback_ClipPosition.SetVisible(False)
     lblPlaybackTimeCodeRemaining.SetVisible(False)
 
+    btnCAM1_OnAir.SetVisible(False)
+    btnCAM1_OnAir.SetEnable(False)
+    btnCAM2_OnAir.SetVisible(False)
+    btnCAM2_OnAir.SetEnable(False)
+    btnPlayback_OnAir.SetVisible(False)
+    btnPlayback_OnAir.SetEnable(False)
+
     # Initialize a bunch of buttons using text pulled from our configuration file
     # This dictionary stores the button object we want to "SetText' on, and the configuration
     # path where we will be able to retrieve the name. The loop at the bottom makes it happen.
@@ -163,7 +173,7 @@ def initialize_all():
     for button, config_key in init_button_name_dict.items():
         button.SetText(utilities.config.get_value(config_key, default_value='(unused)'))
 
-    # Show/Hide our "sidebar buttons" based on whether they are enabled in the configuration or not
+    # Show/Hide our "quick sidebar buttons" based on whether they are enabled in the configuration or not
     init_button_visible_dict = {
         btnQuickButton1: 'interface/quickbuttons/button_1_enabled',
         btnQuickButton2: 'interface/quickbuttons/button_2_enabled',
@@ -173,6 +183,21 @@ def initialize_all():
 
     for button, config_key in init_button_visible_dict.items():
         button.SetVisible(utilities.config.get_value(config_key, default_value=False, cast_as='boolean'))
+
+
+    # Set our "quick sidebar buttons" color based on how they are defined in the configuration
+    button_color_map = {'blue': 0, 'green': 2, 'red': 3, 'white': 4, 'yellow': 5, 'gray': 6}
+    init_button_color_dict = {
+        btnQuickButton1: 'interface/quickbuttons/button_1_color',
+        btnQuickButton2: 'interface/quickbuttons/button_2_color',
+        btnQuickButton3: 'interface/quickbuttons/button_3_color',
+        btnQuickButton4: 'interface/quickbuttons/button_4_color'
+    }
+
+    for button, config_key in init_button_color_dict.items():
+        button.SetState(button_color_map[
+            utilities.config.get_value(config_key, default_value='blue', cast_as='string')]
+                        )
 
 
     # Show/Hide our Camera UI buttons based on whether the camera is disabled in the configuration
@@ -372,7 +397,7 @@ def AUXButtonsPressed(button, state):
     AUXSource = {
         btnCAM1_AUX     : 'Cam 1',
         btnCAM2_AUX     : 'Cam 2',
-        btnCAM4_AUX     : 'Cam 3',
+        btnCAM3_AUX     : 'Cam 3',
         btnCAM4_AUX     : 'Cam 4',
         btnIN5_AUX      : 'HDMI 1',
     }
@@ -433,7 +458,7 @@ def btnCloseButtonsPressed(button, state):
     devices.TouchPanel.ShowPopup('POP - Default Home Popup')
 
 
-
+btnCAM1_OnAir    = Button(devices.TouchPanel, 141)
 btnCAM1_TiltUp   = Button(devices.TouchPanel, 23)
 btnCAM1_TiltDown = Button(devices.TouchPanel, 24)
 btnCAM1_PanLeft  = Button(devices.TouchPanel, 25)
@@ -451,6 +476,8 @@ btnCAM1_Preset5  = Button(devices.TouchPanel, 38)
 btnCAM1_Preset6  = Button(devices.TouchPanel, 39)
 btnCAM1_Preset7  = Button(devices.TouchPanel, 40)
 btnCAM1_Preset8  = Button(devices.TouchPanel, 44)
+lstCAM1_SpeedBtns  = [btnCAM1_Speed1, btnCAM1_Speed2, btnCAM1_Speed3]
+
 lstCAM1_PTZBtns    = [btnCAM1_TiltUp, btnCAM1_TiltDown, btnCAM1_PanLeft, btnCAM1_PanRight,
                       btnCAM1_ZoomIn, btnCAM1_ZoomOut]
 lstCAM1_PresetBtns = [btnCAM1_Preset1, btnCAM1_Preset2, btnCAM1_Preset3, btnCAM1_Preset4,
@@ -540,7 +567,7 @@ def cam1_buttons_pressed_released(button, state):
 
 #end function (cam1_buttons_pressed_released)
 
-
+btnCAM2_OnAir    = Button(devices.TouchPanel, 143)
 btnCAM2_TiltUp   = Button(devices.TouchPanel, 6)
 btnCAM2_TiltDown = Button(devices.TouchPanel, 7)
 btnCAM2_PanLeft  = Button(devices.TouchPanel, 8)
@@ -558,6 +585,7 @@ btnCAM2_Preset5  = Button(devices.TouchPanel, 64)
 btnCAM2_Preset6  = Button(devices.TouchPanel, 65)
 btnCAM2_Preset7  = Button(devices.TouchPanel, 138)
 btnCAM2_Preset8  = Button(devices.TouchPanel, 139)
+lstCAM2_SpeedBtns  = [btnCAM2_Speed1, btnCAM2_Speed2, btnCAM2_Speed3]
 lstCAM2_PTZBtns    = [btnCAM2_TiltUp, btnCAM2_TiltDown, btnCAM2_PanLeft, btnCAM2_PanRight,
                       btnCAM2_ZoomIn, btnCAM2_ZoomOut]
 lstCAM2_PresetBtns = [btnCAM2_Preset1, btnCAM2_Preset2, btnCAM2_Preset3, btnCAM2_Preset4,

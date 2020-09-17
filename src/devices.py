@@ -1,6 +1,8 @@
 from extronlib.device import ProcessorDevice, UIDevice
-from extronlib import event
 from extronlib.system import Wait, Timer
+
+# UNUSED?
+#from extronlib import event
 
 from helper_connectionhandler import GetConnectionHandler
 
@@ -50,18 +52,30 @@ system_states.SubscribeStatus('ActivePopup', None, SystemStatesCallbackHandler)
 system_states.SubscribeStatus('CameraSpeed', None, SystemStatesCallbackHandler)
 
 
-if utilities.config.get_value('devices/switcher/enabled', cast_as='boolean'):
+if utilities.config.get_value('devices/switcher/enabled', default_value=False, cast_as='boolean'):
   import ross_carbonite_solo_frame as CarboniteSolo109
   carbonite = GetConnectionHandler(
     CarboniteSolo109.EthernetClass(
       utilities.config.get_value('devices/switcher/ipaddress'),
-      utilities.config.get_value('devices/switcher/port', cast_as='integer'),
+      utilities.config.get_value('devices/switcher/port', default_value=5253, cast_as='integer'),
       Model='Carbonite Black Solo 109'), 'ProductName')
+
+  if utilities.config.get_value('devices/switcher/tally_enabled', default_value=False, cast_as='boolean'):
+    import driver_tslumd_31 as TallyDriver
+    tally = TallyDriver.EthernetClass(
+      utilities.config.get_value('devices/switcher/tally_port', default_value=5728, cast_as='integer')
+    )
+
+  else:
+    tally = DummyDriver('TSL UMD Tally Device')
+
+
 else:
   carbonite = DummyDriver('Carbonite Black Solo 109')
+  tally = DummyDriver('TSL UMD Tally Device')
 
 device_objects.update({'carbonite': carbonite})
-
+device_objects.update({'tally': tally})
 
 if utilities.config.get_value('devices/matrix/enabled', cast_as='boolean'):
   import driver_extr_matrix_DXPHD4k_Series_v1_3_3_0 as MatrixDriver
@@ -240,7 +254,60 @@ for status in lstCarboniteStatusSubscriptions:
   carbonite.SubscribeStatus(status, None, CarboniteReceivedDataHandler)
 
 
+def TallyReceivedDataHandler(command, value, qualifier):
+  DebugPrint('devices.py/TallyReceivedDataHandler', 'Tally Data Received: -> [{}] [{}] [{}]'.format(
+    command, value, qualifier), 'Trace')
 
+  if qualifier['Input'] == 'Cam 1':
+    temp_button_list = interface.lstCAM1_PTZBtns + interface.lstCAM1_PresetBtns + interface.lstCAM1_SpeedBtns
+
+    if (value == 'Off') or (value == 'Green'):
+      interface.btnCAM1_OnAir.SetState(0)
+      interface.btnCAM1_OnAir.SetVisible(False)
+
+      for single_button in temp_button_list:
+        single_button.SetEnable(True)
+        single_button.SetState(0)
+
+    elif (value == 'Red') or (value == 'Red & Green'):
+      interface.btnCAM1_OnAir.SetBlinking('Fast', [0, 1])
+      interface.btnCAM1_OnAir.SetVisible(True)
+
+      for single_button in temp_button_list:
+        single_button.SetEnable(False)
+        single_button.SetState(2)
+
+  elif qualifier['Input'] == 'Cam 2':
+    temp_button_list = interface.lstCAM2_PTZBtns + interface.lstCAM2_PresetBtns + interface.lstCAM2_SpeedBtns
+
+    if (value == 'Off') or (value == 'Green'):
+      interface.btnCAM2_OnAir.SetState(0)
+      interface.btnCAM2_OnAir.SetVisible(False)
+
+      for single_button in temp_button_list:
+        single_button.SetEnable(True)
+        single_button.SetState(0)
+
+    elif (value == 'Red') or (value == 'Red & Green'):
+      interface.btnCAM2_OnAir.SetBlinking('Fast', [0, 1])
+      interface.btnCAM2_OnAir.SetVisible(True)
+
+      for single_button in temp_button_list:
+        single_button.SetEnable(False)
+        single_button.SetState(2)
+
+  if qualifier['Input'] == 'HDMI 2':
+    if (value == 'Off') or (value == 'Green'):
+      interface.btnPlayback_OnAir.SetState(0)
+      interface.btnPlayback_OnAir.SetVisible(False)
+
+    elif (value == 'Red') or (value == 'Red & Green'):
+      interface.btnPlayback_OnAir.SetBlinking('Fast', [0, 1])
+      interface.btnPlayback_OnAir.SetVisible(True)
+
+#end function (TallyReceivedDataHandler)
+
+tally.SubscribeStatus('Tally', None, TallyReceivedDataHandler)
 
 
 ################################################
@@ -450,6 +517,14 @@ cam2.SubscribeStatus('ConnectionStatus', None, Cam2ReceivedDataHandler)
 def InitializeAll():
   DebugPrint('devices.py/InitializeAll', 'Attempting to connect to Carbonite switcher..', 'Debug')
   carbonite.Connect()
+
+  result = tally.StartListen()
+  if result == 'Listening':
+    DebugPrint('devices.py/InitializeAll', 'TSL UMD Tally Driver is listening on {}/TCP..'.format(tally.IPPort), 'Info')
+
+  else:
+    DebugPrint('devices.py/InitializeAll', 'TSL UMD Tally Driver is NOT LISTENING! Return status was: [{}]'.format(result), 'Error')
+
 
   DebugPrint('devices.py/InitializeAll', 'Attempting to connect to DXP 88 HD device..', 'Debug')
   matrix.Connect()

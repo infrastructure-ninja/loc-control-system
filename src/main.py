@@ -13,9 +13,12 @@ DebugPrint('main.py', '=========================================================
 import devices
 import interface
 
+
 def initialize():
     devices.InitializeAll()
     interface.initialize_all()
+
+
 # end function (Initialize)
 
 

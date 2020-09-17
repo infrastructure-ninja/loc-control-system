@@ -10,7 +10,7 @@ config = ConfigManager('configuration.json')
 def DebugPrint(strFunctionName, strMessage, strMessageLevel = 'Debug' ):
 
     try:
-        intMessageLevel = {'Debug': 0, 'Info': 1, 'Warn': 2, 'Error': 3}[strMessageLevel]
+        intMessageLevel = {'Trace': 0, 'Debug': 1, 'Info': 2, 'Warn': 3, 'Error': 4}[strMessageLevel]
 
         if DebugLevel <= intMessageLevel:
             print ('[{}] [{}] {}'.format(strMessageLevel, strFunctionName, strMessage))
@@ -41,7 +41,7 @@ def ConvertSecondsToTimeCode(seconds):
 class DummyDriver:
     def __init__(self, friendly_name):
         self.friendly_name = friendly_name
-        print('DUMMY DRIVER INITIALIZING: ', self.friendly_name)
+        DebugPrint('utilities/DummyDriver', 'Initializing Dummy Driver for -> [{}]..', self.friendly_name)
 
     def Connect(self, *args, **kwargs):
         pass
@@ -57,3 +57,6 @@ class DummyDriver:
 
     def ReadStatus(self, *args, **kwargs):
         pass
+
+    def StartListen(selfs, *args, **kwargs):
+        return 'DUMMY DRIVER LOADED'
