@@ -3,34 +3,51 @@
         "presets": {
             "preset_1_enabled": true,
             "preset_1_name": "Reading",
-            "preset_1_midi_trigger": "c4",
             "preset_1_steps": {
                 "1_enabled": true,
-                "1_data": "device:cam1:RecallPreset:1",
+                "1_data": "device:cam1:PresetRecall:1:None",
                 "2_enabled": true,
-                "2_data": "device:carbonite:MLEPresetSource:Cam 1",
+                "2_data": "device:carbonite:MLEPresetSource:HDMI 1:None",
                 "3_enabled": true,
-                "3_data": "system:key1:onpreview"
+                "3_data": "device:carbonite:KeySource:Cam 1:Keyer:int:1",
+                "4_enabled": true,
+                "4_data": "device:carbonite:KeyOnPreview:Off:Keyer:int:2",
+                "5_enabled": true,
+                "5_data": "device:carbonite:KeyOnPreview:On:Keyer:int:1"
+            },
+            "preset_2_enabled": true,
+            "preset_2_name": "Lords Prayer",
+            "preset_2_steps": {
+                "1_enabled": true,
+                "1_data": "device:cam1:PresetRecall:1:None",
+                "2_enabled": true,
+                "2_data": "device:carbonite:MLEPresetSource:Cam 1:None",
+                "3_enabled": true,
+                "3_data": "device:carbonite:KeySource:HDMI 1:Keyer:int:2",
+                "4_enabled": false,
+                "4_data": "device:carbonite:KeyOnPreview:Off:Keyer:int:1",
+                "5_enabled": true,
+                "5_data": "device:carbonite:KeyOnPreview:On:Keyer:int:2"
             }
         },
         "interface": {
             "quickbuttons": {
                 "button_1_enabled": true,
-                "button_1_name": "CUT",
-                "button_1_function": "device:carbonite:Cut:None:None",
-                "button_1_color": "yellow",
+                "button_1_name": "Load Preset READING",
+                "button_1_function": "preset:1",
+                "button_1_color": "grey",
                 "button_2_enabled": true,
-                "button_2_name": "Key1 ON",
-                "button_2_function": "device:carbonite:KeyOnPreview:On:Keyer:int:1",
-                "button_2_color": "red",
+                "button_2_name": "Load Preset LORDS PRAYER",
+                "button_2_function": "preset:2",
+                "button_2_color": "blue",
                 "button_3_enabled": true,
                 "button_3_name": "Key1 OFF",
                 "button_3_function": "device:carbonite:KeyOnPreview:Off:Keyer:int:1",
-                "button_3_color": "green",
+                "button_3_color": "purple",
                 "button_4_enabled": true,
                 "button_4_name": "CAM 2 Control",
                 "button_4_function": "ui:popup:POP - CAM2-Control",
-                "button_4_color": "blue"
+                "button_4_color": "purple"
             },
             "mainmenu": {
                 "r1c1_enabled": true,

@@ -27,6 +27,8 @@ import utilities
 # The background button
 btnBackground = Button(devices.TouchPanel, 9)
 
+# The "Next Preset" label
+lblNextPreset = Label(devices.TouchPanel, 109)
 
 # MENU and QuickButtons
 btnMainMenu = Button(devices.TouchPanel, 16)
@@ -137,6 +139,9 @@ def initialize_all():
     devices.TouchPanel.ShowPopup('POP - Main Menu')
     devices.system_states.Set('ActivePopup', 'POP - Main Menu')
 
+    # FIXME - we really should convert this to a system state
+    lblNextPreset.SetText('n/a')
+
     # We want these things hidden until they are programmatically shown
     lvlPlayback_ClipPosition.SetVisible(False)
     lblPlaybackTimeCodeRemaining.SetVisible(False)
@@ -199,7 +204,7 @@ def initialize_all():
 
 
     # Set our "quick sidebar buttons" color based on how they are defined in the configuration
-    button_color_map = {'blue': 0, 'green': 2, 'red': 3, 'white': 4, 'yellow': 5, 'gray': 6}
+    button_color_map = {'blue': 0, 'green': 2, 'red': 3, 'white': 4, 'yellow': 5, 'gray': 6, 'grey': 6}
     init_button_color_dict = {
         btnQuickButton1: 'interface/quickbuttons/button_1_color',
         btnQuickButton2: 'interface/quickbuttons/button_2_color',
@@ -208,9 +213,16 @@ def initialize_all():
     }
 
     for button, config_key in init_button_color_dict.items():
-        button.SetState(button_color_map[
-            utilities.config.get_value(config_key, default_value='blue', cast_as='string')]
-                        )
+        button_color = utilities.config.get_value(config_key, default_value='blue', cast_as='string')
+
+        if button_color not in button_color_map:
+            DebugPrint('interface.py/initialize_all',
+                       'Invalid color specified in config file: [{}]. Defaulting to blue!'.format(config_key),
+                       'Warn')
+
+            button_color = 'blue'
+
+        button.SetState(button_color_map[button_color])
 
 
     # Show/Hide our Camera UI buttons based on whether the camera is disabled in the configuration
@@ -288,20 +300,20 @@ def MainMenuButtonsPressed(button, state):
         devices.system_states.Set('ActivePopup', 'POP - Main Menu')
 
     elif button is btnQuickButton1:
-        execute_command(button, utilities.config.get_value(
-            'interface/quickbuttons/button_1_function', default_value=None))
+        execute_command(utilities.config.get_value(
+            'interface/quickbuttons/button_1_function', default_value=None), button)
 
     elif button is btnQuickButton2:
-        execute_command(button, utilities.config.get_value(
-            'interface/quickbuttons/button_2_function', default_value=None))
+        execute_command(utilities.config.get_value(
+            'interface/quickbuttons/button_2_function', default_value=None), button)
 
     elif button is btnQuickButton3:
-        execute_command(button, utilities.config.get_value(
-            'interface/quickbuttons/button_3_function', default_value=None))
+        execute_command(utilities.config.get_value(
+            'interface/quickbuttons/button_3_function', default_value=None), button)
 
     elif button is btnQuickButton4:
-        execute_command(button, utilities.config.get_value(
-            'interface/quickbuttons/button_4_function', default_value=None))
+        execute_command(utilities.config.get_value(
+            'interface/quickbuttons/button_4_function', default_value=None), button)
 
 #end function (MainMenuButtonsPressed)
 
@@ -648,14 +660,14 @@ def cam2_buttons_pressed_released(button, state):
 #end function (cam2_buttons_pressed_released)
 
 
-def execute_command(button, macro_string):
+def execute_command(macro_string, button = None):
 
     #    device:<object>:<command>:<value>
     #    ui:popup:<name>
     #    macro:<name>
     regex_ui = re.compile(r"^(ui:popup):(.*?)$")
     regex_device = re.compile(r"^(device):(.*?):(.*?):(.*?):(.*?)(?::(int|str):(.*?)){0,1}$")
-    regex_macro = re.compile(r"^(macro):(.*)$")
+    regex_preset = re.compile(r"^(preset):(.*)$")
 
     #ui:popup:POP - CAM1 - Control
     if regex_ui.match(macro_string):
@@ -671,8 +683,8 @@ def execute_command(button, macro_string):
     elif regex_device.match(macro_string):
         p = regex_device.match(macro_string)
         if p.group(4):
-            if True is True:
-            #try:
+
+            try:
                 driver_object = devices.device_objects[p.group(2)]
                 driver_command = p.group(3)
 
@@ -682,12 +694,14 @@ def execute_command(button, macro_string):
                 else:
                     driver_value = p.group(4)
 
-                if p.group(5) and p.group(6) and p.group(7):
-                    if p.group(6) == 'int':
-                        qualifier = {p.group(5): int(p.group(7))}
 
-                    elif p.group(6) == 'str':
-                        qualifier = {p.group(5): p.group(7)}
+                if p.group(5) and p.group(5).lower() != 'none':
+                    if p.group(6) and p.group(7):
+                        if p.group(6) == 'int':
+                            qualifier = {p.group(5): int(p.group(7))}
+
+                        elif p.group(6) == 'str':
+                            qualifier = {p.group(5): p.group(7)}
 
                 else:
                         qualifier = None
@@ -699,18 +713,76 @@ def execute_command(button, macro_string):
                 # Run our driver_command
                 driver_object.Set(driver_command, driver_value, qualifier)
 
-            #except:
-            #    DebugPrint('execute_button_macro/regex_device',
-            #               'An error occurred sending a command to driver object. [{}]'.format(macro_string),
-            #               'Error')
+            except:
+                DebugPrint('execute_button_macro/regex_device',
+                           'An error occurred sending a command to driver module. [{}]'.format(macro_string),
+                           'Error')
 
         else:
             DebugPrint('execute_button_macro/regex_device', 'Attempted to handle a malformed command statement: [{}]'.format(macro_string),
                        'Error')
 
-    elif regex_macro.match(macro_string):
-        pass
+    elif regex_preset.match(macro_string):
+        p = regex_preset.match(macro_string)
+        DebugPrint('execute_button_macro/preset', 'We are loading macro #[{}] [{}]'.
+                   format(p.group(2), macro_string))
+
+        execute_preset(int(p.group(2)))
 
     else:
-        DebugPrint('execute_button_macro', 'UNRECOGNIZED MACRO STRING! Button: [{}] Running with: [{}]'.format(button.Name, macro_string), 'Error')
+        if button is not None:
+            DebugPrint('execute_button_macro', 'UNRECOGNIZED MACRO STRING! Button: [{}] Attempted to parse: [{}]'.
+                       format(button.Name, macro_string), 'Error')
+
+        else:
+            DebugPrint('execute_button_macro', 'UNRECOGNIZED MACRO STRING! Attempted to parse: [{}]'.
+                       format(macro_string), 'Error')
+
 #end function (execute_button_macro)
+
+
+def execute_preset(preset_number):
+    if utilities.config.get_value('presets/preset_{}_enabled'.format(preset_number),
+                                  default_value=False, cast_as='boolean') is True:
+
+        preset_name = utilities.config.get_value('presets/preset_{}_name'.format(preset_number),
+                                  default_value='Un-named', cast_as='string')
+
+        DebugPrint('execute_preset/{}/{}'.format(preset_number, preset_name),
+                   'Preset starting execution..', 'Info')
+
+        preset_index = 0
+        while preset_index < 100:   # We don't want this loop to run away - 100 steps should be enough?
+            preset_index += 1
+
+            current_step_enabled = utilities.config.get_value(
+                'presets/preset_{}_steps/{}_enabled'.format(preset_number, preset_index),
+                default_value=False, cast_as='boolean')
+
+            current_step_data = utilities.config.get_value(
+                'presets/preset_{}_steps/{}_data'.format(preset_number, preset_index),
+                default_value='None', cast_as='string')
+
+            if ((current_step_enabled is False) and (current_step_data == 'None')):
+                DebugPrint('execute_preset/{}/{}'.format(preset_number, preset_name),
+                           'Step #{} is not present, so we are done. Execution completed!'.
+                           format(preset_index), 'Info')
+
+                break
+
+            elif current_step_enabled is False:
+                DebugPrint('execute_preset/{}/{}'.format(preset_number, preset_name),
+                           'Skipping step #{} as it is disabled: [{}]'.
+                           format(preset_index, current_step_data), 'Debug')
+                continue
+
+            # If we get here then we've got valid preset data, AND we're set as enabled. Let's execute!
+            else:
+                DebugPrint('execute_preset/{}/{}'.format(preset_number, preset_name),
+                           'Execute step #{}'.format(preset_index), 'Debug')
+
+                execute_command(current_step_data)
+
+        #FIXME - we really should convert this to a system state
+        lblNextPreset.SetText(preset_name)
+#end function (execute_preset)

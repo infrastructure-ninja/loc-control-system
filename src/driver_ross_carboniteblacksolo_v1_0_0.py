@@ -120,9 +120,8 @@ class DeviceClass:
             self.AddMatchString(re.compile(b'\xba\xd2\xac\xe5\x10\x00[\xc9\xca]\x00\x08\x00(\x0D\xFE|\x0D\xFF|\x0E\x00|\x0E\x01|\x0E\x02|\x0E\x03)\x04([\x00-\xFF]{4})'), self.__MatchAuxSource, None)
             self.AddMatchString(re.compile(b'\xba\xd2\xac\xe5\x10\x00[\xc9\xca]\x00\x08\x00(\x09\x92|\x09\x96|\x09\x9a|\x09\x9e)\x04([\x00-\xFF]{4})'), self.__MatchKeyerStatus, None)
             self.AddMatchString(re.compile(b'\xba\xd2\xac\xe5\x10\x00\xcd\x00\x0a\x00\x09\x90(\x00[\x00-\x04])\x04\x00\x00\x00([\x00-\xFF])'), self.__MatchNextTransitionLayers, 'SingleLayer')
-            self.AddMatchString(re.compile(b'\xba\xd2\xac\xe5\x10\x00\xca\x00\x18\x00\x09\x90\x14\x00\x00\x00([\x00-x01])\x00\x00\x00([\x00-x01])\x00\x00\x00([\x00-x01])\x00\x00\x00([\x00-x01])\x00\x00\x00([\x00-x01])'), self.__MatchNextTransitionLayers, 'AllLayers')
+            self.AddMatchString(re.compile(b'\xba\xd2\xac\xe5\x10\x00[\xc9\xca]\x00\x18\x00\x09\x90\x14\x00\x00\x00([\x00-x01])\x00\x00\x00([\x00-x01])\x00\x00\x00([\x00-x01])\x00\x00\x00([\x00-x01])\x00\x00\x00([\x00-x01])'), self.__MatchNextTransitionLayers, 'AllLayers')
             self.AddMatchString(re.compile(b'\xba\xd2\xac\xe5\x10\x00[\xc9\xca][\x00-\xFF][\x00-\xFF]\x00\x1e\xe6([\x00-\xFF])([\x20-\x7f]*?)\x00(\xba\xd2){0,1}'), self.__MatchProductName, None)
-
 
     def SetKeyOnPreview(self, value, qualifier):
         # Incoming value == "On", "Off", or "Toggle"
@@ -184,9 +183,6 @@ class DeviceClass:
 
             keyer_onair_state = self.ReadStatus('KeyerStatus', {'Keyer': keyer_number})
             key_layer_inclusion_state = self.ReadStatus('NextTransitionLayers', {'Layer': layer_name})
-
-            print('NEXT TRANSITION LAYER ->', self.ReadStatus('NextTransitionLayers', {'Layer': layer_name}))
-            print('KEYER STATUS          ->', self.ReadStatus('KeyerStatus', {'Keyer': keyer_number}))
 
             try:
                 self.WriteStatus('KeyOnPreview',
@@ -274,7 +270,6 @@ class DeviceClass:
             self.WriteStatus('MLEPresetSource', self.VideoSourceNamesByID[value])
         else:
             self.WriteStatus('MLEPresetSource', 'Unknown Source: {}'.format(value))
-
 
 
     def SetKeySource(self, value, qualifier):
@@ -444,7 +439,7 @@ class DeviceClass:
 
 
     def UpdateNextTransitionLayers(self, value, qualifier):
-        UpdateTransitionLayersCmd =   pack('>HHHBHBH', 0xBAD2, 0xACE5, 0x0010, 0x49, 0x0003, 0x00, 0x990)
+        UpdateTransitionLayersCmd = pack('>HHHBHBH', 0xBAD2, 0xACE5, 0x0010, 0x49, 0x0003, 0x00, 0x990)
         self.__UpdateHelper('NextTransitionLayers', UpdateTransitionLayersCmd, value, qualifier)
 
 
@@ -476,10 +471,6 @@ class DeviceClass:
             self.WriteStatus('NextTransitionLayers', key4_value, {'Layer': 'Key 4'})
 
 
-
-####################
-
-
     def UpdateProductName(self, value, qualifier):
         ProductNameOID = 0x1EE6
         UpdateProductNameString =   pack('>HHHBHBH', 0xBAD2, 0xACE5, 0x0010, 0x49, 0x0003, 0x00, ProductNameOID)
@@ -488,20 +479,15 @@ class DeviceClass:
     def __MatchProductName(self, match, tag):
         EncodedProductName = match.group(2)
 
-        #tmp = b''
-        #tmp.join (BinaryProductName)
         try:
             ProductName = EncodedProductName.decode('ascii')
         
         except:
-            print('COULD NOT DECODE THIS: [{}]'.format(EncodedProductName))
-        
             ProductName = 'COULD NOT DECODE'
         
-        #ProgramLog(ProductName, 'info')
         self.WriteStatus('ProductName', ProductName)
-#        except:
-#            ProgramLog('COULD NOT PARSE PRODUCT NAME!', 'error')
+
+
 ################################
 
     def SendHandshake(self):

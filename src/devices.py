@@ -30,7 +30,7 @@ TouchPanel = UIDevice('ExtronPanel')
 import interface
 
 # This dictionary will store all of our device objects, so they can be accessed
-# later via our "scripting/macro" mechanism.
+# later via our "preset/macro" mechanism.
 device_objects = {}
 
 # "system_states" is a custom driver module that provides a way to store various
@@ -90,7 +90,7 @@ system_states.SubscribeStatus('KeyOnPreview', None, SystemStatesCallbackHandler)
 
 
 if utilities.config.get_value('devices/switcher/enabled', default_value=False, cast_as='boolean'):
-  import ross_carbonite_solo_frame as CarboniteSolo109
+  import driver_ross_carboniteblacksolo_v1_0_0 as CarboniteSolo109
   carbonite = GetConnectionHandler(
     CarboniteSolo109.EthernetClass(
       utilities.config.get_value('devices/switcher/ipaddress'),
@@ -561,22 +561,22 @@ def InitializeAll():
     DebugPrint('devices.py/InitializeAll', 'TSL UMD Tally Driver is NOT LISTENING! Return status was: [{}]'.format(result), 'Error')
 
 
-  DebugPrint('devices.py/InitializeAll', 'Attempting to connect to DXP 88 HD device..', 'Debug')
+  DebugPrint('devices.py/InitializeAll', 'Attempting to connect to DXP 88 HD device..', 'Info')
   matrix.Connect()
 
-  DebugPrint('devices.py/InitializeAll', 'Attempting to connect to SMD101 device..', 'Debug')
+  DebugPrint('devices.py/InitializeAll', 'Attempting to connect to SMD101 device..', 'Info')
   smd101.Connect()
 
-  DebugPrint('devices.py/InitializeAll', 'Attempting to connect to SMP351 device..', 'Debug')
+  DebugPrint('devices.py/InitializeAll', 'Attempting to connect to SMP351 device..', 'Info')
   smp351.Connect()
 
-  DebugPrint('devices.py/InitializeAll', 'Attempting to connect to Yamaha TF5 device..', 'Debug')
+  DebugPrint('devices.py/InitializeAll', 'Attempting to connect to Yamaha TF5 device..', 'Info')
   soundboard.Connect()
 
-  DebugPrint('devices.py/InitializeAll', 'Attempting to connect to Camera #1 device..', 'Debug')
+  DebugPrint('devices.py/InitializeAll', 'Attempting to connect to Camera #1 device..', 'Info')
   cam1.Connect()
 
-  DebugPrint('devices.py/InitializeAll', 'Attempting to connect to Camera #2 device..', 'Debug')
+  DebugPrint('devices.py/InitializeAll', 'Attempting to connect to Camera #2 device..', 'Info')
   cam2.Connect()
 
 # Set our system state for the starting camera movement speed

@@ -18,22 +18,24 @@ import datetime
 
 from helper_configmgr import ConfigManager
 
-DebugLevel = 0
+DebugLevel = 1
+#DebugLevel = 0
 
 config = ConfigManager('configuration.json')
 
 
-def DebugPrint(strFunctionName, strMessage, strMessageLevel = 'Debug' ):
+def DebugPrint(strFunctionName, strMessage, strMessageLevel='Debug'):
 
     try:
-        intMessageLevel = {'Trace': 0, 'Debug': 1, 'Info': 2, 'Warn': 3, 'Error': 4}[strMessageLevel]
+        intMessageLevel = {'Trace': 0, 'Debug': 1, 'Info': 2, 'Warn': 3, 'Warning': 3, 'Error': 4}[strMessageLevel]
 
         if DebugLevel <= intMessageLevel:
-            print ('[{}] [{}] {}'.format(strMessageLevel, strFunctionName, strMessage))
+            print('[{}] [{}] {}'.format(strMessageLevel, strFunctionName, strMessage))
     
     except KeyError:
         return False
 #end function (DebugPrint)
+
 
 def ConvertTimecodeToSeconds(timecode):
 
@@ -41,6 +43,7 @@ def ConvertTimecodeToSeconds(timecode):
         hours, minutes, seconds = timecode.split(':')
         seconds = (int(hours) * 60 * 60) + (int(minutes) * 60) + int(seconds)
         return seconds
+
     except:
         return 0
 #end function (ConvertTimecodeToSeconds)
@@ -49,6 +52,7 @@ def ConvertTimecodeToSeconds(timecode):
 def ConvertSecondsToTimeCode(seconds):
     try:
         return str(datetime.timedelta(seconds=seconds))
+
     except:
         return '00:00:00'
 #end function (ConvertSecondsToTimeCode)
@@ -74,5 +78,5 @@ class DummyDriver:
     def ReadStatus(self, *args, **kwargs):
         pass
 
-    def StartListen(selfs, *args, **kwargs):
+    def StartListen(*args, **kwargs):
         return 'DUMMY DRIVER LOADED'
