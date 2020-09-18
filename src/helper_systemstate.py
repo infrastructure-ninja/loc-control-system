@@ -1,9 +1,20 @@
-from extronlib.interface import EthernetClientInterface
-from extronlib.system import ProgramLog
-from extronlib.system import Wait
+# "LoC Audio/Visual Control System for Extron ControlScript"
+# Copyright (C) 2020 Joel D. Caturia <jcaturia@katratech.com>
+#
+# "LoC Control" is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# "LoC Control" is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this code.  If not, see <https://www.gnu.org/licenses/>.
 
 import re
-from struct import pack, unpack
 
 class DeviceClass:
 
@@ -26,6 +37,7 @@ class DeviceClass:
             #'ConnectionStatus': {'Status': {}},
             'ActivePopup': {'Status': {}},
             'CameraSpeed': {'Parameters': ['Camera Number'], 'Status': {}},
+            'KeyOnPreview': {'Parameters': ['Keyer'], 'Status': {}}
         }
 
 
@@ -35,9 +47,8 @@ class DeviceClass:
     def SetCameraSpeed(self, value, qualifier):
         self.WriteStatus('CameraSpeed', value, qualifier)
 
-    def UpdateActivePopup(self, value, qualifier):
-        tmp = self.ReadStatus(value)
-        self.WriteStatus(value, tmp)
+    def SetKeyOnPreview(self, value, qualifier):
+        self.WriteStatus('KeyOnPreview', value, qualifier)
 
 
 ###################################################################
@@ -65,7 +76,6 @@ class DeviceClass:
 
 
     def OnConnected(self):
-        self.SendHandshake()
         self.connectionFlag = True
         self.WriteStatus('ConnectionStatus', 'Connected')
         self.counter = 0
@@ -74,7 +84,6 @@ class DeviceClass:
         self.WriteStatus('ConnectionStatus', 'Disconnected')
         self.connectionFlag = False
         self.HandshakeCompleted = False
-        #self.KeepAliveTimerObject.Cancel()
 
     ######################################################
     # RECOMMENDED not to modify the code below this point
@@ -206,19 +215,19 @@ class DeviceClass:
         return True
 
 
-class EthernetClass(EthernetClientInterface, DeviceClass):
-
-    def __init__(self, Hostname, IPPort, Protocol='TCP', Model=None):
-        EthernetClientInterface.__init__(self, Hostname, IPPort)
-        self.ConnectionType = 'Ethernet'
-        DeviceClass.__init__(self)
-        # Check if Model belongs to a subclass
-        if len(self.Models) > 0:
-            if Model not in self.Models:
-                print('Model mismatch')
-            else:
-                self.Models[Model]()
-
-    def Disconnect(self):
-        EthernetClientInterface.Disconnect(self)
-        self.OnDisconnected()
+# class EthernetClass(EthernetClientInterface, DeviceClass):
+#
+#     def __init__(self, Hostname, IPPort, Protocol='TCP', Model=None):
+#         EthernetClientInterface.__init__(self, Hostname, IPPort)
+#         self.ConnectionType = 'Ethernet'
+#         DeviceClass.__init__(self)
+#         # Check if Model belongs to a subclass
+#         if len(self.Models) > 0:
+#             if Model not in self.Models:
+#                 print('Model mismatch')
+#             else:
+#                 self.Models[Model]()
+#
+#     def Disconnect(self):
+#         EthernetClientInterface.Disconnect(self)
+#         self.OnDisconnected()

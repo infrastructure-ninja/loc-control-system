@@ -1,10 +1,24 @@
-from extronlib.device import ProcessorDevice, UIDevice
-from extronlib.system import Wait, Timer
+# "LoC Audio/Visual Control System for Extron ControlScript"
+# Copyright (C) 2020 Joel D. Caturia <jcaturia@katratech.com>
+#
+# "LoC Control" is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# "LoC Control" is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this code.  If not, see <https://www.gnu.org/licenses/>.
 
-# UNUSED?
-#from extronlib import event
+from extronlib.device import ProcessorDevice, UIDevice
+from extronlib.system import Timer
 
 from helper_connectionhandler import GetConnectionHandler
+from helper_systemstate import DeviceClass
 
 from utilities import DummyDriver
 from utilities import DebugPrint
@@ -15,14 +29,36 @@ TouchPanel = UIDevice('ExtronPanel')
 
 import interface
 
+# This dictionary will store all of our device objects, so they can be accessed
+# later via our "scripting/macro" mechanism.
 device_objects = {}
 
-from helper_systemstate import DeviceClass
+# "system_states" is a custom driver module that provides a way to store various
+# system states and trigger callbacks when they change.
 system_states = DeviceClass()
 
 def SystemStatesCallbackHandler(command, value, qualifier):
-  #FIXME - this could be more compact and pythonic, when you get bored of everything else
-  if command == 'CameraSpeed' and qualifier['Camera Number'] == 1:
+  if command == 'KeyOnPreview':
+    DebugPrint('devices.py/SystemStatesCallbackHandler',
+               '[{}] [{}] [{}]'.format(command, value, qualifier), 'Trace')
+
+    if qualifier['Keyer'] == 1:
+      if value == 'On':
+        interface.btnPreview_Key1.SetState(1)
+        interface.btnPreview_Key1.SetBlinking('Fast', [0, 1])
+      else:
+        interface.btnPreview_Key1.SetState(0)
+
+    elif qualifier['Keyer'] == 2:
+      if value == 'On':
+        interface.btnPreview_Key2.SetState(1)
+        interface.btnPreview_Key2.SetBlinking('Fast', [0, 1])
+      else:
+        interface.btnPreview_Key2.SetState(0)
+
+
+  # FIXME - this could be more compact and pythonic, when you get bored of everything else
+  elif command == 'CameraSpeed' and qualifier['Camera Number'] == 1:
     button_map = {
       'Slow': interface.btnCAM1_Speed1,
       'Medium': interface.btnCAM1_Speed2,
@@ -50,6 +86,7 @@ def SystemStatesCallbackHandler(command, value, qualifier):
 
 system_states.SubscribeStatus('ActivePopup', None, SystemStatesCallbackHandler)
 system_states.SubscribeStatus('CameraSpeed', None, SystemStatesCallbackHandler)
+system_states.SubscribeStatus('KeyOnPreview', None, SystemStatesCallbackHandler)
 
 
 if utilities.config.get_value('devices/switcher/enabled', default_value=False, cast_as='boolean'):
@@ -156,7 +193,7 @@ device_objects.update({'cam2': cam2})
 
 
 ################################################
-##### Ross Video Carbonite Black Frame 109 #####
+##### Ross Video Carbonite Black Solo Frame 109 #####
 ################################################
 def CarboniteReceivedDataHandler(command, value, qualifier):
 
@@ -166,6 +203,9 @@ def CarboniteReceivedDataHandler(command, value, qualifier):
 
       for update in lstCarboniteStatusSubscriptions:
         if update == 'ConnectionStatus': continue  # ConnectionStatus does not support Updates
+        DebugPrint('devices.py/CarboniteReceivedDataHandler',
+                   'Updating status for command: [{}]'.format(update), 'Trace')
+
         carbonite.Update(update)
 
     elif value == 'Disconnected':
@@ -210,46 +250,41 @@ def CarboniteReceivedDataHandler(command, value, qualifier):
       keyer1_source_map[value].SetBlinking('Medium', [2,0])
 
 
-  # Set our "Key 1" and "Key 2" buttons to show what keys are active for the next transition
-  # We use blinking (SetBlinking) to make sure they're noticeable on the screen.
   elif command == 'NextTransitionLayers':
     DebugPrint('devices.py/CarboniteReceivedDataHandler',
                 'Received Carbonite Driver Update: [{0}] [{1}] [{2}]'.format(command, value, qualifier), 'Debug')
 
-    carbonite.Update('KeyerStatus')
-
-    #FIXME - this seems vestigial?
-    # This dict map allows for easy adjustment of additional/different button states
-    #keyer_button_state_map = {'Off': 0, 'On': 2}
-
-    if ('Layer' in qualifier) and qualifier['Layer'] == 'Key 1':
-      if value == 'On':
-        interface.btnPreview_Key1.SetState(1)
-        interface.btnPreview_Key1.SetBlinking('Fast', [0, 1])
-      else:
-        interface.btnPreview_Key1.SetState(0)
-
-    elif ('Layer' in qualifier) and qualifier['Layer'] == 'Key 2':
-      if value == 'On':
-        interface.btnPreview_Key2.SetState(1)
-        interface.btnPreview_Key2.SetBlinking('Fast', [0, 1])
-      else:
-        interface.btnPreview_Key2.SetState(0)
+    carbonite.Update('KeyOnPreview')
 
   elif command == 'KeyerStatus':
     DebugPrint('devices.py/CarboniteReceivedDataHandler',
                 'Received Carbonite Driver Update: [{0}] [{1}] [{2}]'.format(command, value, qualifier), 'Debug')
 
-    carbonite.Update('NextTransitionLayers')
+    carbonite.Update('KeyOnPreview')
+
+  # Set our "Key 1" and "Key 2" buttons to show what keys are active for the next transition
+  # We use blinking (SetBlinking) to make sure they're noticeable on the screen.
+  elif command == 'KeyOnPreview':
+    DebugPrint('devices.py/CarboniteReceivedDataHandler',
+                'Received Carbonite Driver Update: [{0}] [{1}] [{2}]'.format(command, value, qualifier), 'Debug')
+
+    keyer_button = {1: interface.btnPreview_Key1, 2:  interface.btnPreview_Key2}[qualifier['Keyer']]
+
+    if value == 'On':
+      keyer_button.SetState(1)
+      keyer_button.SetBlinking('Fast', [0,1])
+
+    else:
+      keyer_button.SetState(0)
 
   else:
-    DebugPrint('devices.py/CarboniteReceivedDataHandler', 'Unhandled Carbonite Driver Data: [{0}] [{1}] [{2}]'.format(command, value, qualifier), 'Debug')
+    DebugPrint('devices.py/CarboniteReceivedDataHandler', 'Unhandled Carbonite Driver Data: [{0}] [{1}] [{2}]'.format(command, value, qualifier), 'Trace')
 
 #end function (CarboniteReceivedDataHandler)
 
 lstCarboniteStatusSubscriptions = ['ConnectionStatus', 'MLEBackgroundSource', 'MLEPresetSource',
                                 'KeySource', 'AuxSource', 'ProductName','NextTransitionLayers',
-                                'KeyerStatus']
+                                'KeyerStatus', 'KeyOnPreview']
 for status in lstCarboniteStatusSubscriptions:
   carbonite.SubscribeStatus(status, None, CarboniteReceivedDataHandler)
 

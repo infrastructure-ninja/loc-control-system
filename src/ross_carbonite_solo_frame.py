@@ -4,6 +4,7 @@ from extronlib.system import ProgramLog
 import re
 from struct import pack, unpack
 
+
 class DeviceClass:
 
     def __init__(self):
@@ -22,9 +23,7 @@ class DeviceClass:
         self.Models = {}
 
         self.HandshakeCompleted = False
-        self.__KeepAliveSeconds = 5
-        self.KeepAliveTimerObject = None
-        
+
         # These video source IDs are used in a lot of the switcher commands.
         # Putting them here keeps future updates easier.
         self.VideoSourceIDsByName = {
@@ -96,16 +95,13 @@ class DeviceClass:
         # "friendly name" of the video source from its ID number.
         self.VideoSourceNamesByID = {}
         for key, value in self.VideoSourceIDsByName.items():
-            self.VideoSourceNamesByID.update ( {value : key } )
+            self.VideoSourceNamesByID.update ({value : key })
 
 
         self.Commands = {
             'ConnectionStatus': {'Status': {}},
             'ProductName': {'Status': {}},
-
             #'RunMacro': {'Status': {}},
-            #'Transition': {'Parameters': ['Transition Style', 'Next Transition', 'Style', 'Background', 'Key 1', 'Key 2', 'Key 3', 'Key 4'], 'Status': {}},
-
             'Auto': {'Status': {}},
             'Cut': {'Status': {}},
             'KeySource': {'Parameters': ['Keyer'], 'Status': {}},
@@ -113,52 +109,125 @@ class DeviceClass:
             'AuxSource': {'Parameters': ['Aux Bus'], 'Status': {}},
             'MLEBackgroundSource': {'Parameters': ['Source'], 'Status': {}},
             'MLEPresetSource': {'Parameters': ['Source'], 'Status': {}},
-            #'NextTransition': {'Parameters': ['Style','Background', 'Key 1', 'Key 2', 'Key 3', 'Key4'], 'Status': {}},
             'NextTransitionLayers': {'Parameters': ['Layer'], 'Status': {}},
-            
-            
-            #'ClipProgress': {'Status': {}},
+            'KeyOnPreview': {'Parameters': ['Keyer'], 'Status': {}},
         }
 
-
         if self.Unidirectional == 'False':
-            #self.AddMatchString(re.compile(b'\xba\xd2\xac\xe5\x10\x00\xca\x00\x08\x00\x61\x62'), self.__MatchClipProgress, None)
             self.AddMatchString(re.compile(b'\xba\xd2\xac\xe5\x10\x00[\xc9\xca]\x00\x08\x00\x0e\x06\x04([\x00-\xFF]{4})'), self.__MatchMLEBackgroundSource, None)
             self.AddMatchString(re.compile(b'\xba\xd2\xac\xe5\x10\x00[\xc9\xca]\x00\x08\x00\x0e\x07\x04([\x00-\xFF]{4})'), self.__MatchMLEPresetSource, None)
             self.AddMatchString(re.compile(b'\xba\xd2\xac\xe5\x10\x00[\xc9\xca]\x00\x08\x00(\x0d[\xf6\xf7\xf8\xf9])\x04([\x00-\xFF]{4})'), self.__MatchKeySource, None)
             self.AddMatchString(re.compile(b'\xba\xd2\xac\xe5\x10\x00[\xc9\xca]\x00\x08\x00(\x0D\xFE|\x0D\xFF|\x0E\x00|\x0E\x01|\x0E\x02|\x0E\x03)\x04([\x00-\xFF]{4})'), self.__MatchAuxSource, None)
             self.AddMatchString(re.compile(b'\xba\xd2\xac\xe5\x10\x00[\xc9\xca]\x00\x08\x00(\x09\x92|\x09\x96|\x09\x9a|\x09\x9e)\x04([\x00-\xFF]{4})'), self.__MatchKeyerStatus, None)
-
-            #self.AddMatchString(re.compile(b'\xba\xd2\xac\xe5\x10\x00[\xc9\xca]\x00\x08\x00(\x09\x8d|\x09\x95|\x09\x99|\x09\x9d|\x09\xa1)\x04([\x00-\xFF]{4})'), self.__MatchNextTransitionLayers, None)
-
             self.AddMatchString(re.compile(b'\xba\xd2\xac\xe5\x10\x00\xcd\x00\x0a\x00\x09\x90(\x00[\x00-\x04])\x04\x00\x00\x00([\x00-\xFF])'), self.__MatchNextTransitionLayers, 'SingleLayer')
             self.AddMatchString(re.compile(b'\xba\xd2\xac\xe5\x10\x00\xca\x00\x18\x00\x09\x90\x14\x00\x00\x00([\x00-x01])\x00\x00\x00([\x00-x01])\x00\x00\x00([\x00-x01])\x00\x00\x00([\x00-x01])\x00\x00\x00([\x00-x01])'), self.__MatchNextTransitionLayers, 'AllLayers')
-
             self.AddMatchString(re.compile(b'\xba\xd2\xac\xe5\x10\x00[\xc9\xca][\x00-\xFF][\x00-\xFF]\x00\x1e\xe6([\x00-\xFF])([\x20-\x7f]*?)\x00(\xba\xd2){0,1}'), self.__MatchProductName, None)
 
+
+    def SetKeyOnPreview(self, value, qualifier):
+        # Incoming value == "On", "Off", or "Toggle"
+
+        if qualifier is not None and 'Keyer' in qualifier:
+            layer_name = {1: 'Key 1', 2: 'Key 2', 3: 'Key 3', 4: 'Key 4'}[qualifier['Keyer']]
+
+            # if the keyer is OFF-AIR and it is NOT INCLUDED -> key is OFF preview - to turn it ON send an ON
+            # if the keyer is ON-AIR and it is INCLUDED      -> key is OFF preview - to turn it ON send an OFF
+            if value == 'On':
+                if self.ReadStatus('KeyerStatus', qualifier) == 'Off-Air' and \
+                self.ReadStatus('NextTransitionLayers', {'Layer': layer_name}) == 'Not Included':
+
+                    self.Set('NextTransitionLayers', 'On', {'Layer': layer_name})
+
+                elif self.ReadStatus('KeyerStatus', qualifier) == 'On-Air' and \
+                self.ReadStatus('NextTransitionLayers', {'Layer': layer_name}) == 'Included':
+
+                    self.Set('NextTransitionLayers', 'Off', {'Layer': layer_name})
+
+            # if the keyer is ON-AIR and it is NOT INCLUDED  -> key is ON preview - to turn it OFF send an ON
+            # if the keyer is OFF-AIR and it is INCLUDED     -> key is ON preview - to turn it OFF send an OFF
+            elif value == 'Off':
+                if self.ReadStatus('KeyerStatus', qualifier) == 'On-Air' and \
+                self.ReadStatus('NextTransitionLayers', {'Layer': layer_name}) == 'Not Included':
+
+                    self.Set('NextTransitionLayers', 'On', {'Layer': layer_name})
+
+                elif self.ReadStatus('KeyerStatus', qualifier) == 'Off-Air' and \
+                self.ReadStatus('NextTransitionLayers', {'Layer': layer_name}) == 'Included':
+
+                    self.Set('NextTransitionLayers', 'Off', {'Layer': layer_name})
+
+            elif value == 'Toggle':
+                key_on_preview_status = self.ReadStatus('KeyOnPreview', qualifier)
+                if key_on_preview_status == 'On':
+                    self.Set('KeyOnPreview', 'Off', qualifier)
+
+                else:
+                    self.Set('KeyOnPreview', 'On', qualifier)
+        else:
+                ProgramLog('Invalid qualifier specified for Setting KeyOnPreview command')
+
+
+    def UpdateKeyOnPreview(self, value, qualifier):
+
+        # This is a tuple map that gets us the proper value out of the dictionary.
+        # if the keyer is ON-AIR and it is NOT INCLUDED  -> key is ON preview
+        # if the keyer is OFF-AIR and it is NOT INCLUDED -> key is OFF preview
+        # if the keyer is ON-AIR and it is INCLUDED      -> key is OFF preview
+        # if the keyer is OFF-AIR and it is INCLUDED     -> key is ON preview
+
+        key_on_preview_map = {('On-Air', 'Not Included'): 'On', ('Off-Air', 'Not Included'): 'Off',
+                              ('On-Air', 'Included')    : 'Off', ('Off-Air', 'Included'): 'On'}
+
+        if qualifier is not None and 'Keyer' in qualifier:
+            keyer_number = qualifier['Keyer']
+            layer_name = {1: 'Key 1', 2: 'Key 2', 3: 'Key 3', 4: 'Key 4'}[keyer_number]
+
+            keyer_onair_state = self.ReadStatus('KeyerStatus', {'Keyer': keyer_number})
+            key_layer_inclusion_state = self.ReadStatus('NextTransitionLayers', {'Layer': layer_name})
+
+            print('NEXT TRANSITION LAYER ->', self.ReadStatus('NextTransitionLayers', {'Layer': layer_name}))
+            print('KEYER STATUS          ->', self.ReadStatus('KeyerStatus', {'Keyer': keyer_number}))
+
+            try:
+                self.WriteStatus('KeyOnPreview',
+                                 key_on_preview_map[(keyer_onair_state, key_layer_inclusion_state)],
+                                 {'Keyer': keyer_number})
+
+            except KeyError:
+                pass
+
+        else:
+            # Recursively call ourselves to update all available keyers
+            # if the programmer does not specify the one they want
+            for x in [1, 2, 3, 4]:
+                self.Update('KeyOnPreview', {'Keyer': x})
+
+
     def SetAuto(self, value, qualifier):
-        # noinspection PyPep8Naming,SpellCheckingInspection
         AutoCmdString = pack('>HHBBBHBHBl', 0xBAD2, 0xACE5, 0x00, 0x10, 0x4A, 0x0008, 0x00, 0x98D, 0x04, 0x1)
         self.__SetHelper('Auto', AutoCmdString, value, qualifier)
+
 
     def SetCut(self, value, qualifier):
         CutCmdString = pack('>HHBBBHBHBl', 0xBAD2, 0xACE5, 0x00, 0x10, 0x4A, 0x0008, 0x00, 0x98C, 0x04, 0x1)
         self.__SetHelper('Auto', CutCmdString, value, qualifier)
 
 
-
     def SetMLEBackgroundSource(self, value, qualifier):
                 
         try:
             MLEBackgroundSourceValue = self.VideoSourceIDsByName[value]
-        
+
+            MLEBackgroundSourceOID = 0xE06
+
+            SetMLEBackgroundSourceCmdString = pack('>HHBBBHBHBl', 0xBAD2, 0xACE5, 0x00, 0x10, 0x4A, 0x0008, 0x00,
+                                               MLEBackgroundSourceOID, 0x04, MLEBackgroundSourceValue)
+
+            self.__SetHelper('MLEBackgroundSource', SetMLEBackgroundSourceCmdString, value, qualifier)
+
         except KeyError:
             ProgramLog('[SetMLEBackgroundSource] Invalid source name specified.', 'error')
 
-        MLEBackgroundSourceOID = 0xE06
-        
-        SetMLEBackgroundSourceCmdString = pack('>HHBBBHBHBl', 0xBAD2, 0xACE5, 0x00, 0x10, 0x4A, 0x0008, 0x00, MLEBackgroundSourceOID, 0x04, MLEBackgroundSourceValue)
-        self.__SetHelper('MLEBackgroundSource', SetMLEBackgroundSourceCmdString, value, qualifier)
 
     def UpdateMLEBackgroundSource(self, value, qualifier):
         
@@ -352,7 +421,7 @@ class DeviceClass:
 
         value = unpack('>l', match.group(2))[0]
         KeyerStatus = {0x00: 'Off-Air', 0x01: 'On-Air'}[value]
-        
+
         self.WriteStatus('KeyerStatus', KeyerStatus, {'Keyer': KeyerNumber})
 
 
@@ -380,46 +449,27 @@ class DeviceClass:
 
 
     def __MatchNextTransitionLayers(self, match, tag):
-
-        layer_state_map = {
-            ('On-Air', 0x01): 'Off', ('Off-Air', 0x01): 'On',
-            ('On-Air', 0x00): 'On', ('Off-Air', 0x00): 'Off'
-            }
+        layer_state_map = {0x01: 'Included', 0x00: 'Not Included'}
         layer_key_name_map = {0x0: 'BG', 0x1: 'Key 1', 0x2: 'Key 2', 0x3: 'Key 3', 0x4: 'Key 4'}
 
         if tag == 'SingleLayer':
-            #print('SINGLE LAYER -> MATCH GROUP 1: ->', match.group(1), '2 ->', match.group(2))
             layer_id = unpack('>H', match.group(1))[0]
             layer_value = unpack('>B', match.group(2))[0]
-            layer_value_swapped = {0: 1, 1: 0}[layer_value]
-
-            #FIXME - debug printing
-            #print('SINGLE PARAMETER MATCH! LAYER ID: [{}] LAYER VALUE: [{}]'.format(layer_id, layer_value, layer_value_swapped))
-
-            keyer_onair_status = self.ReadStatus('KeyerStatus', {'Keyer': layer_id})
-            layer_state = layer_state_map[(keyer_onair_status, layer_value_swapped)]
+            layer_state = layer_state_map[layer_value]
 
             self.WriteStatus('NextTransitionLayers', layer_state, {'Layer': layer_key_name_map[layer_id]})
 
         elif tag == 'AllLayers':
-           # bg_value   = layer_state_map[unpack('>B', match.group(1))[0]]
-
             keyer1_next_transition_value = unpack('>B', match.group(2))[0]
             keyer2_next_transition_value = unpack('>B', match.group(3))[0]
             keyer3_next_transition_value = unpack('>B', match.group(4))[0]
             keyer4_next_transition_value = unpack('>B', match.group(5))[0]
 
-            keyer1_onair_status = self.ReadStatus('KeyerStatus', {'Keyer': 1})
-            keyer2_onair_status = self.ReadStatus('KeyerStatus', {'Keyer': 2})
-            keyer3_onair_status = self.ReadStatus('KeyerStatus', {'Keyer': 3})
-            keyer4_onair_status = self.ReadStatus('KeyerStatus', {'Keyer': 4})
+            key1_value = layer_state_map[keyer1_next_transition_value]
+            key2_value = layer_state_map[keyer2_next_transition_value]
+            key3_value = layer_state_map[keyer3_next_transition_value]
+            key4_value = layer_state_map[keyer4_next_transition_value]
 
-            key1_value = layer_state_map[(keyer1_onair_status, keyer1_next_transition_value)]
-            key2_value = layer_state_map[(keyer2_onair_status, keyer2_next_transition_value)]
-            key3_value = layer_state_map[(keyer3_onair_status, keyer3_next_transition_value)]
-            key4_value = layer_state_map[(keyer4_onair_status, keyer4_next_transition_value)]
-
-            #self.WriteStatus('NextTransitionLayers', bg_value, {'Layer': 'BG'})
             self.WriteStatus('NextTransitionLayers', key1_value, {'Layer': 'Key 1'})
             self.WriteStatus('NextTransitionLayers', key2_value, {'Layer': 'Key 2'})
             self.WriteStatus('NextTransitionLayers', key3_value, {'Layer': 'Key 3'})
@@ -462,7 +512,6 @@ class DeviceClass:
         if self.HandshakeCompleted is False:
             HandshakeCmdString = b'\xba\xd2\xac\xe5\x00\x10\x4A\x00\x08\x00\xff\x03\x04\x00\x00\x00\x00'
 
-            #print('SENDING HANDSHAKE TO SWITCHER->', HandshakeCmdString)    
             self.Send(HandshakeCmdString)
             self.HandshakeCompleted = True                               
         
@@ -498,13 +547,12 @@ class DeviceClass:
         self.WriteStatus('ConnectionStatus', 'Connected')
         self.counter = 0
         
-        #self.KeepAliveTimerObject = Wait(self.__KeepAliveSeconds, self.__KeepAliveTimerHandler) 
 
     def OnDisconnected(self):
         self.WriteStatus('ConnectionStatus', 'Disconnected')
         self.connectionFlag = False
         self.HandshakeCompleted = False
-        #self.KeepAliveTimerObject.Cancel()
+
 
     ######################################################
     # RECOMMENDED not to modify the code below this point
@@ -638,7 +686,7 @@ class DeviceClass:
 
 class EthernetClass(EthernetClientInterface, DeviceClass):
 
-    def __init__(self, Hostname, IPPort, Protocol='TCP', Model=None):
+    def __init__(self, Hostname, IPPort, Model=None):
         EthernetClientInterface.__init__(self, Hostname, IPPort)
         self.ConnectionType = 'Ethernet'
         DeviceClass.__init__(self)

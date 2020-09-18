@@ -1,14 +1,32 @@
-from extronlib import event
-from extronlib.ui import Button, Label, Level  #,  Slider
+# "LoC Audio/Visual Control System for Extron ControlScript"
+# Copyright (C) 2020 Joel D. Caturia <jcaturia@katratech.com>
+#
+# "LoC Control" is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# "LoC Control" is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this code.  If not, see <https://www.gnu.org/licenses/>.
 
-# UNUSED?
-#from extronlib.system import Wait
+from extronlib import event
+from extronlib.ui import Button, Label, Level
 
 import re
 
 import devices
 from utilities import DebugPrint
 import utilities
+
+
+# The background button
+btnBackground = Button(devices.TouchPanel, 9)
+
 
 # MENU and QuickButtons
 btnMainMenu = Button(devices.TouchPanel, 16)
@@ -50,11 +68,6 @@ btnBottomBar4 = Button(devices.TouchPanel, 59)
 btnBottomBar5 = Button(devices.TouchPanel, 60)
 btnBottomBar6 = Button(devices.TouchPanel, 99)
 btnBottomBar3 = Button(devices.TouchPanel, 110)
-
-#FIXME - REMOVE THESE?
-btnPreview_KeyOFF = Button(devices.TouchPanel, 106)
-btnPreview_Key1and2 = Button(devices.TouchPanel, 183)
-##
 
 btnPreview_Key1 = Button(devices.TouchPanel, 108)
 btnPreview_Key2 = Button(devices.TouchPanel, 182)
@@ -260,6 +273,10 @@ def ShowPopup(PopupName):
 #end function (ShowPopup)
 
 
+@event(btnBackground, 'Pressed')
+def BackgroundButtonPressed(button, state):
+    button.SetEnable(False)
+#end function (BackgroundButtonPressed)
 
 
 @event(lstMainMenuButtons, 'Pressed')
@@ -406,34 +423,15 @@ def AUXButtonsPressed(button, state):
 #end function (AUXButtonsPressed)
 
 
-@event(btnPreview_KeyOFF, 'Pressed')
-def btnPreview_KeyOFFPressed(button, state):
-    devices.carbonite.Set('NextTransitionLayers', 'Off', {'Layer' : 'Key 1'})
-    devices.carbonite.Set('NextTransitionLayers', 'Off', {'Layer' : 'Key 2'})
-#endfunction (btnPreview_KeyOFFPressed)
-
-
 @event([btnPreview_Key1, btnPreview_Key2], 'Pressed')
 def KeyButtonsPressed(button, state):
 
-    #FIXME - build and use a toggle helper function?
-
     if button is btnPreview_Key1:
-        if devices.carbonite.ReadStatus('NextTransitionLayers', {'Layer': 'Key 1'}) == 'On':
-            devices.carbonite.Set('NextTransitionLayers', 'Off', {'Layer': 'Key 1'})
-        else:
-            devices.carbonite.Set('NextTransitionLayers', 'On', {'Layer': 'Key 1'})
+        devices.carbonite.Set('KeyOnPreview', 'Toggle', {'Keyer': 1})
 
     elif button is btnPreview_Key2:
-        if devices.carbonite.ReadStatus('NextTransitionLayers', {'Layer': 'Key 2'}) == 'On':
-            devices.carbonite.Set('NextTransitionLayers', 'Off', {'Layer': 'Key 2'})
-        else:
-            devices.carbonite.Set('NextTransitionLayers', 'On', {'Layer': 'Key 2'})
+        devices.carbonite.Set('KeyOnPreview', 'Toggle', {'Keyer': 2})
 
-
-@event(btnPreview_Key1and2, 'Pressed')
-def btnPreview_Key1and2Pressed(button, state):
-    pass
 
 @event(btnBottomBar3, 'Pressed')
 def btnBottomBar3Pressed(button, state):
@@ -656,7 +654,7 @@ def execute_command(button, macro_string):
     #    ui:popup:<name>
     #    macro:<name>
     regex_ui = re.compile(r"^(ui:popup):(.*?)$")
-    regex_device = re.compile(r"^(device):(.*?):(.*?):(.*?)$")
+    regex_device = re.compile(r"^(device):(.*?):(.*?):(.*?):(.*?)(?::(int|str):(.*?)){0,1}$")
     regex_macro = re.compile(r"^(macro):(.*)$")
 
     #ui:popup:POP - CAM1 - Control
@@ -668,19 +666,43 @@ def execute_command(button, macro_string):
             DebugPrint('execute_button_macro/regex_ui', 'Attempted to handle a malformed command statement: [{}]'.format(macro_string),
                        'Error')
 
-    # device:<obj>:<command>:<value>
+    #device:carbonite:Cut:None:None
+    #device:carbonite:KeyOnPreview:On:Keyer:int:1
     elif regex_device.match(macro_string):
         p = regex_device.match(macro_string)
         if p.group(4):
-            try:
+            if True is True:
+            #try:
                 driver_object = devices.device_objects[p.group(2)]
                 driver_command = p.group(3)
-                driver_value = p.group(4)
-                driver_object.Set(driver_command, driver_value)
-            except:
-                DebugPrint('execute_button_macro/regex_device',
-                           'An error occurred sending a command to driver object. [{}]'.format(macro_string),
-                           'Error')
+
+                if p.group(4).lower() == 'none':
+                    driver_value = None
+
+                else:
+                    driver_value = p.group(4)
+
+                if p.group(5) and p.group(6) and p.group(7):
+                    if p.group(6) == 'int':
+                        qualifier = {p.group(5): int(p.group(7))}
+
+                    elif p.group(6) == 'str':
+                        qualifier = {p.group(5): p.group(7)}
+
+                else:
+                        qualifier = None
+
+                DebugPrint('interface.py/execute_command',
+                           'Sending Device Driver Command: [{}] [{}] [{}]'.format(driver_command, driver_value, qualifier),
+                           'Trace')
+
+                # Run our driver_command
+                driver_object.Set(driver_command, driver_value, qualifier)
+
+            #except:
+            #    DebugPrint('execute_button_macro/regex_device',
+            #               'An error occurred sending a command to driver object. [{}]'.format(macro_string),
+            #               'Error')
 
         else:
             DebugPrint('execute_button_macro/regex_device', 'Attempted to handle a malformed command statement: [{}]'.format(macro_string),
