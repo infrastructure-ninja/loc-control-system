@@ -2,7 +2,7 @@
     "data": {
         "presets": {
             "preset_1_enabled": true,
-            "preset_1_name": "Reading",
+            "preset_1_name": "Readings/PiP",
             "preset_1_steps": {
                 "1_enabled": true,
                 "1_data": "device:cam1:PresetRecall:1:None",
@@ -16,7 +16,7 @@
                 "5_data": "device:carbonite:KeyOnPreview:On:Keyer:int:1"
             },
             "preset_2_enabled": true,
-            "preset_2_name": "Lords Prayer",
+            "preset_2_name": "Full-screen Graphics",
             "preset_2_steps": {
                 "1_enabled": true,
                 "1_data": "device:cam1:PresetRecall:1:None",
@@ -24,7 +24,7 @@
                 "2_data": "device:carbonite:MLEPresetSource:Cam 1:None",
                 "3_enabled": true,
                 "3_data": "device:carbonite:KeySource:HDMI 1:Keyer:int:2",
-                "4_enabled": false,
+                "4_enabled": true,
                 "4_data": "device:carbonite:KeyOnPreview:Off:Keyer:int:1",
                 "5_enabled": true,
                 "5_data": "device:carbonite:KeyOnPreview:On:Keyer:int:2"
@@ -101,9 +101,15 @@
                 "serial_baud": "38400"
             },
             "midi": {
-                "enabled": false,
+                "enabled": true,
                 "serial_port": "COM1",
-                "serial_baud": "38400"
+                "midi_channel": 1,
+                "preset_mapping": {
+                    "c4": 1,
+                    "c#4": 2,
+                    "d4": 3,
+                    "e4": 4
+                }
             },
             "cam1": {
                 "enabled": true,

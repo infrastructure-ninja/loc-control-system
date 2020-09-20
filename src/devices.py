@@ -15,7 +15,7 @@
 # along with this code.  If not, see <https://www.gnu.org/licenses/>.
 
 from extronlib.device import ProcessorDevice, UIDevice
-from extronlib.system import Timer
+from extronlib.system import Timer, Wait
 
 from helper_connectionhandler import GetConnectionHandler
 from helper_systemstate import DeviceClass
@@ -44,25 +44,25 @@ def SystemStatesCallbackHandler(command, value, qualifier):
 
     if qualifier['Keyer'] == 1:
       if value == 'On':
-        interface.btnPreview_Key1.SetState(1)
-        interface.btnPreview_Key1.SetBlinking('Fast', [0, 1])
+        interface.mainscreen.btnPreview_Key1.SetState(1)
+        interface.mainscreen.btnPreview_Key1.SetBlinking('Fast', [0, 1])
       else:
-        interface.btnPreview_Key1.SetState(0)
+        interface.mainscreen.btnPreview_Key1.SetState(0)
 
     elif qualifier['Keyer'] == 2:
       if value == 'On':
-        interface.btnPreview_Key2.SetState(1)
-        interface.btnPreview_Key2.SetBlinking('Fast', [0, 1])
+        interface.mainscreen.btnPreview_Key2.SetState(1)
+        interface.mainscreen.btnPreview_Key2.SetBlinking('Fast', [0, 1])
       else:
-        interface.btnPreview_Key2.SetState(0)
+        interface.mainscreen.btnPreview_Key2.SetState(0)
 
 
   # FIXME - this could be more compact and pythonic, when you get bored of everything else
   elif command == 'CameraSpeed' and qualifier['Camera Number'] == 1:
     button_map = {
-      'Slow': interface.btnCAM1_Speed1,
-      'Medium': interface.btnCAM1_Speed2,
-      'Fast': interface.btnCAM1_Speed3
+      'Slow': interface.cam1.btnCAM1_Speed1,
+      'Medium': interface.cam1.btnCAM1_Speed2,
+      'Fast': interface.cam1.btnCAM1_Speed3
     }
 
     for single_button in button_map.values():
@@ -72,9 +72,9 @@ def SystemStatesCallbackHandler(command, value, qualifier):
 
   elif command == 'CameraSpeed' and qualifier['Camera Number'] == 2:
     button_map = {
-      'Slow': interface.btnCAM2_Speed1,
-      'Medium': interface.btnCAM2_Speed2,
-      'Fast': interface.btnCAM2_Speed3
+      'Slow': interface.cam2.btnCAM2_Speed1,
+      'Medium': interface.cam2.btnCAM2_Speed2,
+      'Fast': interface.cam2.btnCAM2_Speed3
     }
 
     for single_button in button_map.values():
@@ -143,10 +143,15 @@ else:
 device_objects.update({'smd101': smd101})
 
 
-import driver_extr_sm_SMP_300_Series_v1_16_3_0 as SMP351Driver
-smp351 = GetConnectionHandler(
+if utilities.config.get_value('devices/smp351/enabled', default_value=False, cast_as='boolean'):
+  import driver_extr_sm_SMP_300_Series_v1_16_3_0 as SMP351Driver
+  smp351 = GetConnectionHandler(
     SMP351Driver.SerialClass(ControlProcessor, 'COM1', Baud=38400, Model='SMP 351'),
     'Alarm')
+
+else:
+  smp351 = DummyDriver('Extron SMP351 Streaming Media Processor')
+
 device_objects.update({'smp351': smp351})
 
 
@@ -216,9 +221,9 @@ def CarboniteReceivedDataHandler(command, value, qualifier):
                 'Received Carbonite Driver Update: [{0}] [{1}] [{2}]'.format(command, value, qualifier), 'Debug')
 
     mle_preset_source_map = {
-      'Cam 1': interface.btnCAM1_Preview, 'Cam 2': interface.btnCAM2_Preview,
-      'Cam 3': interface.btnCAM3_Preview, 'Cam 4': interface.btnCAM4_Preview,
-      'HDMI 1': interface.btnIN5_Preview, 'HDMI 2': interface.btnIN6_Preview
+      'Cam 1': interface.mainscreen.btnCAM1_Preview, 'Cam 2': interface.mainscreen.btnCAM2_Preview,
+      'Cam 3': interface.mainscreen.btnCAM3_Preview, 'Cam 4': interface.mainscreen.btnCAM4_Preview,
+      'HDMI 1': interface.mainscreen.btnIN5_Preview, 'HDMI 2': interface.mainscreen.btnIN6_Preview
       }
 
     # Set all buttons to normal state
@@ -235,9 +240,9 @@ def CarboniteReceivedDataHandler(command, value, qualifier):
                 'Received Carbonite Driver Update: [{0}] [{1}] [{2}]'.format(command, value, qualifier), 'Debug')
 
     keyer1_source_map = {
-      'Cam 1': interface.btnCAM1_AUX, 'Cam 2': interface.btnCAM2_AUX,
-      'Cam 3': interface.btnCAM3_AUX, 'Cam 4': interface.btnCAM4_AUX,
-      'HDMI 1': interface.btnIN5_AUX
+      'Cam 1': interface.mainscreen.btnCAM1_AUX, 'Cam 2': interface.mainscreen.btnCAM2_AUX,
+      'Cam 3': interface.mainscreen.btnCAM3_AUX, 'Cam 4': interface.mainscreen.btnCAM4_AUX,
+      'HDMI 1': interface.mainscreen.btnIN5_AUX
       }
 
     # Set all buttons to normal state
@@ -268,7 +273,7 @@ def CarboniteReceivedDataHandler(command, value, qualifier):
     DebugPrint('devices.py/CarboniteReceivedDataHandler',
                 'Received Carbonite Driver Update: [{0}] [{1}] [{2}]'.format(command, value, qualifier), 'Debug')
 
-    keyer_button = {1: interface.btnPreview_Key1, 2:  interface.btnPreview_Key2}[qualifier['Keyer']]
+    keyer_button = {1: interface.mainscreen.btnPreview_Key1, 2:  interface.mainscreen.btnPreview_Key2}[qualifier['Keyer']]
 
     if value == 'On':
       keyer_button.SetState(1)
@@ -294,38 +299,42 @@ def TallyReceivedDataHandler(command, value, qualifier):
     command, value, qualifier), 'Trace')
 
   if qualifier['Input'] == 'Cam 1':
-    temp_button_list = interface.lstCAM1_PTZBtns + interface.lstCAM1_PresetBtns + interface.lstCAM1_SpeedBtns
+    temp_button_list = interface.cam1.lstCAM1_PTZBtns +\
+                       interface.cam1.lstCAM1_PresetBtns +\
+                       interface.cam1.lstCAM1_SpeedBtns
 
     if (value == 'Off') or (value == 'Green'):
-      interface.btnCAM1_OnAir.SetState(0)
-      interface.btnCAM1_OnAir.SetVisible(False)
+      interface.cam1.btnCAM1_OnAir.SetState(0)
+      interface.cam1.btnCAM1_OnAir.SetVisible(False)
 
       for single_button in temp_button_list:
         single_button.SetEnable(True)
         single_button.SetState(0)
 
     elif (value == 'Red') or (value == 'Red & Green'):
-      interface.btnCAM1_OnAir.SetBlinking('Fast', [0, 1])
-      interface.btnCAM1_OnAir.SetVisible(True)
+      interface.cam1.btnCAM1_OnAir.SetBlinking('Fast', [0, 1])
+      interface.cam1.btnCAM1_OnAir.SetVisible(True)
 
       for single_button in temp_button_list:
         single_button.SetEnable(False)
         single_button.SetState(2)
 
   elif qualifier['Input'] == 'Cam 2':
-    temp_button_list = interface.lstCAM2_PTZBtns + interface.lstCAM2_PresetBtns + interface.lstCAM2_SpeedBtns
+    temp_button_list = interface.cam2.lstCAM2_PTZBtns +\
+                       interface.cam2.lstCAM2_PresetBtns +\
+                       interface.cam2.lstCAM2_SpeedBtns
 
     if (value == 'Off') or (value == 'Green'):
-      interface.btnCAM2_OnAir.SetState(0)
-      interface.btnCAM2_OnAir.SetVisible(False)
+      interface.cam2.btnCAM2_OnAir.SetState(0)
+      interface.cam2.btnCAM2_OnAir.SetVisible(False)
 
       for single_button in temp_button_list:
         single_button.SetEnable(True)
         single_button.SetState(0)
 
     elif (value == 'Red') or (value == 'Red & Green'):
-      interface.btnCAM2_OnAir.SetBlinking('Fast', [0, 1])
-      interface.btnCAM2_OnAir.SetVisible(True)
+      interface.cam2.btnCAM2_OnAir.SetBlinking('Fast', [0, 1])
+      interface.cam2.btnCAM2_OnAir.SetVisible(True)
 
       for single_button in temp_button_list:
         single_button.SetEnable(False)
@@ -333,12 +342,12 @@ def TallyReceivedDataHandler(command, value, qualifier):
 
   if qualifier['Input'] == 'HDMI 2':
     if (value == 'Off') or (value == 'Green'):
-      interface.btnPlayback_OnAir.SetState(0)
-      interface.btnPlayback_OnAir.SetVisible(False)
+      interface.playback.btnPlayback_OnAir.SetState(0)
+      interface.playback.btnPlayback_OnAir.SetVisible(False)
 
     elif (value == 'Red') or (value == 'Red & Green'):
-      interface.btnPlayback_OnAir.SetBlinking('Fast', [0, 1])
-      interface.btnPlayback_OnAir.SetVisible(True)
+      interface.playback.btnPlayback_OnAir.SetBlinking('Fast', [0, 1])
+      interface.playback.btnPlayback_OnAir.SetVisible(True)
 
 #end function (TallyReceivedDataHandler)
 
@@ -394,42 +403,42 @@ def SMD101ReceivedDataHandler(command, value, qualifier):
       tmrSMD101_poll_timer.Pause()
 
   elif command == 'CurrentClipLength':
-    interface.lblPlayback_CurrentClipLength.SetText(value)
+    interface.playback.lblPlayback_CurrentClipLength.SetText(value)
 
     timecode_in_seconds = utilities.ConvertTimecodeToSeconds(value)
     if timecode_in_seconds <= 0:
-      interface.lvlPlayback_ClipPosition.SetVisible(False)
-      interface.lvlPlayback_ClipPosition.SetRange(0, 1)
-      interface.lblPlaybackTimeCodeRemaining.SetVisible(False)
+      interface.playback.lvlPlayback_ClipPosition.SetVisible(False)
+      interface.playback.lvlPlayback_ClipPosition.SetRange(0, 1)
+      interface.playback.lblPlaybackTimeCodeRemaining.SetVisible(False)
 
     else:
-      interface.lvlPlayback_ClipPosition.SetVisible(True)
-      interface.lvlPlayback_ClipPosition.SetRange(0, timecode_in_seconds)
-      interface.lblPlaybackTimeCodeRemaining.SetVisible(True)
+      interface.playback.lvlPlayback_ClipPosition.SetVisible(True)
+      interface.playback.lvlPlayback_ClipPosition.SetRange(0, timecode_in_seconds)
+      interface.playback.lblPlaybackTimeCodeRemaining.SetVisible(True)
 
   elif command == 'CurrentTimecode':
-    interface.lblPlayback_CurrentTimeCode.SetText(value)
+    interface.playback.lblPlayback_CurrentTimeCode.SetText(value)
 
     timecode_in_seconds = utilities.ConvertTimecodeToSeconds(value)
-    interface.lvlPlayback_ClipPosition.SetLevel(timecode_in_seconds)
+    interface.playback.lvlPlayback_ClipPosition.SetLevel(timecode_in_seconds)
     current_clip_length = utilities.ConvertTimecodeToSeconds(smd101.ReadStatus('CurrentClipLength'))
 
     remaining_seconds = current_clip_length - timecode_in_seconds
-    interface.lblPlaybackTimeCodeRemaining.SetText('(-{})'.format(utilities.ConvertSecondsToTimeCode(remaining_seconds)))
+    interface.playback.lblPlaybackTimeCodeRemaining.SetText('(-{})'.format(utilities.ConvertSecondsToTimeCode(remaining_seconds)))
 
   elif command == 'CurrentPlaylistTrack':
-    interface.lblPlayback_CurrentPlaylist.SetText(value)
+    interface.playback.lblPlayback_CurrentPlaylist.SetText(value)
 
   elif command == 'CurrentSourceItem':
-    interface.lblPlayback_CurrentSourceItem.SetText(value)
+    interface.playback.lblPlayback_CurrentSourceItem.SetText(value)
 
   elif command == 'Playback':
     value_text = {'Play': 'Playing', 'Pause': 'Paused', 'Stop': 'Stopped'}[value]
-    interface.lblPlayback_CurrentState.SetText(value_text)
+    interface.playback.lblPlayback_CurrentState.SetText(value_text)
 
   else:
     DebugPrint('devices.py/SMD101ReceivedDataHandler',
-               'Unhandled SMD101 Driver Data: [{0}] [{1}] [{2}]'.format(command, value, qualifier), 'Warn')
+               'Unused SMD101 Driver Data: [{0}] [{1}] [{2}]'.format(command, value, qualifier), 'Trace')
 
 #end function (SMD101ReceivedDataHandler)
 
@@ -549,6 +558,51 @@ cam2.SubscribeStatus('ConnectionStatus', None, Cam2ReceivedDataHandler)
 
 
 
+################################################
+############ DecaBox MIDI<->RS-232 #############
+################################################
+if utilities.config.get_value('devices/midi/enabled', default_value=False, cast_as='boolean'):
+  import driver_decaboxmidi_1_0 as MIDIDriver
+
+  midi = MIDIDriver.SerialClass(ControlProcessor,
+                                utilities.config.get_value('devices/midi/serial_port',
+                                                           cast_as='string'),
+                                Baud=38400, Data=8, Parity='None', Stop=1, Mode='RS232')
+
+else:
+  midi = DummyDriver('DecaBox MIDI<->RS-232 Gateway')
+
+device_objects.update({'midi': midi})
+
+
+def midi_received_data_handler(command, value, qualifier):
+  print('MIDI CALLBACK ->[{}] [{}] [{}]'.format(command, value, qualifier))
+
+  if value != 'Off':
+    midi_note = qualifier['Note']
+    midi_channel = qualifier['Channel']
+
+    config_value_to_lookup = 'devices/midi/preset_mapping/{}'.format(midi_note)
+    preset_number = utilities.config.get_value(config_value_to_lookup,
+                               default_value='None', cast_as='string')
+
+    print('MIDI NOTE     ->', midi_note)
+    print('CONFIG VALUE  ->', config_value_to_lookup)
+    print('PRESET NUMBER ->', preset_number)
+
+    if preset_number != 'None':
+      print('TRIGGERING PRESET #{}'.format(preset_number))
+      interface.mainscreen.execute_preset(preset_number)
+
+# end function (midi_received_data_handler)
+
+#FIXME - add the MIDI channel subscription code here
+midi.SubscribeStatus('IncomingNote', None, midi_received_data_handler)
+
+
+
+
+
 def InitializeAll():
   DebugPrint('devices.py/InitializeAll', 'Attempting to connect to Carbonite switcher..', 'Debug')
   carbonite.Connect()
@@ -567,8 +621,8 @@ def InitializeAll():
   DebugPrint('devices.py/InitializeAll', 'Attempting to connect to SMD101 device..', 'Info')
   smd101.Connect()
 
-  DebugPrint('devices.py/InitializeAll', 'Attempting to connect to SMP351 device..', 'Info')
-  smp351.Connect()
+#  DebugPrint('devices.py/InitializeAll', 'Attempting to connect to SMP351 device..', 'Info')
+#  smp351.Connect()
 
   DebugPrint('devices.py/InitializeAll', 'Attempting to connect to Yamaha TF5 device..', 'Info')
   soundboard.Connect()
@@ -578,6 +632,7 @@ def InitializeAll():
 
   DebugPrint('devices.py/InitializeAll', 'Attempting to connect to Camera #2 device..', 'Info')
   cam2.Connect()
+
 
 # Set our system state for the starting camera movement speed
   system_states.Set('CameraSpeed',
