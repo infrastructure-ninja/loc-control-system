@@ -15,12 +15,9 @@
 # along with this code.  If not, see <https://www.gnu.org/licenses/>.
 
 from extronlib.device import ProcessorDevice, UIDevice
-from extronlib.system import Timer, Wait
 
-from helper_connectionhandler import GetConnectionHandler
 from helper_systemstate import DeviceClass
 
-from utilities import DummyDriver
 from utilities import DebugPrint
 import utilities
 
@@ -29,625 +26,129 @@ TouchPanel = UIDevice('ExtronPanel')
 
 import interface
 
+
 # This dictionary will store all of our device objects, so they can be accessed
-# later via our "preset/macro" mechanism.
+# later via our "preset/macro" mechanism. Each device module we load below will be responsible
+# to add itself to this dictionary.
 device_objects = {}
+
+
+import dev_cam1 as cam1
+import dev_cam2 as cam2
+import dev_switcher as switcher
+import dev_matrix as matrix
+import dev_playback as playback
+import dev_soundboard as soundboard
+import dev_recorder as recorder
+import dev_midi as midi
 
 # "system_states" is a custom driver module that provides a way to store various
 # system states and trigger callbacks when they change.
 system_states = DeviceClass()
 
-def SystemStatesCallbackHandler(command, value, qualifier):
-  if command == 'KeyOnPreview':
-    DebugPrint('devices.py/SystemStatesCallbackHandler',
-               '[{}] [{}] [{}]'.format(command, value, qualifier), 'Trace')
 
-    if qualifier['Keyer'] == 1:
-      if value == 'On':
-        interface.mainscreen.btnPreview_Key1.SetState(1)
-        interface.mainscreen.btnPreview_Key1.SetBlinking('Fast', [0, 1])
-      else:
-        interface.mainscreen.btnPreview_Key1.SetState(0)
+def system_states_callback_handler(command, value, qualifier):
+    if command == 'KeyOnPreview':
+        DebugPrint('devices.py/system_states_callback_handler',
+                   '[{}] [{}] [{}]'.format(command, value, qualifier), 'Trace')
 
-    elif qualifier['Keyer'] == 2:
-      if value == 'On':
-        interface.mainscreen.btnPreview_Key2.SetState(1)
-        interface.mainscreen.btnPreview_Key2.SetBlinking('Fast', [0, 1])
-      else:
-        interface.mainscreen.btnPreview_Key2.SetState(0)
+        if qualifier['Keyer'] == 1:
+            if value == 'On':
+                interface.mainscreen.btnPreview_Key1.SetState(1)
+                interface.mainscreen.btnPreview_Key1.SetBlinking('Fast', [0, 1])
 
+            else:
+                interface.mainscreen.btnPreview_Key1.SetState(0)
 
-  # FIXME - this could be more compact and pythonic, when you get bored of everything else
-  elif command == 'CameraSpeed' and qualifier['Camera Number'] == 1:
-    button_map = {
-      'Slow': interface.cam1.btnCAM1_Speed1,
-      'Medium': interface.cam1.btnCAM1_Speed2,
-      'Fast': interface.cam1.btnCAM1_Speed3
-    }
+        elif qualifier['Keyer'] == 2:
+            if value == 'On':
+                interface.mainscreen.btnPreview_Key2.SetState(1)
+                interface.mainscreen.btnPreview_Key2.SetBlinking('Fast', [0, 1])
 
-    for single_button in button_map.values():
-      single_button.SetState(0)
+            else:
+                interface.mainscreen.btnPreview_Key2.SetState(0)
 
-    button_map[value].SetState(1)
+    # FIXME - this could be more compact and pythonic, when you get bored of everything else
+    elif command == 'CameraSpeed' and qualifier['Camera Number'] == 1:
+        button_map = {
+            'Slow': interface.cam1.btnCAM1_Speed1,
+            'Medium': interface.cam1.btnCAM1_Speed2,
+            'Fast': interface.cam1.btnCAM1_Speed3
+          }
 
-  elif command == 'CameraSpeed' and qualifier['Camera Number'] == 2:
-    button_map = {
-      'Slow': interface.cam2.btnCAM2_Speed1,
-      'Medium': interface.cam2.btnCAM2_Speed2,
-      'Fast': interface.cam2.btnCAM2_Speed3
-    }
+        button_map[value].SetState(1)
 
-    for single_button in button_map.values():
-      single_button.SetState(0)
+        # Update states on all buttons than aren't the one we changed above
+        for single_button in button_map.values():
+            if single_button is not button_map[value]:
+                single_button.SetState(0)
 
-    button_map[value].SetState(1)
+        # Change the button label to "Slow", "Medium" or "Fast"
+        interface.cam1.btnCAM1_SpeedToggle.SetText(value)
 
-#end function (SystemStatesCallbackHandler)
+    elif command == 'CameraSpeed' and qualifier['Camera Number'] == 2:
+        button_map = {
+            'Slow': interface.cam2.btnCAM2_Speed1,
+            'Medium': interface.cam2.btnCAM2_Speed2,
+            'Fast': interface.cam2.btnCAM2_Speed3
+          }
 
-system_states.SubscribeStatus('ActivePopup', None, SystemStatesCallbackHandler)
-system_states.SubscribeStatus('CameraSpeed', None, SystemStatesCallbackHandler)
-system_states.SubscribeStatus('KeyOnPreview', None, SystemStatesCallbackHandler)
+        button_map[value].SetState(1)
 
+        # Update states on all buttons than aren't the one we changed above
+        for single_button in button_map.values():
+            if single_button is not button_map[value]:
+                single_button.SetState(0)
 
-if utilities.config.get_value('devices/switcher/enabled', default_value=False, cast_as='boolean'):
-  import driver_ross_carboniteblacksolo_v1_0_0 as CarboniteSolo109
-  carbonite = GetConnectionHandler(
-    CarboniteSolo109.EthernetClass(
-      utilities.config.get_value('devices/switcher/ipaddress'),
-      utilities.config.get_value('devices/switcher/port', default_value=5253, cast_as='integer'),
-      Model='Carbonite Black Solo 109'), 'ProductName')
-
-  if utilities.config.get_value('devices/switcher/tally_enabled', default_value=False, cast_as='boolean'):
-    import driver_tslumd_31 as TallyDriver
-    tally = TallyDriver.EthernetClass(
-      utilities.config.get_value('devices/switcher/tally_port', default_value=5728, cast_as='integer')
-    )
-
-  else:
-    tally = DummyDriver('TSL UMD Tally Device')
+# end function (system_states_callback_handler)
 
 
-else:
-  carbonite = DummyDriver('Carbonite Black Solo 109')
-  tally = DummyDriver('TSL UMD Tally Device')
-
-device_objects.update({'carbonite': carbonite})
-device_objects.update({'tally': tally})
-
-if utilities.config.get_value('devices/matrix/enabled', cast_as='boolean'):
-  import driver_extr_matrix_DXPHD4k_Series_v1_3_3_0 as MatrixDriver
-  matrix = GetConnectionHandler(
-    MatrixDriver.EthernetClass(
-      utilities.config.get_value('devices/matrix/ipaddress'),
-      utilities.config.get_value('devices/matrix/port', cast_as='integer'),
-      Model='DXP 88 HD 4K'), 'Temperature')
-else:
-  matrix = DummyDriver('Extron DXP 88 HD 4K Matrix')
-
-device_objects.update({'matrix': matrix})
+system_states.SubscribeStatus('ActivePopup', None, system_states_callback_handler)
+system_states.SubscribeStatus('CameraSpeed', None, system_states_callback_handler)
+system_states.SubscribeStatus('KeyOnPreview', None, system_states_callback_handler)
 
 
-if utilities.config.get_value('devices/playback/enabled', cast_as='boolean'):
-  import driver_extr_sm_SMD101_SMD202_v1_11_4_0 as SMD101Driver
-  smd101 = GetConnectionHandler(
-    SMD101Driver.SSHClass(
-      utilities.config.get_value('devices/playback/ipaddress'),
-      utilities.config.get_value('devices/playback/port', cast_as='integer'),
-      Credentials=(
-        utilities.config.get_value('devices/playback/username'),
-        utilities.config.get_value('devices/playback/password'),
-      )), 'Temperature')
-else:
-  smd101 = DummyDriver('Extron SMD101 Playback Unit')
+def initialize_all():
+    DebugPrint('devices.py/initialize_all', 'Attempting to connect to Carbonite switcher..', 'Debug')
+    switcher.carbonite.Connect()
 
-device_objects.update({'smd101': smd101})
-
-
-if utilities.config.get_value('devices/smp351/enabled', default_value=False, cast_as='boolean'):
-  import driver_extr_sm_SMP_300_Series_v1_16_3_0 as SMP351Driver
-  smp351 = GetConnectionHandler(
-    SMP351Driver.SerialClass(ControlProcessor, 'COM1', Baud=38400, Model='SMP 351'),
-    'Alarm')
-
-else:
-  smp351 = DummyDriver('Extron SMP351 Streaming Media Processor')
-
-device_objects.update({'smp351': smp351})
-
-
-if utilities.config.get_value('devices/playback/enabled', cast_as='boolean'):
-  import driver_yama_dsp_TF1_TF5_TFRack_v1_0_0_0 as SoundboardDriver
-  soundboard = GetConnectionHandler(
-    SoundboardDriver.EthernetClass(
-      utilities.config.get_value('devices/soundboard/ipaddress'),
-      utilities.config.get_value('devices/soundboard/port', cast_as='integer'),
-      Model='TF5'), 'Firmware')
-else:
-  soundboard = DummyDriver('Yamaha TF5 Sound Console')
-
-device_objects.update({'soundboard': soundboard})
-
-
-if utilities.config.get_value('devices/cam1/enabled', cast_as='boolean'):
-  import driver_vadd_controller_QuickConnectUSB_v1_3_0_1 as CameraDriver
-  cam1 = GetConnectionHandler(
-    CameraDriver.EthernetClass(
-      utilities.config.get_value('devices/cam1/ipaddress'),
-      utilities.config.get_value('devices/cam1/port', cast_as='integer'),
-      ), 'StreamingMode')
-else:
-  cam1 = DummyDriver('Vaddio USB Quick-Connect (CAM1)')
-
-device_objects.update({'cam1': cam1})
-
-
-if utilities.config.get_value('devices/cam2/enabled', cast_as='boolean'):
-  import driver_vadd_controller_QuickConnectUSB_v1_3_0_1 as CameraDriver
-  cam2 = GetConnectionHandler(
-    CameraDriver.EthernetClass(
-      utilities.config.get_value('devices/cam2/ipaddress'),
-      utilities.config.get_value('devices/cam2/port', cast_as='integer'),
-      ), 'StreamingMode')
-else:
-  cam2 = DummyDriver('Vaddio USB Quick-Connect (CAM2)')
-
-device_objects.update({'cam2': cam2})
-
-################################################
-
-
-
-################################################
-##### Ross Video Carbonite Black Solo Frame 109 #####
-################################################
-def CarboniteReceivedDataHandler(command, value, qualifier):
-
-  if command == 'ConnectionStatus':
-    if   value == 'Connected':
-      DebugPrint('devices.py/CarboniteReceivedDataHandler', 'Carbonite has been successfully connected', 'Info')
-
-      for update in lstCarboniteStatusSubscriptions:
-        if update == 'ConnectionStatus': continue  # ConnectionStatus does not support Updates
-        DebugPrint('devices.py/CarboniteReceivedDataHandler',
-                   'Updating status for command: [{}]'.format(update), 'Trace')
-
-        carbonite.Update(update)
-
-    elif value == 'Disconnected':
-      DebugPrint('devices.py/CarboniteReceivedDataHandler', 'Carbonite has been disconnected from the system. Will attempt reconnection..', 'Error')
-
-  elif command == 'MLEPresetSource':
-    DebugPrint('devices.py/CarboniteReceivedDataHandler',
-                'Received Carbonite Driver Update: [{0}] [{1}] [{2}]'.format(command, value, qualifier), 'Debug')
-
-    mle_preset_source_map = {
-      'Cam 1': interface.mainscreen.btnCAM1_Preview, 'Cam 2': interface.mainscreen.btnCAM2_Preview,
-      'Cam 3': interface.mainscreen.btnCAM3_Preview, 'Cam 4': interface.mainscreen.btnCAM4_Preview,
-      'HDMI 1': interface.mainscreen.btnIN5_Preview, 'HDMI 2': interface.mainscreen.btnIN6_Preview
-      }
-
-    # Set all buttons to normal state
-    for input_name, button in mle_preset_source_map.items():
-      button.SetState(0)
-
-    # Set our selected button to slow flash
-    if value in mle_preset_source_map:
-      mle_preset_source_map[value].SetState(2)
-      mle_preset_source_map[value].SetBlinking('Medium', [2,0])
-
-  elif (command == 'KeySource') and qualifier['Keyer'] == 1:
-    DebugPrint('devices.py/CarboniteReceivedDataHandler',
-                'Received Carbonite Driver Update: [{0}] [{1}] [{2}]'.format(command, value, qualifier), 'Debug')
-
-    keyer1_source_map = {
-      'Cam 1': interface.mainscreen.btnCAM1_AUX, 'Cam 2': interface.mainscreen.btnCAM2_AUX,
-      'Cam 3': interface.mainscreen.btnCAM3_AUX, 'Cam 4': interface.mainscreen.btnCAM4_AUX,
-      'HDMI 1': interface.mainscreen.btnIN5_AUX
-      }
-
-    # Set all buttons to normal state
-    for input_name, button in keyer1_source_map.items():
-      button.SetState(0)
-
-    # Set our selected button to slow flash
-    if value in keyer1_source_map:
-      keyer1_source_map[value].SetState(2)
-      keyer1_source_map[value].SetBlinking('Medium', [2,0])
-
-
-  elif command == 'NextTransitionLayers':
-    DebugPrint('devices.py/CarboniteReceivedDataHandler',
-                'Received Carbonite Driver Update: [{0}] [{1}] [{2}]'.format(command, value, qualifier), 'Debug')
-
-    carbonite.Update('KeyOnPreview')
-
-  elif command == 'KeyerStatus':
-    DebugPrint('devices.py/CarboniteReceivedDataHandler',
-                'Received Carbonite Driver Update: [{0}] [{1}] [{2}]'.format(command, value, qualifier), 'Debug')
-
-    carbonite.Update('KeyOnPreview')
-
-  # Set our "Key 1" and "Key 2" buttons to show what keys are active for the next transition
-  # We use blinking (SetBlinking) to make sure they're noticeable on the screen.
-  elif command == 'KeyOnPreview':
-    DebugPrint('devices.py/CarboniteReceivedDataHandler',
-                'Received Carbonite Driver Update: [{0}] [{1}] [{2}]'.format(command, value, qualifier), 'Debug')
-
-    keyer_button = {1: interface.mainscreen.btnPreview_Key1, 2:  interface.mainscreen.btnPreview_Key2}[qualifier['Keyer']]
-
-    if value == 'On':
-      keyer_button.SetState(1)
-      keyer_button.SetBlinking('Fast', [0,1])
+    result = switcher.tally.StartListen()
+    if result == 'Listening':
+        DebugPrint('devices.py/initialize_all',
+                   'TSL UMD Tally Driver is listening on {}/TCP..'.format(switcher.tally.IPPort), 'Info')
 
     else:
-      keyer_button.SetState(0)
+        DebugPrint('devices.py/initialize_all',
+                   'TSL UMD Tally Driver is NOT LISTENING! Return status was: [{}]'.format(result), 'Error')
 
-  else:
-    DebugPrint('devices.py/CarboniteReceivedDataHandler', 'Unhandled Carbonite Driver Data: [{0}] [{1}] [{2}]'.format(command, value, qualifier), 'Trace')
+    DebugPrint('devices.py/initialize_all', 'Attempting to connect to DXP 88 HD matrix switcher..', 'Info')
+    matrix.matrix.Connect()
 
-#end function (CarboniteReceivedDataHandler)
+    DebugPrint('devices.py/initialize_all', 'Attempting to connect to the SMD101 playback device..', 'Info')
+    playback.smd101.Connect()
 
-lstCarboniteStatusSubscriptions = ['ConnectionStatus', 'MLEBackgroundSource', 'MLEPresetSource',
-                                'KeySource', 'AuxSource', 'ProductName','NextTransitionLayers',
-                                'KeyerStatus', 'KeyOnPreview']
-for status in lstCarboniteStatusSubscriptions:
-  carbonite.SubscribeStatus(status, None, CarboniteReceivedDataHandler)
+    DebugPrint('devices.py/initialize_all', 'Attempting to connect to the Yamaha TF5 audio console..', 'Info')
+    soundboard.soundboard.Connect()
 
+    DebugPrint('devices.py/initialize_all', 'Attempting to connect to Camera #1 ..', 'Info')
+    cam1.cam1.Connect()
 
-def TallyReceivedDataHandler(command, value, qualifier):
-  DebugPrint('devices.py/TallyReceivedDataHandler', 'Tally Data Received: -> [{}] [{}] [{}]'.format(
-    command, value, qualifier), 'Trace')
+    DebugPrint('devices.py/initialize_all', 'Attempting to connect to Camera #2 ..', 'Info')
+    cam2.cam2.Connect()
 
-  if qualifier['Input'] == 'Cam 1':
-    temp_button_list = interface.cam1.lstCAM1_PTZBtns +\
-                       interface.cam1.lstCAM1_PresetBtns +\
-                       interface.cam1.lstCAM1_SpeedBtns
+    # Set our system state for the starting camera movement speed
+    system_states.Set('CameraSpeed',
+                      utilities.config.get_value('devices/cam1/default_speed', default_value='Slow'),
+                      {'Camera Number': 1})
 
-    if (value == 'Off') or (value == 'Green'):
-      interface.cam1.btnCAM1_OnAir.SetState(0)
-      interface.cam1.btnCAM1_OnAir.SetVisible(False)
+    system_states.Set('CameraSpeed',
+                      utilities.config.get_value('devices/cam2/default_speed', default_value='Slow'),
+                      {'Camera Number': 2})
 
-      for single_button in temp_button_list:
-        single_button.SetEnable(True)
-        single_button.SetState(0)
+    system_states.Set('CameraSpeed',
+                      utilities.config.get_value('devices/cam3/default_speed', default_value='Slow'),
+                      {'Camera Number': 3})
 
-    elif (value == 'Red') or (value == 'Red & Green'):
-      interface.cam1.btnCAM1_OnAir.SetBlinking('Fast', [0, 1])
-      interface.cam1.btnCAM1_OnAir.SetVisible(True)
-
-      for single_button in temp_button_list:
-        single_button.SetEnable(False)
-        single_button.SetState(2)
-
-  elif qualifier['Input'] == 'Cam 2':
-    temp_button_list = interface.cam2.lstCAM2_PTZBtns +\
-                       interface.cam2.lstCAM2_PresetBtns +\
-                       interface.cam2.lstCAM2_SpeedBtns
-
-    if (value == 'Off') or (value == 'Green'):
-      interface.cam2.btnCAM2_OnAir.SetState(0)
-      interface.cam2.btnCAM2_OnAir.SetVisible(False)
-
-      for single_button in temp_button_list:
-        single_button.SetEnable(True)
-        single_button.SetState(0)
-
-    elif (value == 'Red') or (value == 'Red & Green'):
-      interface.cam2.btnCAM2_OnAir.SetBlinking('Fast', [0, 1])
-      interface.cam2.btnCAM2_OnAir.SetVisible(True)
-
-      for single_button in temp_button_list:
-        single_button.SetEnable(False)
-        single_button.SetState(2)
-
-  if qualifier['Input'] == 'HDMI 2':
-    if (value == 'Off') or (value == 'Green'):
-      interface.playback.btnPlayback_OnAir.SetState(0)
-      interface.playback.btnPlayback_OnAir.SetVisible(False)
-
-    elif (value == 'Red') or (value == 'Red & Green'):
-      interface.playback.btnPlayback_OnAir.SetBlinking('Fast', [0, 1])
-      interface.playback.btnPlayback_OnAir.SetVisible(True)
-
-#end function (TallyReceivedDataHandler)
-
-tally.SubscribeStatus('Tally', None, TallyReceivedDataHandler)
-
-
-################################################
-########### Extron DXP HD 8x8 MATRIX ###########
-################################################
-def MatrixReceivedDataHandler(command, value, qualifier):
-
-  if command == 'ConnectionStatus':
-    if   value == 'Connected':
-      DebugPrint('devices.py/MatrixReceivedDataHandler', 'Matrix switch has been successfully connected', 'Info')
-    
-    elif value == 'Disconnected':
-      DebugPrint('devices.py/MatrixReceivedDataHandler', 'Matrix has been disconnected from the system. Will attempt reconnection..', 'Error')
-
-  else:
-    print('Received Matrix Driver Data: [{0}] [{1}] [{2}]'.format(command, value, qualifier))
-
-#end function (MatrixReceivedDataHandler)
-
-matrix.SubscribeStatus('ConnectionStatus', None, MatrixReceivedDataHandler)
-matrix.SubscribeStatus('InputSignalStatus', None, MatrixReceivedDataHandler)
-matrix.SubscribeStatus('InputTieStatus', None, MatrixReceivedDataHandler)
-matrix.SubscribeStatus('OutputTieStatus', None, MatrixReceivedDataHandler)
-
-
-
-
-
-################################################
-######## Extron SMD 101 Playback Device ########
-################################################
-def SMD101ReceivedDataHandler(command, value, qualifier):
-
-  DebugPrint('devices.py/SMD101ReceivedDataHandler',
-             'Received SMD101 Driver Data: [{0}] [{1}] [{2}]'.format(command, value, qualifier), 'Debug')
-
-  if command == 'ConnectionStatus':
-    if   value == 'Connected':
-      DebugPrint('devices.py/SMD101ReceivedDataHandler', 'SMD101 has been successfully connected', 'Info')
-
-      for update in lstSMD101statusSubscriptions:
-        if update == 'ConnectionStatus': continue # ConnectionStatus does not support Updates
-        smd101.Update(update)
-
-      tmrSMD101_poll_timer.Resume()
-
-    elif value == 'Disconnected':
-      DebugPrint('devices.py/SMD101ReceivedDataHandler', 'SMD101 has been disconnected from the system. Will attempt reconnection..', 'Error')
-      tmrSMD101_poll_timer.Pause()
-
-  elif command == 'CurrentClipLength':
-    interface.playback.lblPlayback_CurrentClipLength.SetText(value)
-
-    timecode_in_seconds = utilities.ConvertTimecodeToSeconds(value)
-    if timecode_in_seconds <= 0:
-      interface.playback.lvlPlayback_ClipPosition.SetVisible(False)
-      interface.playback.lvlPlayback_ClipPosition.SetRange(0, 1)
-      interface.playback.lblPlaybackTimeCodeRemaining.SetVisible(False)
-
-    else:
-      interface.playback.lvlPlayback_ClipPosition.SetVisible(True)
-      interface.playback.lvlPlayback_ClipPosition.SetRange(0, timecode_in_seconds)
-      interface.playback.lblPlaybackTimeCodeRemaining.SetVisible(True)
-
-  elif command == 'CurrentTimecode':
-    interface.playback.lblPlayback_CurrentTimeCode.SetText(value)
-
-    timecode_in_seconds = utilities.ConvertTimecodeToSeconds(value)
-    interface.playback.lvlPlayback_ClipPosition.SetLevel(timecode_in_seconds)
-    current_clip_length = utilities.ConvertTimecodeToSeconds(smd101.ReadStatus('CurrentClipLength'))
-
-    remaining_seconds = current_clip_length - timecode_in_seconds
-    interface.playback.lblPlaybackTimeCodeRemaining.SetText('(-{})'.format(utilities.ConvertSecondsToTimeCode(remaining_seconds)))
-
-  elif command == 'CurrentPlaylistTrack':
-    interface.playback.lblPlayback_CurrentPlaylist.SetText(value)
-
-  elif command == 'CurrentSourceItem':
-    interface.playback.lblPlayback_CurrentSourceItem.SetText(value)
-
-  elif command == 'Playback':
-    value_text = {'Play': 'Playing', 'Pause': 'Paused', 'Stop': 'Stopped'}[value]
-    interface.playback.lblPlayback_CurrentState.SetText(value_text)
-
-  else:
-    DebugPrint('devices.py/SMD101ReceivedDataHandler',
-               'Unused SMD101 Driver Data: [{0}] [{1}] [{2}]'.format(command, value, qualifier), 'Trace')
-
-#end function (SMD101ReceivedDataHandler)
-
-lstSMD101statusSubscriptions = ['ConnectionStatus', 'Playback', 'CurrentTimecode', 'CurrentSourceItem',
-                                'CurrentPlaylistTrack', 'CurrentTimecode', 'CurrentClipLength']
-
-for status in lstSMD101statusSubscriptions:
-  smd101.SubscribeStatus(status, None, SMD101ReceivedDataHandler)
-
-def SMD101_poll_function(timer, count):
-  smd101.Update('CurrentClipLength')
-  smd101.Update('CurrentPlaylistTrack')
-  smd101.Update('CurrentSourceItem')
-  smd101.Update('CurrentTimecode')
-#end function(SMD101_poll_function)
-
-
-tmrSMD101_poll_timer = Timer(1, SMD101_poll_function)
-tmrSMD101_poll_timer.Stop()
-
-
-################################################
-### Extron SMP351 Streading Media Processor ####
-################################################
-def SMP351ReceivedDataHandler(command, value, qualifier):
-
-  if command == 'ConnectionStatus':
-    if   value == 'Connected':
-      DebugPrint('devices.py/SMP351ReceivedDataHandler', 'SMP351 has been successfully connected', 'Info')
-    
-    elif value == 'Disconnected':
-      DebugPrint('devices.py/SMP351ReceivedDataHandler', 'SMP351 has been disconnected from the system. Will attempt reconnection..', 'Error')
-
-  else:
-    print('Received SMP351 Driver Data: [{0}] [{1}] [{2}]'.format(command, value, qualifier))
-
-#end function (SMD101ReceivedDataHandler)
-
-smp351.SubscribeStatus('ConnectionStatus', None, SMP351ReceivedDataHandler)
-smp351.SubscribeStatus('Alarm', None, SMP351ReceivedDataHandler)
-smp351.SubscribeStatus('Record', None, SMP351ReceivedDataHandler)
-smp351.SubscribeStatus('RTMPStream', None, SMP351ReceivedDataHandler)
-
-
-
-
-
-################################################
-############# Yamaha TF5 Soundboard ############
-################################################
-def SoundboardReceivedDataHandler(command, value, qualifier):
-
-  if command == 'ConnectionStatus':
-    if   value == 'Connected':
-      DebugPrint('devices.py/SoundboardReceivedDataHandler', 'Yamaha TF5 soundboard has been successfully connected', 'Info')
-    
-    elif value == 'Disconnected':
-      DebugPrint('devices.py/SoundboardReceivedDataHandler', 'Yamaha TF5 soundboard has been disconnected from the system. Will attempt reconnection..', 'Error')
-
-  else:
-    print('Received Yamaha TF5 Driver Data: [{0}] [{1}] [{2}]'.format(command, value, qualifier))
-
-#end function (SoundboardReceivedDataHandler)
-
-soundboard.SubscribeStatus('ConnectionStatus', None, SoundboardReceivedDataHandler)
-soundboard.SubscribeStatus('InputMute', None, SoundboardReceivedDataHandler)
-soundboard.SubscribeStatus('OutputLevel', None, SoundboardReceivedDataHandler)
-soundboard.SubscribeStatus('InputLevel', None, SoundboardReceivedDataHandler)
-
-
-
-
-
-################################################
-############### Vaddio Camera #1 ###############
-################################################
-def Cam1ReceivedDataHandler(command, value, qualifier):
-
-  if command == 'ConnectionStatus':
-    if   value == 'Connected':
-      DebugPrint('devices.py/Cam1ReceivedDataHandler', 'Camera #1 has been successfully connected', 'Info')
-    
-    elif value == 'Disconnected':
-      DebugPrint('devices.py/Cam1ReceivedDataHandler', 'Camera #1 has been disconnected from the system. Will attempt reconnection..', 'Error')
-
-  else:
-    print('Received CAM#1 Driver Data: [{0}] [{1}] [{2}]'.format(command, value, qualifier))
-
-#end function (Cam1ReceivedDataHandler)
-
-cam1.SubscribeStatus('ConnectionStatus', None, Cam1ReceivedDataHandler)
-
-
-
-
-
-################################################
-############### Vaddio Camera #2 ###############
-################################################
-def Cam2ReceivedDataHandler(command, value, qualifier):
-
-  if command == 'ConnectionStatus':
-    if   value == 'Connected':
-      DebugPrint('devices.py/Cam1ReceivedDataHandler', 'Camera #2 has been successfully connected', 'Info')
-    
-    elif value == 'Disconnected':
-      DebugPrint('devices.py/Cam1ReceivedDataHandler', 'Camera #2 has been disconnected from the system. Will attempt reconnection..', 'Error')
-
-  else:
-    print('Received CAM#2 Driver Data: [{0}] [{1}] [{2}]'.format(command, value, qualifier))
-
-#end function (Cam1ReceivedDataHandler)
-
-cam2.SubscribeStatus('ConnectionStatus', None, Cam2ReceivedDataHandler)
-
-
-
-
-
-################################################
-############ DecaBox MIDI<->RS-232 #############
-################################################
-if utilities.config.get_value('devices/midi/enabled', default_value=False, cast_as='boolean'):
-  import driver_decaboxmidi_1_0 as MIDIDriver
-
-  midi = MIDIDriver.SerialClass(ControlProcessor,
-                                utilities.config.get_value('devices/midi/serial_port',
-                                                           cast_as='string'),
-                                Baud=38400, Data=8, Parity='None', Stop=1, Mode='RS232')
-
-else:
-  midi = DummyDriver('DecaBox MIDI<->RS-232 Gateway')
-
-device_objects.update({'midi': midi})
-
-
-def midi_received_data_handler(command, value, qualifier):
-  print('MIDI CALLBACK ->[{}] [{}] [{}]'.format(command, value, qualifier))
-
-  if value != 'Off':
-    midi_note = qualifier['Note']
-    midi_channel = qualifier['Channel']
-
-    config_value_to_lookup = 'devices/midi/preset_mapping/{}'.format(midi_note)
-    preset_number = utilities.config.get_value(config_value_to_lookup,
-                               default_value='None', cast_as='string')
-
-    print('MIDI NOTE     ->', midi_note)
-    print('CONFIG VALUE  ->', config_value_to_lookup)
-    print('PRESET NUMBER ->', preset_number)
-
-    if preset_number != 'None':
-      print('TRIGGERING PRESET #{}'.format(preset_number))
-      interface.mainscreen.execute_preset(preset_number)
-
-# end function (midi_received_data_handler)
-
-#FIXME - add the MIDI channel subscription code here
-midi.SubscribeStatus('IncomingNote', None, midi_received_data_handler)
-
-
-
-
-
-def InitializeAll():
-  DebugPrint('devices.py/InitializeAll', 'Attempting to connect to Carbonite switcher..', 'Debug')
-  carbonite.Connect()
-
-  result = tally.StartListen()
-  if result == 'Listening':
-    DebugPrint('devices.py/InitializeAll', 'TSL UMD Tally Driver is listening on {}/TCP..'.format(tally.IPPort), 'Info')
-
-  else:
-    DebugPrint('devices.py/InitializeAll', 'TSL UMD Tally Driver is NOT LISTENING! Return status was: [{}]'.format(result), 'Error')
-
-
-  DebugPrint('devices.py/InitializeAll', 'Attempting to connect to DXP 88 HD device..', 'Info')
-  matrix.Connect()
-
-  DebugPrint('devices.py/InitializeAll', 'Attempting to connect to SMD101 device..', 'Info')
-  smd101.Connect()
-
-#  DebugPrint('devices.py/InitializeAll', 'Attempting to connect to SMP351 device..', 'Info')
-#  smp351.Connect()
-
-  DebugPrint('devices.py/InitializeAll', 'Attempting to connect to Yamaha TF5 device..', 'Info')
-  soundboard.Connect()
-
-  DebugPrint('devices.py/InitializeAll', 'Attempting to connect to Camera #1 device..', 'Info')
-  cam1.Connect()
-
-  DebugPrint('devices.py/InitializeAll', 'Attempting to connect to Camera #2 device..', 'Info')
-  cam2.Connect()
-
-
-# Set our system state for the starting camera movement speed
-  system_states.Set('CameraSpeed',
-                    utilities.config.get_value('devices/cam1/default_speed', default_value='Slow'),
-                    {'Camera Number': 1})
-
-  system_states.Set('CameraSpeed',
-                    utilities.config.get_value('devices/cam2/default_speed', default_value='Slow'),
-                    {'Camera Number': 2})
-
-  system_states.Set('CameraSpeed',
-                    utilities.config.get_value('devices/cam3/default_speed', default_value='Slow'),
-                    {'Camera Number': 3})
-
-  system_states.Set('CameraSpeed',
-                    utilities.config.get_value('devices/cam4/default_speed', default_value='Slow'),
-                    {'Camera Number': 4})
-
+    system_states.Set('CameraSpeed',
+                      utilities.config.get_value('devices/cam4/default_speed', default_value='Slow'),
+                      {'Camera Number': 4})

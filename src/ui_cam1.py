@@ -28,6 +28,10 @@ btnCAM1_PanLeft  = Button(devices.TouchPanel, 25)
 btnCAM1_PanRight = Button(devices.TouchPanel, 26)
 btnCAM1_ZoomIn   = Button(devices.TouchPanel, 27)
 btnCAM1_ZoomOut  = Button(devices.TouchPanel, 28)
+
+
+btnCAM1_SpeedToggle = Button(devices.TouchPanel, 183)
+
 btnCAM1_Speed1   = Button(devices.TouchPanel, 31)
 btnCAM1_Speed2   = Button(devices.TouchPanel, 30)
 btnCAM1_Speed3   = Button(devices.TouchPanel, 29)
@@ -59,6 +63,18 @@ def get_cam1_pan_speed():
 # FIXME - this needs to be controlled by the buttons/system state
 def get_cam1_zoom_speed():
     return 10
+
+@event(btnCAM1_SpeedToggle, 'Pressed')
+def btnCAM1_speedtoggle_pressed(button, state):
+
+    if devices.system_states.ReadStatus('CameraSpeed', {'Camera Number': 1}) == 'Slow':
+        devices.system_states.Set('CameraSpeed', 'Medium', {'Camera Number': 1})
+
+    elif devices.system_states.ReadStatus('CameraSpeed', {'Camera Number': 1}) == 'Medium':
+        devices.system_states.Set('CameraSpeed', 'Fast', {'Camera Number': 1})
+
+    elif devices.system_states.ReadStatus('CameraSpeed', {'Camera Number': 1}) == 'Fast':
+        devices.system_states.Set('CameraSpeed', 'Slow', {'Camera Number': 1})
 
 
 @event(lstCAM1_PresetBtns, 'Pressed')
@@ -104,14 +120,14 @@ def cam1_buttons_pressed_released(button, state):
         DebugPrint('interface.py/cam1_buttons_pressed_released', '[{}] [{}] [{}]'.
                    format(command, value, qualifier))
 
-        devices.cam1.Set(command, value, qualifier)
+        devices.cam1.cam1.Set(command, value, qualifier)
 
     elif button in lstCAM1_PresetBtns:
         preset_btn_map = {
             btnCAM1_Preset1: '1', btnCAM1_Preset2: '2', btnCAM1_Preset3: '3', btnCAM1_Preset4: '4',
             btnCAM1_Preset5: '5', btnCAM1_Preset6: '6', btnCAM1_Preset7: '7', btnCAM1_Preset8: '8'
         }
-        devices.cam1.Set('PresetRecall', preset_btn_map[button])
+        devices.cam1.cam1.Set('PresetRecall', preset_btn_map[button])
 
     elif button in [btnCAM1_Speed1, btnCAM1_Speed2, btnCAM1_Speed3]:
         button_map = {btnCAM1_Speed1: 'Slow', btnCAM1_Speed2: 'Medium', btnCAM1_Speed3: 'Fast'}

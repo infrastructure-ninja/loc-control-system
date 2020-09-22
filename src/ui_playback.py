@@ -22,7 +22,7 @@ import utilities
 
 from utilities import DebugPrint
 
-# PLAYBACK BUTTONs, LABELs and LEVELs
+# PLAYBACK BUTTONS, LABELS and LEVELS
 lblPlayback_CurrentClipLength = Label(devices.TouchPanel, 127)
 lblPlayback_CurrentTimeCode   = Label(devices.TouchPanel, 128)
 lblPlaybackTimeCodeRemaining  = Label(devices.TouchPanel, 203)
@@ -53,15 +53,15 @@ lstPlayListButtons = [btnPlayback_Playlist1, btnPlayback_Playlist2, btnPlayback_
 def playback_button_pressed(button, state):
 
     if button is btnPlayback_PLAY:
-        devices.smd101.Set('Playback', 'Play')
+        devices.playback.smd101.Set('Playback', 'Play')
         DebugPrint('interface/PlaybackButtonsPressed', 'Playback button pressed', 'Debug')
 
     elif button is btnPlayback_PAUSE:
-        devices.smd101.Set('Playback', 'Pause')
+        devices.playback.smd101.Set('Playback', 'Pause')
         DebugPrint('interface/PlaybackButtonsPressed', 'Pause button activated', 'Debug')
 
     elif button is btnPlayback_STOP:
-        devices.smd101.Set('Playback', 'Stop')
+        devices.playback.smd101.Set('Playback', 'Stop')
         DebugPrint('interface/PlaybackButtonsPressed', 'Stop button activated', 'Debug')
 
     elif button in lstPlayListButtons:
@@ -79,7 +79,7 @@ def playback_button_pressed(button, state):
                                                    default_value=None)
 
         if playlist_name is not None:
-            devices.smd101.Set('LoadPlaylistCommand ', playlist_name)
+            devices.playback.smd101.Set('LoadPlaylistCommand ', playlist_name)
             DebugPrint('interface/PlaybackButtonsPressed',
                        'Loading playlist: [{}]'.format(playlist_name), 'Info')
 

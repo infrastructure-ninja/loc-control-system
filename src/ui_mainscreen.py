@@ -17,10 +17,9 @@
 from extronlib import event
 from extronlib.ui import Button, Label
 
-import re
-
 import devices
 import utilities
+import presets
 from utilities import DebugPrint
 
 
@@ -92,19 +91,19 @@ def main_screen_buttons_pressed(button, state):
         devices.system_states.Set('ActivePopup', 'POP - Main Menu')
 
     elif button is btnQuickButton1:
-        execute_command(utilities.config.get_value(
+        presets.execute_command(utilities.config.get_value(
             'interface/quickbuttons/button_1_function', default_value=None), button)
 
     elif button is btnQuickButton2:
-        execute_command(utilities.config.get_value(
+        presets.execute_command(utilities.config.get_value(
             'interface/quickbuttons/button_2_function', default_value=None), button)
 
     elif button is btnQuickButton3:
-        execute_command(utilities.config.get_value(
+        presets.execute_command(utilities.config.get_value(
             'interface/quickbuttons/button_3_function', default_value=None), button)
 
     elif button is btnQuickButton4:
-        execute_command(utilities.config.get_value(
+        presets.execute_command(utilities.config.get_value(
             'interface/quickbuttons/button_4_function', default_value=None), button)
 
 #end function (main_screen_buttons_pressed)
@@ -131,11 +130,11 @@ def PTZButtonsPressed(button, state):
 @event([btnMIX, btnCUT], 'Pressed')
 def TransitionButtons(button, state):
     if button is btnMIX:
-        devices.carbonite.Set('Auto', None)
+        devices.switcher.carbonite.Set('Auto', None)
         DebugPrint('interface/TransitionButtons', 'MIX Button pressed', 'Debug')
 
     elif button is btnCUT:
-        devices.carbonite.Set('Cut', None)
+        devices.switcher.carbonite.Set('Cut', None)
         DebugPrint('interface/TransitionButtons', 'CUT Button pressed', 'Debug')
 
 # end function (TransitionButtons)
@@ -152,7 +151,7 @@ def PreviewButtonsPressed(button, state):
         btnIN6_Preview : 'HDMI 2'
     }
 
-    devices.carbonite.Set('MLEPresetSource', PresetSource[button])
+    devices.switcher.carbonite.Set('MLEPresetSource', PresetSource[button])
     DebugPrint('interface/PreviewButtonsPressed', 'Preset button pressed for input: [{}]'.
                format(PresetSource[button]), 'Debug')
 
@@ -170,7 +169,7 @@ def AUXButtonsPressed(button, state):
         btnIN5_AUX : 'HDMI 1',
     }
 
-    devices.carbonite.Set('KeySource', AUXSource[button], {'Keyer': 1})
+    devices.switcher.carbonite.Set('KeySource', AUXSource[button], {'Keyer': 1})
 
 
 # end function (AUXButtonsPressed)
@@ -179,10 +178,10 @@ def AUXButtonsPressed(button, state):
 @event([btnPreview_Key1, btnPreview_Key2], 'Pressed')
 def KeyButtonsPressed(button, state):
     if button is btnPreview_Key1:
-        devices.carbonite.Set('KeyOnPreview', 'Toggle', {'Keyer': 1})
+        devices.switcher.carbonite.Set('KeyOnPreview', 'Toggle', {'Keyer': 1})
 
     elif button is btnPreview_Key2:
-        devices.carbonite.Set('KeyOnPreview', 'Toggle', {'Keyer': 2})
+        devices.switcher.carbonite.Set('KeyOnPreview', 'Toggle', {'Keyer': 2})
 
 @event([btnCloseNoButtonsA, btnCloseNoButtonsB], 'Pressed')
 def btnCloseButtonsPressed(button, state):
@@ -194,133 +193,6 @@ def btnCloseButtonsPressed(button, state):
 
 
 ##################################################################################
-# FIXME - move this (the scripting and macro stuff) into its own file/class
-def execute_command(macro_string, button = None):
-
-    #    device:<object>:<command>:<value>
-    #    ui:popup:<name>
-    #    macro:<name>
-    regex_ui = re.compile(r"^(ui:popup):(.*?)$")
-    regex_device = re.compile(r"^(device):(.*?):(.*?):(.*?):(.*?)(?::(int|str):(.*?)){0,1}$")
-    regex_preset = re.compile(r"^(preset):(.*)$")
-
-    #ui:popup:POP - CAM1 - Control
-    if regex_ui.match(macro_string):
-        p = regex_ui.match(macro_string)
-        if p.group(2):
-            devices.TouchPanel.ShowPopup(p.group(2))
-        else:
-            DebugPrint('execute_button_macro/regex_ui', 'Attempted to handle a malformed command statement: [{}]'.format(macro_string),
-                       'Error')
-
-    #device:carbonite:Cut:None:None
-    #device:carbonite:KeyOnPreview:On:Keyer:int:1
-    elif regex_device.match(macro_string):
-        p = regex_device.match(macro_string)
-        if p.group(4):
-
-            try:
-                driver_object = devices.device_objects[p.group(2)]
-                driver_command = p.group(3)
-
-                if p.group(4).lower() == 'none':
-                    driver_value = None
-
-                else:
-                    driver_value = p.group(4)
-
-
-                if p.group(5) and p.group(5).lower() != 'none':
-                    if p.group(6) and p.group(7):
-                        if p.group(6) == 'int':
-                            qualifier = {p.group(5): int(p.group(7))}
-
-                        elif p.group(6) == 'str':
-                            qualifier = {p.group(5): p.group(7)}
-
-                else:
-                        qualifier = None
-
-                DebugPrint('interface.py/execute_command',
-                           'Sending Device Driver Command: [{}] [{}] [{}]'.format(driver_command, driver_value, qualifier),
-                           'Trace')
-
-                # Run our driver_command
-                driver_object.Set(driver_command, driver_value, qualifier)
-
-            except:
-                DebugPrint('execute_button_macro/regex_device',
-                           'An error occurred sending a command to driver module. [{}]'.format(macro_string),
-                           'Error')
-
-        else:
-            DebugPrint('execute_button_macro/regex_device', 'Attempted to handle a malformed command statement: [{}]'.format(macro_string),
-                       'Error')
-
-    elif regex_preset.match(macro_string):
-        p = regex_preset.match(macro_string)
-        DebugPrint('execute_button_macro/preset', 'We are loading macro #[{}] [{}]'.
-                   format(p.group(2), macro_string))
-
-        execute_preset(int(p.group(2)))
-
-    else:
-        if button is not None:
-            DebugPrint('execute_button_macro', 'UNRECOGNIZED MACRO STRING! Button: [{}] Attempted to parse: [{}]'.
-                       format(button.Name, macro_string), 'Error')
-
-        else:
-            DebugPrint('execute_button_macro', 'UNRECOGNIZED MACRO STRING! Attempted to parse: [{}]'.
-                       format(macro_string), 'Error')
-
-#end function (execute_button_macro)
-
-
-def execute_preset(preset_number):
-    if utilities.config.get_value('presets/preset_{}_enabled'.format(preset_number),
-                                  default_value=False, cast_as='boolean') is True:
-
-        preset_name = utilities.config.get_value('presets/preset_{}_name'.format(preset_number),
-                                  default_value='Un-named', cast_as='string')
-
-        DebugPrint('execute_preset/{}/{}'.format(preset_number, preset_name),
-                   'Preset starting execution..', 'Info')
-
-        preset_index = 0
-        while preset_index < 100:   # We don't want this loop to run away - 100 steps should be enough?
-            preset_index += 1
-
-            current_step_enabled = utilities.config.get_value(
-                'presets/preset_{}_steps/{}_enabled'.format(preset_number, preset_index),
-                default_value=False, cast_as='boolean')
-
-            current_step_data = utilities.config.get_value(
-                'presets/preset_{}_steps/{}_data'.format(preset_number, preset_index),
-                default_value='None', cast_as='string')
-
-            if ((current_step_enabled is False) and (current_step_data == 'None')):
-                DebugPrint('execute_preset/{}/{}'.format(preset_number, preset_name),
-                           'Step #{} is not present, so we are done. Execution completed!'.
-                           format(preset_index), 'Info')
-
-                break
-
-            elif current_step_enabled is False:
-                DebugPrint('execute_preset/{}/{}'.format(preset_number, preset_name),
-                           'Skipping step #{} as it is disabled: [{}]'.
-                           format(preset_index, current_step_data), 'Debug')
-                continue
-
-            # If we get here then we've got valid preset data, AND we're set as enabled. Let's execute!
-            else:
-                DebugPrint('execute_preset/{}/{}'.format(preset_number, preset_name),
-                           'Execute step #{}'.format(preset_index), 'Debug')
-
-                execute_command(current_step_data)
-
-        #FIXME - we really should convert this to a system state
-        lblNextPreset.SetText(preset_name)
-#end function (execute_preset)
 
 
 

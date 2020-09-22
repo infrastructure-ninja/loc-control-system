@@ -25,6 +25,7 @@ import ui_mainscreen as mainscreen
 import ui_playback as playback
 import ui_cam1 as cam1
 import ui_cam2 as cam2
+import ui_presets as presets
 
 
 # Main Menu Buttons
@@ -171,15 +172,15 @@ def initialize_all():
     # seem worth implementing this in the driver.
     if not cam3_is_enabled:
         # HIDE
-        devices.carbonite.Send(b'\xba\xd2\xac\xe5\x00\x10\x4a\x00\x08\x00\x0c\x87\x04\x00\x00\x00\x00') #MV Box3 Label (0xc87)
-        devices.carbonite.Send(b'\xba\xd2\xac\xe5\x00\x10\x4a\x00\x08\x00\x0c\x84\x04\x00\x00\x00\x00') #MV Box3 Source (0xc84)
-        devices.carbonite.Send(b'\xba\xd2\xac\xe5\x00\x10\x4a\x00\x08\x00\x19\x1a\x04\x00\x00\x00\x00') #MV Box3 Border (0x191a)
+        devices.switcher.carbonite.Send(b'\xba\xd2\xac\xe5\x00\x10\x4a\x00\x08\x00\x0c\x87\x04\x00\x00\x00\x00') #MV Box3 Label (0xc87)
+        devices.switcher.carbonite.Send(b'\xba\xd2\xac\xe5\x00\x10\x4a\x00\x08\x00\x0c\x84\x04\x00\x00\x00\x00') #MV Box3 Source (0xc84)
+        devices.switcher.carbonite.Send(b'\xba\xd2\xac\xe5\x00\x10\x4a\x00\x08\x00\x19\x1a\x04\x00\x00\x00\x00') #MV Box3 Border (0x191a)
 
     else:
         # SHOW
-        devices.carbonite.Send(b'\xba\xd2\xac\xe5\x00\x10\x4a\x00\x08\x00\x0c\x87\x04\x00\x00\x00\x01') #MV Box3 Label (0xc87)
-        devices.carbonite.Send(b'\xba\xd2\xac\xe5\x00\x10\x4a\x00\x08\x00\x0c\x84\x04\x00\x00\x03\xea') #MV Box3 Source (0xc84)
-        devices.carbonite.Send(b'\xba\xd2\xac\xe5\x00\x10\x4a\x00\x08\x00\x19\x1a\x04\x00\x00\x00\x01') #MV Box3 Border (0x191a)
+        devices.switcher.carbonite.Send(b'\xba\xd2\xac\xe5\x00\x10\x4a\x00\x08\x00\x0c\x87\x04\x00\x00\x00\x01') #MV Box3 Label (0xc87)
+        devices.switcher.carbonite.Send(b'\xba\xd2\xac\xe5\x00\x10\x4a\x00\x08\x00\x0c\x84\x04\x00\x00\x03\xea') #MV Box3 Source (0xc84)
+        devices.switcher.carbonite.Send(b'\xba\xd2\xac\xe5\x00\x10\x4a\x00\x08\x00\x19\x1a\x04\x00\x00\x00\x01') #MV Box3 Border (0x191a)
 
     cam4_is_enabled = utilities.config.get_value('devices/cam4/enabled', default_value=False, cast_as='boolean')
     for i in [mainscreen.btnCAM4_PTZ, mainscreen.btnCAM4_Preview, mainscreen.btnCAM4_AUX]:
@@ -190,15 +191,31 @@ def initialize_all():
     # seem worth implementing this in the driver.
     if not cam4_is_enabled:
         # HIDE
-        devices.carbonite.Send(b'\xba\xd2\xac\xe5\x00\x10\x4a\x00\x08\x00\x0c\x8e\x04\x00\x00\x00\x00') #MV Box4 Label (0xc8e)
-        devices.carbonite.Send(b'\xba\xd2\xac\xe5\x00\x10\x4a\x00\x08\x00\x0c\x8b\x04\x00\x00\x00\x00') #MV Box4 Source (0xc8b)
-        devices.carbonite.Send(b'\xba\xd2\xac\xe5\x00\x10\x4a\x00\x08\x00\x19\x1b\x04\x00\x00\x00\x00') #MV Box4 Border (0x191b)
+        devices.switcher.carbonite.Send(b'\xba\xd2\xac\xe5\x00\x10\x4a\x00\x08\x00\x0c\x8e\x04\x00\x00\x00\x00') #MV Box4 Label (0xc8e)
+        devices.switcher.carbonite.Send(b'\xba\xd2\xac\xe5\x00\x10\x4a\x00\x08\x00\x0c\x8b\x04\x00\x00\x00\x00') #MV Box4 Source (0xc8b)
+        devices.switcher.carbonite.Send(b'\xba\xd2\xac\xe5\x00\x10\x4a\x00\x08\x00\x19\x1b\x04\x00\x00\x00\x00') #MV Box4 Border (0x191b)
 
     else:
         # SHOW
-        devices.carbonite.Send(b'\xba\xd2\xac\xe5\x00\x10\x4a\x00\x08\x00\x0c\x8e\x04\x00\x00\x00\x01') #MV Box4 Label (0xc8e)
-        devices.carbonite.Send(b'\xba\xd2\xac\xe5\x00\x10\x4a\x00\x08\x00\x0c\x8b\x04\x00\x00\x03\xeb') #MV Box4 Source (0xc8b)
-        devices.carbonite.Send(b'\xba\xd2\xac\xe5\x00\x10\x4a\x00\x08\x00\x19\x1b\x04\x00\x00\x00\x01') #MV Box4 Border (0x191b)
+        devices.switcher.carbonite.Send(b'\xba\xd2\xac\xe5\x00\x10\x4a\x00\x08\x00\x0c\x8e\x04\x00\x00\x00\x01') #MV Box4 Label (0xc8e)
+        devices.switcher.carbonite.Send(b'\xba\xd2\xac\xe5\x00\x10\x4a\x00\x08\x00\x0c\x8b\x04\x00\x00\x03\xeb') #MV Box4 Source (0xc8b)
+        devices.switcher.carbonite.Send(b'\xba\xd2\xac\xe5\x00\x10\x4a\x00\x08\x00\x19\x1b\x04\x00\x00\x00\x01') #MV Box4 Border (0x191b)
+
+
+    # PRESET INITIALIZATION
+    for preset_id in range(1, 13):
+        if utilities.config.get_value('presets/preset_{}_enabled'.
+                                              format(preset_id), default_value=False, cast_as='boolean') is True:
+
+            presets.lstPresetButtons[preset_id - 1].SetText(utilities.config.get_value('presets/preset_{}_name'.
+                                              format(preset_id), default_value='Unnamed', cast_as='string'))
+
+            presets.lstPresetButtons[preset_id - 1].SetEnable(True)
+            presets.lstPresetButtons[preset_id - 1].SetVisible(True)
+
+        else:
+            presets.lstPresetButtons[preset_id - 1].SetVisible(False)
+
 
 #end function (Initialize)
 

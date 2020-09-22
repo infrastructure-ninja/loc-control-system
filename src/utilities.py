@@ -19,10 +19,14 @@ import datetime
 
 from helper_configmgr import ConfigManager
 
-DebugLevel = 1
-#DebugLevel = 0
+#DebugLevel = 1
+DebugLevel = 0
 
 config = ConfigManager('configuration.json')
+
+udp_host_ip = '172.16.200.50'
+udp_host_port = 514
+udp_client = EthernetClientInterface(udp_host_ip, udp_host_port, Protocol='UDP')
 
 
 def DebugPrint(strFunctionName, strMessage, strMessageLevel='Debug'):
@@ -33,7 +37,6 @@ def DebugPrint(strFunctionName, strMessage, strMessageLevel='Debug'):
         if DebugLevel <= intMessageLevel:
             print('[{}] [{}] {}'.format(strMessageLevel, strFunctionName, strMessage))
 
-
         SendSyslog(strFunctionName, strMessage, strMessageLevel)
 
     except KeyError:
@@ -42,8 +45,6 @@ def DebugPrint(strFunctionName, strMessage, strMessageLevel='Debug'):
 
 
 def SendSyslog(strFunctionName, strMessage, strMessageLevel='Debug'):
-    udp_host_ip = '172.16.200.50'
-    udp_host_port = 514
 
     level = 2
     facility = 1
@@ -51,7 +52,6 @@ def SendSyslog(strFunctionName, strMessage, strMessageLevel='Debug'):
     syslog_data = '<{}>[{}] [{}] [{}]'.format( level + facility * 8,
                                                strMessageLevel, strFunctionName, strMessage)
 
-    udp_client = EthernetClientInterface(udp_host_ip, udp_host_port, Protocol='UDP')
     udp_client.Send(syslog_data)
 
 

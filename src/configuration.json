@@ -2,9 +2,49 @@
     "data": {
         "presets": {
             "preset_1_enabled": true,
-            "preset_1_name": "Readings/PiP",
+            "preset_1_name": "Playback (START)",
             "preset_1_steps": {
                 "1_enabled": true,
+                "1_data": "device:carbonite:KeyOnPreview:Off:Keyer:int:2",
+                "2_enabled": true,
+                "2_data": "device:carbonite:KeyOnPreview:Off:Keyer:int:1",
+                "3_enabled": true,
+                "3_data": "device:carbonite:MLEPresetSource:HDMI 2:None",
+                "4_enabled": true,
+                "4_data": "device:playback:Playback:Play:None",
+                "5_enabled": true,
+                "5_data": "device:carbonite:Auto:None:None"
+            },
+            "preset_2_enabled": true,
+            "preset_2_name": "Podium Close-Up",
+            "preset_2_steps": {
+                "1_enabled": true,
+                "1_data": "device:carbonite:KeyOnPreview:Off:Keyer:int:2",
+                "2_enabled": true,
+                "2_data": "device:carbonite:KeyOnPreview:Off:Keyer:int:1",
+                "3_enabled": true,
+                "3_data": "device:carbonite:MLEPresetSource:Cam 1:None",
+                "4_enabled": false,
+                "4_data": "device:playback:Playback:Play:None",
+                "5_enabled": true,
+                "5_data": "device:carbonite:Auto:None:None"
+            },
+            "preset_4_enabled": true,
+            "preset_4_name": "Flowers",
+            "preset_4_steps": {
+                "1_enabled": true,
+                "1_data": "device:carbonite:KeyOnPreview:Off:Keyer:int:2",
+                "2_enabled": true,
+                "2_data": "device:carbonite:KeyOnPreview:Off:Keyer:int:1",
+                "3_enabled": true,
+                "3_data": "device:carbonite:MLEPresetSource:M4:None",
+                "4_enabled": true,
+                "4_data": "device:carbonite:Auto:None:None"
+            },
+            "preset_5_enabled": true,
+            "preset_5_name": "Readings/PiP",
+            "preset_5_steps": {
+                "1_enabled": false,
                 "1_data": "device:cam1:PresetRecall:1:None",
                 "2_enabled": true,
                 "2_data": "device:carbonite:MLEPresetSource:HDMI 1:None",
@@ -13,38 +53,62 @@
                 "4_enabled": true,
                 "4_data": "device:carbonite:KeyOnPreview:Off:Keyer:int:2",
                 "5_enabled": true,
-                "5_data": "device:carbonite:KeyOnPreview:On:Keyer:int:1"
+                "5_data": "device:carbonite:KeyOnPreview:On:Keyer:int:1",
+                "6_enabled": false,
+                "6_data": "device:carbonite:Auto:None:None"
             },
-            "preset_2_enabled": true,
-            "preset_2_name": "Full-screen Graphics",
-            "preset_2_steps": {
+            "preset_6_enabled": true,
+            "preset_6_name": "Altar",
+            "preset_6_steps": {
                 "1_enabled": true,
-                "1_data": "device:cam1:PresetRecall:1:None",
+                "1_data": "device:carbonite:KeyOnPreview:Off:Keyer:int:1",
                 "2_enabled": true,
-                "2_data": "device:carbonite:MLEPresetSource:Cam 1:None",
+                "2_data": "device:carbonite:KeyOnPreview:Off:Keyer:int:2",
                 "3_enabled": true,
-                "3_data": "device:carbonite:KeySource:HDMI 1:Keyer:int:2",
-                "4_enabled": true,
-                "4_data": "device:carbonite:KeyOnPreview:Off:Keyer:int:1",
-                "5_enabled": true,
-                "5_data": "device:carbonite:KeyOnPreview:On:Keyer:int:2"
+                "3_data": "device:carbonite:MLEPresetSource:Cam 1:None",
+                "4_enabled": false,
+                "4_data": "device:carbonite:Auto:None:None"
+            },
+            "preset_7_enabled": true,
+            "preset_7_name": "Altar /w Graphics",
+            "preset_7_steps": {
+                "1_enabled": true,
+                "1_data": "device:carbonite:KeyOnPreview:Off:Keyer:int:1",
+                "2_enabled": true,
+                "2_data": "device:carbonite:KeyOnPreview:On:Keyer:int:2",
+                "3_enabled": true,
+                "3_data": "device:carbonite:MLEPresetSource:Cam 1:None",
+                "4_enabled": false,
+                "4_data": "device:carbonite:Auto:None:None"
+            },
+            "preset_8_enabled": true,
+            "preset_8_name": "Full-screen Graphics",
+            "preset_8_steps": {
+                "1_enabled": true,
+                "1_data": "device:carbonite:KeyOnPreview:Off:Keyer:int:1",
+                "2_enabled": true,
+                "2_data": "device:carbonite:KeyOnPreview:Off:Keyer:int:2",
+                "3_enabled": true,
+                "3_data": "device:carbonite:MLEPresetSource:HDMI 1:None",
+                "4_enabled": false,
+                "4_data": "device:carbonite:Auto:None:None"
             }
         },
         "interface": {
             "quickbuttons": {
                 "button_1_enabled": true,
-                "button_1_name": "Load Preset READING",
-                "button_1_function": "preset:1",
-                "button_1_color": "grey",
-                "button_2_enabled": true,
+                "button_1_name": "Service Presets",
+                "button_1_function": "ui:popup:POP - Service Presets",
+                "button_1_color": "blue",
+                "button_2_enabled": false,
                 "button_2_name": "Load Preset LORDS PRAYER",
                 "button_2_function": "preset:2",
                 "button_2_color": "blue",
-                "button_3_enabled": true,
+                "button_3_enabled": false,
                 "button_3_name": "Key1 OFF",
                 "button_3_function": "device:carbonite:KeyOnPreview:Off:Keyer:int:1",
                 "button_3_color": "purple",
-                "button_4_enabled": true,
+                "button_4_enabled": false,
                 "button_4_name": "CAM 2 Control",
                 "button_4_function": "ui:popup:POP - CAM2-Control",
                 "button_4_color": "purple"
@@ -52,7 +116,7 @@
             "mainmenu": {
                 "r1c1_enabled": true,
                 "r1c1_name": "CUT",
-                "r1c1_function": "device:carbonite:Cut:none",
+                "r1c1_function": "device:carbonite:Cut:None:None",
                 "r1c1_color": "yellow"
             }
         },
@@ -102,7 +166,7 @@
             },
             "midi": {
                 "enabled": true,
-                "serial_port": "COM1",
+                "serial_port": "COM3",
                 "midi_channel": 1,
                 "preset_mapping": {
                     "c4": 1,
@@ -135,7 +199,7 @@
                 "speed_zoom_fast": "7"
             },
             "cam2": {
-                "enabled": true,
+                "enabled": false,
                 "ipaddress": "172.16.200.248",
                 "port": "23",
                 "preset_1_name": "Extreme Wide",
@@ -158,7 +222,7 @@
                 "speed_zoom_fast": "7"
             },
             "cam3": {
-                "enabled": true,
+                "enabled": false,
                 "ipaddress": "192.168.1.2",
                 "port": "23",
                 "preset_1_name": "Preset A",
@@ -180,7 +244,7 @@
                 "speed_zoom_fast": "7"
             },
             "cam4": {
-                "enabled": true,
+                "enabled": false,
                 "ipaddress": "192.168.1.1",
                 "port": "23",
                 "preset_1_name": "Preset A",

@@ -47,7 +47,7 @@ import interface
 
 
 def initialize():
-    devices.InitializeAll()
+    devices.initialize_all()
     interface.initialize_all()
 # end function (Initialize)
 
