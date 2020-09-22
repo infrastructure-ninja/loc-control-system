@@ -26,40 +26,9 @@ import ui_playback as playback
 import ui_cam1 as cam1
 import ui_cam2 as cam2
 import ui_presets as presets
+import ui_mainmenu as mainmenu
+import ui_options as options
 
-
-# Main Menu Buttons
-btnMainMenuR1C1 = Button(devices.TouchPanel, 1000)
-btnMainMenuR2C1 = Button(devices.TouchPanel, 1001)
-btnMainMenuR3C1 = Button(devices.TouchPanel, 1002)
-btnMainMenuR4C1 = Button(devices.TouchPanel, 1003)
-
-btnMainMenuR1C2 = Button(devices.TouchPanel, 1004)
-btnMainMenuR2C2 = Button(devices.TouchPanel, 1005)
-btnMainMenuR3C2 = Button(devices.TouchPanel, 1006)
-btnMainMenuR4C2 = Button(devices.TouchPanel, 1007)
-
-btnMainMenuR1C3 = Button(devices.TouchPanel, 1008)
-btnMainMenuR2C3 = Button(devices.TouchPanel, 1009)
-btnMainMenuR3C3 = Button(devices.TouchPanel, 1010)
-btnMainMenuR4C3 = Button(devices.TouchPanel, 1011)
-
-btnMainMenuR1C4 = Button(devices.TouchPanel, 1012)
-btnMainMenuR2C4 = Button(devices.TouchPanel, 1013)
-btnMainMenuR3C4 = Button(devices.TouchPanel, 1014)
-btnMainMenuR4C4 = Button(devices.TouchPanel, 1015)
-
-btnMainMenuR1C5 = Button(devices.TouchPanel, 1016)
-btnMainMenuR2C5 = Button(devices.TouchPanel, 1017)
-btnMainMenuR3C5 = Button(devices.TouchPanel, 1018)
-btnMainMenuR4C5 = Button(devices.TouchPanel, 1019)
-lstMainPopupButtons = [
-                    btnMainMenuR1C1, btnMainMenuR2C1, btnMainMenuR3C1, btnMainMenuR4C1,
-                    btnMainMenuR1C2, btnMainMenuR2C2, btnMainMenuR3C2, btnMainMenuR4C2,
-                    btnMainMenuR1C3, btnMainMenuR2C3, btnMainMenuR3C3, btnMainMenuR4C3,
-                    btnMainMenuR1C4, btnMainMenuR2C4, btnMainMenuR3C4, btnMainMenuR4C4,
-                    btnMainMenuR1C5, btnMainMenuR2C5, btnMainMenuR3C5, btnMainMenuR4C5
-                    ]
 
 def initialize_all():
     devices.TouchPanel.ShowPage('Main Page')
@@ -167,6 +136,44 @@ def initialize_all():
     for i in [mainscreen.btnCAM3_PTZ, mainscreen.btnCAM3_Preview, mainscreen.btnCAM3_AUX]:
         i.SetVisible(cam3_is_enabled)
 
+    cam3_is_enabled = utilities.config.get_value('devices/cam3/enabled', default_value=False, cast_as='boolean')
+    for i in [mainscreen.btnCAM3_PTZ, mainscreen.btnCAM3_Preview, mainscreen.btnCAM3_AUX]:
+        i.SetVisible(cam3_is_enabled)
+
+    cam4_is_enabled = utilities.config.get_value('devices/cam4/enabled', default_value=False, cast_as='boolean')
+    for i in [mainscreen.btnCAM4_PTZ, mainscreen.btnCAM4_Preview, mainscreen.btnCAM4_AUX]:
+        i.SetVisible(cam4_is_enabled)
+
+    # Hide the CAM1 window on the multiview of the Carbonite switcher
+    # We're just sending raw commands since we don't care about feedback on this, it does not
+    # seem worth implementing this in the driver.
+    if not cam1_is_enabled:
+        # HIDE
+        devices.switcher.carbonite.Send(b'\xba\xd2\xac\xe5\x00\x10\x4a\x00\x08\x00\x0c\x79\x04\x00\x00\x00\x00') #MV Box1 Label (0xc79)
+        devices.switcher.carbonite.Send(b'\xba\xd2\xac\xe5\x00\x10\x4a\x00\x08\x00\x0c\x76\x04\x00\x00\x00\x00') #MV Box1 Source (0xc76)
+        devices.switcher.carbonite.Send(b'\xba\xd2\xac\xe5\x00\x10\x4a\x00\x08\x00\x19\x18\x04\x00\x00\x00\x00') #MV Box1 Border (0x1918)
+
+    else:
+        # SHOW
+        devices.switcher.carbonite.Send(b'\xba\xd2\xac\xe5\x00\x10\x4a\x00\x08\x00\x0c\x79\x04\x00\x00\x00\x01') #MV Box1 Label (0xc79)
+        devices.switcher.carbonite.Send(b'\xba\xd2\xac\xe5\x00\x10\x4a\x00\x08\x00\x0c\x76\x04\x00\x00\x03\xe8') #MV Box1 Source (0xc76)
+        devices.switcher.carbonite.Send(b'\xba\xd2\xac\xe5\x00\x10\x4a\x00\x08\x00\x19\x18\x04\x00\x00\x00\x01') #MV Box1 Border (0x1918)
+
+    # Hide the CAM2 window on the multiview of the Carbonite switcher
+    # We're just sending raw commands since we don't care about feedback on this, it does not
+    # seem worth implementing this in the driver.
+    if not cam2_is_enabled:
+        # HIDE
+        devices.switcher.carbonite.Send(b'\xba\xd2\xac\xe5\x00\x10\x4a\x00\x08\x00\x0c\x80\x04\x00\x00\x00\x00') #MV Box2 Label (0xc80)
+        devices.switcher.carbonite.Send(b'\xba\xd2\xac\xe5\x00\x10\x4a\x00\x08\x00\x0c\x84\x04\x00\x00\x00\x00') #MV Box2 Source (0xc84)
+        devices.switcher.carbonite.Send(b'\xba\xd2\xac\xe5\x00\x10\x4a\x00\x08\x00\x19\x19\x04\x00\x00\x00\x00') #MV Box2 Border (0x1919)
+
+    else:
+        # SHOW
+        devices.switcher.carbonite.Send(b'\xba\xd2\xac\xe5\x00\x10\x4a\x00\x08\x00\x0c\x80\x04\x00\x00\x00\x01') #MV Box2 Label (0xc80)
+        devices.switcher.carbonite.Send(b'\xba\xd2\xac\xe5\x00\x10\x4a\x00\x08\x00\x0c\x84\x04\x00\x00\x03\xe9') #MV Box2 Source (0xc84)
+        devices.switcher.carbonite.Send(b'\xba\xd2\xac\xe5\x00\x10\x4a\x00\x08\x00\x19\x19\x04\x00\x00\x00\x01') #MV Box2 Border (0x1919)
+
     # Hide the CAM3 window on the multiview of the Carbonite switcher
     # We're just sending raw commands since we don't care about feedback on this, it does not
     # seem worth implementing this in the driver.
@@ -182,10 +189,6 @@ def initialize_all():
         devices.switcher.carbonite.Send(b'\xba\xd2\xac\xe5\x00\x10\x4a\x00\x08\x00\x0c\x84\x04\x00\x00\x03\xea') #MV Box3 Source (0xc84)
         devices.switcher.carbonite.Send(b'\xba\xd2\xac\xe5\x00\x10\x4a\x00\x08\x00\x19\x1a\x04\x00\x00\x00\x01') #MV Box3 Border (0x191a)
 
-    cam4_is_enabled = utilities.config.get_value('devices/cam4/enabled', default_value=False, cast_as='boolean')
-    for i in [mainscreen.btnCAM4_PTZ, mainscreen.btnCAM4_Preview, mainscreen.btnCAM4_AUX]:
-        i.SetVisible(cam4_is_enabled)
-
     # Hide the CAM4 window on the multiview of the Carbonite switcher
     # We're just sending raw commands since we don't care about feedback on this, it does not
     # seem worth implementing this in the driver.
@@ -200,7 +203,6 @@ def initialize_all():
         devices.switcher.carbonite.Send(b'\xba\xd2\xac\xe5\x00\x10\x4a\x00\x08\x00\x0c\x8e\x04\x00\x00\x00\x01') #MV Box4 Label (0xc8e)
         devices.switcher.carbonite.Send(b'\xba\xd2\xac\xe5\x00\x10\x4a\x00\x08\x00\x0c\x8b\x04\x00\x00\x03\xeb') #MV Box4 Source (0xc8b)
         devices.switcher.carbonite.Send(b'\xba\xd2\xac\xe5\x00\x10\x4a\x00\x08\x00\x19\x1b\x04\x00\x00\x00\x01') #MV Box4 Border (0x191b)
-
 
     # PRESET INITIALIZATION
     for preset_id in range(1, 13):
@@ -233,21 +235,6 @@ def ShowPopup(PopupName):
 
 
 
-
-@event(lstMainPopupButtons, 'Pressed')
-def MainMenuPopupButtonsPressed(button,state):
-    DebugPrint('interface/MainMenuPopupButtonsPressed', 'Button was pressed: [{}]'.format(button.Name), 'Debug')
-
-#                    btnMainMenuR1C1, btnMainMenuR2C1, btnMainMenuR3C1, btnMainMenuR4C1,
-#                    btnMainMenuR1C2, btnMainMenuR2C2, btnMainMenuR3C2, btnMainMenuR4C2,
-#                    btnMainMenuR1C3, btnMainMenuR2C3, btnMainMenuR3C3, btnMainMenuR4C3,
-#                    btnMainMenuR1C4, btnMainMenuR2C4, btnMainMenuR3C4, btnMainMenuR4C4,
-#                    btnMainMenuR1C5, btnMainMenuR2C5, btnMainMenuR3C5, btnMainMenuR4C5
-
-    if button is btnMainMenuR4C5:
-        DebugPrint('interface/MainMenuPopupButtonsPressed', 'Running a re-initialize', 'Info')
-        utilities.config.reload()
-        initialize_all()
 
 
 

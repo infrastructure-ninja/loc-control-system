@@ -65,10 +65,6 @@ btnCUT = Button(devices.TouchPanel, 5)
 btnMIX = Button(devices.TouchPanel, 52)
 
 btnPlaybackControls = Button(devices.TouchPanel, 47)
-btnBottomBar4 = Button(devices.TouchPanel, 59)
-btnBottomBar5 = Button(devices.TouchPanel, 60)
-btnBottomBar6 = Button(devices.TouchPanel, 99)
-btnBottomBar3 = Button(devices.TouchPanel, 110)
 
 btnPreview_Key1 = Button(devices.TouchPanel, 108)
 btnPreview_Key2 = Button(devices.TouchPanel, 182)
@@ -155,7 +151,6 @@ def PreviewButtonsPressed(button, state):
     DebugPrint('interface/PreviewButtonsPressed', 'Preset button pressed for input: [{}]'.
                format(PresetSource[button]), 'Debug')
 
-
 # end function (PreviewButtonsPressed)
 
 
@@ -171,7 +166,6 @@ def AUXButtonsPressed(button, state):
 
     devices.switcher.carbonite.Set('KeySource', AUXSource[button], {'Keyer': 1})
 
-
 # end function (AUXButtonsPressed)
 
 
@@ -183,35 +177,14 @@ def KeyButtonsPressed(button, state):
     elif button is btnPreview_Key2:
         devices.switcher.carbonite.Set('KeyOnPreview', 'Toggle', {'Keyer': 2})
 
+
 @event([btnCloseNoButtonsA, btnCloseNoButtonsB], 'Pressed')
 def btnCloseButtonsPressed(button, state):
     devices.TouchPanel.ShowPage('Main Page')
     devices.TouchPanel.ShowPopup('POP - Default Home Popup')
 
 
-
-
-
 ##################################################################################
-
-
-
-@event(btnBottomBar3, 'Pressed')
-def btnBottomBar3Pressed(button, state):
-    pass
-
-@event(btnBottomBar4, 'Pressed')
-def btnBottomBar4Pressed(button, state):
-    devices.TouchPanel.ShowPage('No-Button View')
-
-@event(btnBottomBar5, 'Pressed')
-def btnBottomBar5Pressed(button, state):
-    devices.TouchPanel.ShowPopup('POP - Options')
-
-@event(btnBottomBar6, 'Pressed')
-def btnBottomBar6Pressed(button, state):
-    pass
-
 
 
 
