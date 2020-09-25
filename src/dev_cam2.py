@@ -24,20 +24,27 @@ import interface
 import devices
 
 ################################################
-# Vaddio Camera #2
+# Panasonic Camera #2
 ################################################
 
-if utilities.config.get_value('devices/cam2/enabled', cast_as='boolean'):
-    # import driver_pana_camera_AW_HE_UE_Series_v1_6_1_1 as CameraDriver
-    import driver_vadd_controller_QuickConnectUSB_v1_3_0_1 as CameraDriver
+if utilities.config.get_value('devices/cam2/enabled', default_value=False, cast_as='boolean'):
+    import driver_pana_camera_AW_HE_UE_Series_v1_6_1_1 as CameraDriver
 
-    cam2 = GetConnectionHandler(
-        CameraDriver.EthernetClass(
+#    cam2 = GetConnectionHandler(
+#        CameraDriver.HTTPClass(
+#            utilities.config.get_value('devices/cam2/ipaddress'),
+#            utilities.config.get_value('devices/cam2/port', default_value=80, cast_as='integer'),
+#            utilities.config.get_value('devices/cam2/username', default_value='admin', cast_as='string'),
+#            utilities.config.get_value('devices/cam2/password', default_value='password', cast_as='string')),
+#    ), 'Tally')
+    cam2 = CameraDriver.HTTPClass(
             utilities.config.get_value('devices/cam2/ipaddress'),
-            utilities.config.get_value('devices/cam2/port', cast_as='integer'),
-        ), 'StreamingMode')
+            utilities.config.get_value('devices/cam2/port', default_value=80, cast_as='integer'),
+            utilities.config.get_value('devices/cam2/username', default_value='admin', cast_as='string'),
+            utilities.config.get_value('devices/cam2/password', default_value='password', cast_as='string'))
+
 else:
-    cam2 = DummyDriver('Vaddio USB Quick-Connect (CAM2)')
+    cam2 = DummyDriver('Panasonic AW-HE40 Camera (CAM#2)')
 
 devices.device_objects.update({'cam2': cam2})
 

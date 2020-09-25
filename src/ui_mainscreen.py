@@ -28,6 +28,7 @@ btnBackground = Button(devices.TouchPanel, 9)
 
 # The "Next Preset" label
 lblNextPreset = Label(devices.TouchPanel, 109)
+btnMainScreen_ActivatePreset = Button(devices.TouchPanel, 183)
 
 # MENU and QuickButtons
 btnMainMenu = Button(devices.TouchPanel, 16)
@@ -65,6 +66,7 @@ btnCUT = Button(devices.TouchPanel, 5)
 btnMIX = Button(devices.TouchPanel, 52)
 
 btnPlaybackControls = Button(devices.TouchPanel, 47)
+lblPlayback_MainScreenStatus = Label(devices.TouchPanel, 110)
 
 btnPreview_Key1 = Button(devices.TouchPanel, 108)
 btnPreview_Key2 = Button(devices.TouchPanel, 182)
@@ -186,6 +188,9 @@ def btnCloseButtonsPressed(button, state):
 
 ##################################################################################
 
+@event(btnMainScreen_ActivatePreset, 'Pressed')
+def btn_activate_preset_pressed():
+    pass
 
 
 

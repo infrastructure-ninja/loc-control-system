@@ -46,13 +46,26 @@ else:
 devices.device_objects.update({'smd101': smd101})
 
 
+def smd101_update_playback_menu_screen():
+
+    current_timecode = smd101.ReadStatus('CurrentTimecode')
+    current_transport_status = smd101.ReadStatus('Playback')
+    transport_status_text = {'Play': 'Playing', 'Pause': 'Paused', 'Stop': 'Stopped', None: 'Unknown'}[current_transport_status]
+
+    if transport_status_text == 'Stopped' or current_timecode == '':
+        interface.mainscreen.lblPlayback_MainScreenStatus.SetText('{}'.format(transport_status_text))
+
+    else:
+        interface.mainscreen.lblPlayback_MainScreenStatus.SetText('{} [{}]'.
+                                                                  format(transport_status_text, current_timecode))
+
+# end function (smd101_update_playback_menu_screen)
+
 def smd101_receive_data_handler(command, value, qualifier):
-    DebugPrint('devices.py/smd101_receive_data_handler',
-               'Received SMD101 Driver Data: [{0}] [{1}] [{2}]'.format(command, value, qualifier), 'Debug')
 
     if command == 'ConnectionStatus':
         if value == 'Connected':
-            DebugPrint('devices.py/smd101_receive_data_handler', 'SMD101 has been successfully connected', 'Info')
+            DebugPrint('dev_playback.py/smd101_receive_data_handler', 'SMD101 has been successfully connected', 'Info')
 
             for update in lstSMD101statusSubscriptions:
                 if update != 'ConnectionStatus': # ConnectionStatus does not support Updates
@@ -61,7 +74,7 @@ def smd101_receive_data_handler(command, value, qualifier):
             smd101_poll_timer.Resume()
 
         elif value == 'Disconnected':
-            DebugPrint('devices.py/smd101_receive_data_handler',
+            DebugPrint('dev_playback.py/smd101_receive_data_handler',
                        'SMD101 has been disconnected from the system. Will attempt reconnection..', 'Error')
             smd101_poll_timer.Pause()
 
@@ -82,6 +95,8 @@ def smd101_receive_data_handler(command, value, qualifier):
     elif command == 'CurrentTimecode':
         interface.playback.lblPlayback_CurrentTimeCode.SetText(value)
 
+        smd101_update_playback_menu_screen()  # Update the mains screen with some of our playback data
+
         timecode_in_seconds = utilities.ConvertTimecodeToSeconds(value)
         interface.playback.lvlPlayback_ClipPosition.SetLevel(timecode_in_seconds)
         current_clip_length = utilities.ConvertTimecodeToSeconds(smd101.ReadStatus('CurrentClipLength'))
@@ -94,15 +109,29 @@ def smd101_receive_data_handler(command, value, qualifier):
         interface.playback.lblPlayback_CurrentPlaylist.SetText(value)
 
     elif command == 'CurrentSourceItem':
-        #FIXME - add some parsing/conversion here so we don't need such a large amount of room
-        interface.playback.lblPlayback_CurrentSourceItem.SetText(value)
+        # We split this down based on forward slashes, and then use the final element in the resulting array,m
+        # as we are less interested in the full path, and just the filename (which could also be quite long)
+        try:
+            source_item_elements = value.split('/')
+            interface.playback.lblPlayback_CurrentSourceItem.SetText(source_item_elements[-1])
+
+        except:
+            pass
 
     elif command == 'Playback':
         value_text = {'Play': 'Playing', 'Pause': 'Paused', 'Stop': 'Stopped'}[value]
         interface.playback.lblPlayback_CurrentState.SetText(value_text)
 
+        smd101_update_playback_menu_screen()  # Update the mains screen with some of our playback data
+
+        if value == 'Play':
+            interface.playback.btnPlayback_TallyLockout.SetVisible(True)
+
+        else:
+            interface.playback.btnPlayback_TallyLockout.SetVisible(False)
+
     else:
-        DebugPrint('devices.py/smd101_receive_data_handler',
+        DebugPrint('dev_playback.py/smd101_receive_data_handler',
                    'Playback Unhandled data driver data received: [{}] [{}] [{}]'.
                    format(command, value, qualifier), 'Trace')
 
@@ -117,14 +146,16 @@ for status in lstSMD101statusSubscriptions:
 
 
 def smd101_poll_function(timer, count):
-    smd101.Update('CurrentClipLength')
-    smd101.Update('CurrentPlaylistTrack')
-    smd101.Update('CurrentSourceItem')
     smd101.Update('CurrentTimecode')
 
+    # We only want to update these things every second (every-other-time the Timer fires)
+    if count % 2 == 0:
+        smd101.Update('CurrentClipLength')
+        smd101.Update('CurrentPlaylistTrack')
+        smd101.Update('CurrentSourceItem')
 
 # end function(SMD101_poll_function)
 
 
-smd101_poll_timer = Timer(1, smd101_poll_function)
+smd101_poll_timer = Timer(.4, smd101_poll_function)
 smd101_poll_timer.Stop()

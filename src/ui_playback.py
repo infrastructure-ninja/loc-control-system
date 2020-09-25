@@ -23,6 +23,8 @@ import utilities
 from utilities import DebugPrint
 
 # PLAYBACK BUTTONS, LABELS and LEVELS
+btnPlayback_TallyLockout      = Button(devices.TouchPanel, 99)
+
 lblPlayback_CurrentClipLength = Label(devices.TouchPanel, 127)
 lblPlayback_CurrentTimeCode   = Label(devices.TouchPanel, 128)
 lblPlaybackTimeCodeRemaining  = Label(devices.TouchPanel, 203)

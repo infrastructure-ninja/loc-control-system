@@ -35,6 +35,9 @@ device_objects = {}
 
 import dev_cam1 as cam1
 import dev_cam2 as cam2
+import dev_cam3 as cam3
+import dev_cam4 as cam4
+
 import dev_switcher as switcher
 import dev_matrix as matrix
 import dev_playback as playback
@@ -83,14 +86,40 @@ def system_states_callback_handler(command, value, qualifier):
             if single_button is not button_map[value]:
                 single_button.SetState(0)
 
-        # Change the button label to "Slow", "Medium" or "Fast"
-        interface.cam1.btnCAM1_SpeedToggle.SetText(value)
 
     elif command == 'CameraSpeed' and qualifier['Camera Number'] == 2:
         button_map = {
             'Slow': interface.cam2.btnCAM2_Speed1,
             'Medium': interface.cam2.btnCAM2_Speed2,
             'Fast': interface.cam2.btnCAM2_Speed3
+          }
+
+        button_map[value].SetState(1)
+
+        # Update states on all buttons than aren't the one we changed above
+        for single_button in button_map.values():
+            if single_button is not button_map[value]:
+                single_button.SetState(0)
+
+    elif command == 'CameraSpeed' and qualifier['Camera Number'] == 3:
+        button_map = {
+            'Slow': interface.cam3.btnCam3_Speed1,
+            'Medium': interface.cam3.btnCam3_Speed2,
+            'Fast': interface.cam3.btnCam3_Speed3
+          }
+
+        button_map[value].SetState(1)
+
+        # Update states on all buttons than aren't the one we changed above
+        for single_button in button_map.values():
+            if single_button is not button_map[value]:
+                single_button.SetState(0)
+
+    elif command == 'CameraSpeed' and qualifier['Camera Number'] == 4:
+        button_map = {
+            'Slow': interface.cam4.btnCam4_Speed1,
+            'Medium': interface.cam4.btnCam4_Speed2,
+            'Fast': interface.cam4.btnCam4_Speed3
           }
 
         button_map[value].SetState(1)
@@ -130,25 +159,25 @@ def initialize_all():
     DebugPrint('devices.py/initialize_all', 'Attempting to connect to the Yamaha TF5 audio console..', 'Info')
     soundboard.soundboard.Connect()
 
-    DebugPrint('devices.py/initialize_all', 'Attempting to connect to Camera #1 ..', 'Info')
-    cam1.cam1.Connect()
+    #DebugPrint('devices.py/initialize_all', 'Attempting to connect to Camera #1 ..', 'Info')
+    #cam1.cam1.Connect()
 
-    DebugPrint('devices.py/initialize_all', 'Attempting to connect to Camera #2 ..', 'Info')
-    cam2.cam2.Connect()
+    #DebugPrint('devices.py/initialize_all', 'Attempting to connect to Camera #2 ..', 'Info')
+    #cam2.cam2.Connect()
 
     # Set our system state for the starting camera movement speed
     system_states.Set('CameraSpeed',
-                      utilities.config.get_value('devices/cam1/default_speed', default_value='Slow'),
+                      utilities.config.get_value('devices/cam1/default_speed', default_value='Slow', cast_as='string'),
                       {'Camera Number': 1})
 
     system_states.Set('CameraSpeed',
-                      utilities.config.get_value('devices/cam2/default_speed', default_value='Slow'),
+                      utilities.config.get_value('devices/cam2/default_speed', default_value='Slow', cast_as='string'),
                       {'Camera Number': 2})
 
     system_states.Set('CameraSpeed',
-                      utilities.config.get_value('devices/cam3/default_speed', default_value='Slow'),
+                      utilities.config.get_value('devices/cam3/default_speed', default_value='Slow', cast_as='string'),
                       {'Camera Number': 3})
 
     system_states.Set('CameraSpeed',
-                      utilities.config.get_value('devices/cam4/default_speed', default_value='Slow'),
+                      utilities.config.get_value('devices/cam4/default_speed', default_value='Slow', cast_as='string'),
                       {'Camera Number': 4})

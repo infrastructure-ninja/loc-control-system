@@ -25,31 +25,47 @@ import ui_mainscreen as mainscreen
 import ui_playback as playback
 import ui_cam1 as cam1
 import ui_cam2 as cam2
+import ui_cam3 as cam3
+import ui_cam4 as cam4
+
 import ui_presets as presets
 import ui_mainmenu as mainmenu
 import ui_options as options
 
 
 def initialize_all():
-    devices.TouchPanel.ShowPage('Main Page')
-    devices.TouchPanel.ShowPopup('POP - Main Menu')
-    devices.system_states.Set('ActivePopup', 'POP - Main Menu')
 
     # FIXME - we really should convert this to a system state
     mainscreen.lblNextPreset.SetText('n/a')
 
     # We want these things hidden until they are programmatically shown
-    playback.lvlPlayback_ClipPosition.SetVisible(False)
-    playback.lblPlaybackTimeCodeRemaining.SetVisible(False)
-
     cam1.btnCAM1_OnAir.SetVisible(False)
     cam1.btnCAM1_OnAir.SetEnable(False)
+    cam1.btnCAM1_TallyLockout.SetVisible(False)
+    cam1.lblCam1_PresetUpdatedNotice.SetVisible(False)
 
     cam2.btnCAM2_OnAir.SetVisible(False)
     cam2.btnCAM2_OnAir.SetEnable(False)
+    cam2.btnCam2_TallyLockout.SetVisible(False)
+    cam2.lblCam2_PresetUpdatedNotice.SetVisible(False)
+
+    cam3.btnCam3_OnAir.SetVisible(False)
+    cam3.btnCam3_OnAir.SetEnable(False)
+    cam3.btnCam3_TallyLockout.SetVisible(False)
+    cam3.lblCam3_PresetUpdatedNotice.SetVisible(False)
+
+    cam4.btnCam4_OnAir.SetVisible(False)
+    cam4.btnCam4_OnAir.SetEnable(False)
+    cam4.btnCam4_TallyLockout.SetVisible(False)
+    cam4.lblCam4_PresetUpdatedNotice.SetVisible(False)
 
     playback.btnPlayback_OnAir.SetVisible(False)
     playback.btnPlayback_OnAir.SetEnable(False)
+    playback.btnPlayback_TallyLockout.SetVisible(False)
+    playback.lvlPlayback_ClipPosition.SetVisible(False)
+    playback.lblPlaybackTimeCodeRemaining.SetVisible(False)
+
+    playback.lblPlayback_CurrentState.SetText('Playing [-00:00:02]')
 
     # Initialize a bunch of buttons using text pulled from our configuration file
     # This dictionary stores the button object we want to "SetText' on, and the configuration
@@ -79,6 +95,24 @@ def initialize_all():
         cam2.btnCAM2_Preset6: 'devices/cam2/preset_6_name',
         cam2.btnCAM2_Preset7: 'devices/cam2/preset_7_name',
         cam2.btnCAM2_Preset8: 'devices/cam2/preset_8_name',
+
+        cam3.btnCam3_Preset1: 'devices/cam3/preset_1_name',
+        cam3.btnCam3_Preset2: 'devices/cam3/preset_2_name',
+        cam3.btnCam3_Preset3: 'devices/cam3/preset_3_name',
+        cam3.btnCam3_Preset4: 'devices/cam3/preset_4_name',
+        cam3.btnCam3_Preset5: 'devices/cam3/preset_5_name',
+        cam3.btnCam3_Preset6: 'devices/cam3/preset_6_name',
+        cam3.btnCam3_Preset7: 'devices/cam3/preset_7_name',
+        cam3.btnCam3_Preset8: 'devices/cam3/preset_8_name',
+
+        cam4.btnCam4_Preset1: 'devices/cam4/preset_1_name',
+        cam4.btnCam4_Preset2: 'devices/cam4/preset_2_name',
+        cam4.btnCam4_Preset3: 'devices/cam4/preset_3_name',
+        cam4.btnCam4_Preset4: 'devices/cam4/preset_4_name',
+        cam4.btnCam4_Preset5: 'devices/cam4/preset_5_name',
+        cam4.btnCam4_Preset6: 'devices/cam4/preset_6_name',
+        cam4.btnCam4_Preset7: 'devices/cam4/preset_7_name',
+        cam4.btnCam4_Preset8: 'devices/cam4/preset_8_name',
 
         mainscreen.btnQuickButton1: 'interface/quickbuttons/button_1_name',
         mainscreen.btnQuickButton2: 'interface/quickbuttons/button_2_name',
@@ -218,6 +252,10 @@ def initialize_all():
         else:
             presets.lstPresetButtons[preset_id - 1].SetVisible(False)
 
+    # The last thing we do is to show our actual Main Page and the home popup.
+    devices.TouchPanel.ShowPage('Main Page')
+    devices.TouchPanel.ShowPopup('POP - Main Menu')
+    devices.system_states.Set('ActivePopup', 'POP - Main Menu')
 
 #end function (Initialize)
 
