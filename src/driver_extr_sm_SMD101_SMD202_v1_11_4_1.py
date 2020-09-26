@@ -102,8 +102,8 @@ class DeviceClass:
             self.AddMatchString(re.compile(b'SubtE1\*(1|0)\r\n'), self.__MatchClosedCaption, None)
             self.AddMatchString(re.compile(b'PlyrZ1\*(|\d+:\d{2}:\d{2}\.\d{9})\r\n'), self.__MatchCurrentClipLength, None)
             self.AddMatchString(re.compile(b'Dir (.*?)/\r\n'), self.__MatchCurrentDirectory, None)
-            self.AddMatchString(re.compile(b'PlyrL1\*(.*?)\r\n'), self.__MatchCurrentPlaylistTrack, None)
-            self.AddMatchString(re.compile(b'PlyrU1\*(.*?)\r\n'), self.__MatchCurrentSourceItem, None)
+            self.AddMatchString(re.compile(b'PlyrL1\*(.*)\r\n'), self.__MatchCurrentPlaylistTrack, None)
+            self.AddMatchString(re.compile(b'PlyrU1\*(.*)\r\n'), self.__MatchCurrentSourceItem, None)
             self.AddMatchString(re.compile(b'PlyrT1\*(\d+)\r\n'), self.__MatchCurrentTrackNumber, None)
             self.AddMatchString(re.compile(b'PlstG (.*?)\r\n'), self.__MatchCurrentPlaylistTrackList, None)
             self.AddMatchString(re.compile(b'PlyrK1\*(|\d+:\d{2}:\d{2}\.\d{9})\r\n'), self.__MatchCurrentTimecode, None)
@@ -318,9 +318,12 @@ class DeviceClass:
     def __MatchCurrentPlaylistTrackList(self, match, tag):
 
         jsonData = json.loads(match.group(1).decode())
-        value = jsonData[int(self.CurrentTrackNumber)-1]['location'][0] # use self.CurrentTrackNumber as index to get current playing track
-        self.WriteStatus('CurrentSourceItem', value, None) # write current playing track
-
+        try:
+            value = jsonData[int(self.CurrentTrackNumber)-1]['location'][0] # use self.CurrentTrackNumber as index to get current playing track
+            self.WriteStatus('CurrentSourceItem', value, None) # write current playing track
+        except IndexError:
+            pass
+            
     def SetChangeDirectory(self, value, qualifier):
 
         path = qualifier['Directory Path']
@@ -1351,6 +1354,7 @@ class DeviceClass:
 
             SeekCmdString = 'wK1*{0}:{1}:{2}PLYR\r'.format(hours, minutes, seconds)
             self.__SetHelper('Seek', SeekCmdString, value, qualifier)
+            
     def SetStandbyTimer(self, value, qualifier):
 
         ValueConstraints = {

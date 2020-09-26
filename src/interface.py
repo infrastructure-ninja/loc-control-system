@@ -61,7 +61,7 @@ def initialize_all():
 
     playback.btnPlayback_OnAir.SetVisible(False)
     playback.btnPlayback_OnAir.SetEnable(False)
-    playback.btnPlayback_TallyLockout.SetVisible(False)
+    playback.btnPlayback_TallyPresetsLockout.SetVisible(False)
     playback.lvlPlayback_ClipPosition.SetVisible(False)
     playback.lblPlaybackTimeCodeRemaining.SetVisible(False)
 

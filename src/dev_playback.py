@@ -30,7 +30,7 @@ import devices
 ################################################
 
 if utilities.config.get_value('devices/playback/enabled', cast_as='boolean'):
-    import driver_extr_sm_SMD101_SMD202_v1_11_4_0 as SMD101Driver
+    import driver_extr_sm_SMD101_SMD202_v1_11_4_1 as SMD101Driver
 
     smd101 = GetConnectionHandler(
         SMD101Driver.SSHClass(
@@ -40,6 +40,7 @@ if utilities.config.get_value('devices/playback/enabled', cast_as='boolean'):
                 utilities.config.get_value('devices/playback/username'),
                 utilities.config.get_value('devices/playback/password'),
             )), 'Temperature')
+
 else:
     smd101 = DummyDriver('Extron SMD101 Playback Unit')
 
@@ -50,7 +51,10 @@ def smd101_update_playback_menu_screen():
 
     current_timecode = smd101.ReadStatus('CurrentTimecode')
     current_transport_status = smd101.ReadStatus('Playback')
-    transport_status_text = {'Play': 'Playing', 'Pause': 'Paused', 'Stop': 'Stopped', None: 'Unknown'}[current_transport_status]
+    transport_status_text = {'Play': 'Playing',
+                             'Pause': 'Paused',
+                             'Stop': 'Stopped',
+                             None: 'Unknown'}[current_transport_status]
 
     if transport_status_text == 'Stopped' or current_timecode == '':
         interface.mainscreen.lblPlayback_MainScreenStatus.SetText('{}'.format(transport_status_text))
@@ -61,6 +65,7 @@ def smd101_update_playback_menu_screen():
 
 # end function (smd101_update_playback_menu_screen)
 
+
 def smd101_receive_data_handler(command, value, qualifier):
 
     if command == 'ConnectionStatus':
@@ -68,7 +73,7 @@ def smd101_receive_data_handler(command, value, qualifier):
             DebugPrint('dev_playback.py/smd101_receive_data_handler', 'SMD101 has been successfully connected', 'Info')
 
             for update in lstSMD101statusSubscriptions:
-                if update != 'ConnectionStatus': # ConnectionStatus does not support Updates
+                if update != 'ConnectionStatus':  # ConnectionStatus does not support Updates
                     smd101.Update(update)
 
             smd101_poll_timer.Resume()
@@ -124,11 +129,11 @@ def smd101_receive_data_handler(command, value, qualifier):
 
         smd101_update_playback_menu_screen()  # Update the mains screen with some of our playback data
 
-        if value == 'Play':
-            interface.playback.btnPlayback_TallyLockout.SetVisible(True)
+        if value == 'Play' or value == 'Pause':
+            interface.playback.btnPlayback_TallyPresetsLockout.SetVisible(True)
 
         else:
-            interface.playback.btnPlayback_TallyLockout.SetVisible(False)
+            interface.playback.btnPlayback_TallyPresetsLockout.SetVisible(False)
 
     else:
         DebugPrint('dev_playback.py/smd101_receive_data_handler',
