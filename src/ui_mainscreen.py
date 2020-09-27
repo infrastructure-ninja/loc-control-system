@@ -26,6 +26,12 @@ from utilities import DebugPrint
 # The background button
 btnBackground = Button(devices.TouchPanel, 9)
 
+# The audio and stream status widgets
+btnMainSoundMicsActive = Button(devices.TouchPanel, 53)
+btnMainSoundPlaybackActive = Button(devices.TouchPanel, 54)
+btnMainStreamingStatus = Button(devices.TouchPanel, 55)
+
+
 # The "Next Preset" label
 lblNextPreset = Label(devices.TouchPanel, 109)
 btnMainScreen_ActivatePreset = Button(devices.TouchPanel, 183)
@@ -189,8 +195,16 @@ def btnCloseButtonsPressed(button, state):
 ##################################################################################
 
 @event(btnMainScreen_ActivatePreset, 'Pressed')
-def btn_activate_preset_pressed():
-    pass
+def btn_activate_preset_pressed(button, state):
+    preset_to_activate = devices.system_states.ReadStatus('NextPreset')
+
+    if preset_to_activate != 0 and preset_to_activate is not None:
+        presets.execute_preset(preset_to_activate, stage='activate')
+
+        devices.system_states.Set('NextPreset', None, None)
+
+
+
 
 
 

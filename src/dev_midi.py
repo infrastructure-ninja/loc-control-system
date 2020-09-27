@@ -20,8 +20,8 @@ from utilities import DummyDriver
 from utilities import DebugPrint
 import utilities
 
-import interface
 import devices
+import presets
 
 ################################################
 # DecaBox MIDI<->RS-232
@@ -49,16 +49,22 @@ def midi_received_data_handler(command, value, qualifier):
     midi_channel = qualifier['Channel']
 
     config_value_to_lookup = 'devices/midi/preset_mapping/{}'.format(midi_note)
-    preset_number = utilities.config.get_value(config_value_to_lookup,
+
+    preset_information = utilities.config.get_value(config_value_to_lookup,
                                default_value='None', cast_as='string')
+
+    preset_number, tmp_stage = preset_information.split(':')
+
+    preset_stage = {'p': 'prepare', 'a': 'activate'}[tmp_stage.lower()]
 
     print('MIDI NOTE     ->', midi_note)
     print('CONFIG VALUE  ->', config_value_to_lookup)
     print('PRESET NUMBER ->', preset_number)
+    print('PRESET STAGE  ->', preset_stage)
 
-    if preset_number != 'None':
-      print('TRIGGERING PRESET #{}'.format(preset_number))
-      interface.mainscreen.execute_preset(preset_number)
+    if preset_number != 'None' and preset_stage in ['prepare', 'activate']:
+      print('TRIGGERING PRESET #{}/{}'.format(preset_number, preset_stage))
+      presets.execute_preset(preset_number, stage=preset_stage)
 
 
     #DebugPrint('devices.py/smp351_received_data_handler',

@@ -31,7 +31,7 @@ import ui_cam4 as cam4
 import ui_presets as presets
 import ui_mainmenu as mainmenu
 import ui_options as options
-
+import ui_audio as audio
 
 def initialize_all():
 
@@ -62,6 +62,7 @@ def initialize_all():
     playback.btnPlayback_OnAir.SetVisible(False)
     playback.btnPlayback_OnAir.SetEnable(False)
     playback.btnPlayback_TallyPresetsLockout.SetVisible(False)
+    playback.btnPlayback_TallyTransportLockout.SetVisible(False)
     playback.lvlPlayback_ClipPosition.SetVisible(False)
     playback.lblPlaybackTimeCodeRemaining.SetVisible(False)
 
@@ -238,12 +239,12 @@ def initialize_all():
         devices.switcher.carbonite.Send(b'\xba\xd2\xac\xe5\x00\x10\x4a\x00\x08\x00\x0c\x8b\x04\x00\x00\x03\xeb') #MV Box4 Source (0xc8b)
         devices.switcher.carbonite.Send(b'\xba\xd2\xac\xe5\x00\x10\x4a\x00\x08\x00\x19\x1b\x04\x00\x00\x00\x01') #MV Box4 Border (0x191b)
 
-    # PRESET INITIALIZATION
+    # PRESET BUTTON INITIALIZATION
     for preset_id in range(1, 13):
-        if utilities.config.get_value('presets/preset_{}_enabled'.
+        if utilities.config.get_value('presets/{}/enabled'.
                                               format(preset_id), default_value=False, cast_as='boolean') is True:
 
-            presets.lstPresetButtons[preset_id - 1].SetText(utilities.config.get_value('presets/preset_{}_name'.
+            presets.lstPresetButtons[preset_id - 1].SetText(utilities.config.get_value('presets/{}/name'.
                                               format(preset_id), default_value='Unnamed', cast_as='string'))
 
             presets.lstPresetButtons[preset_id - 1].SetEnable(True)

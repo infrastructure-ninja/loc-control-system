@@ -1,332 +1,624 @@
 {
-    "data": {
-        "presets": {
-            "1": {
-                "enabled": true,
-                "name": "Playback (START)",
-                "prepare": {
-                    "1": {
-                        "enabled": true,
-                        "type": "device",
-                        "device": "carbonite",
-                        "command": "KeyOnPreview",
-                        "value": "Off",
-                        "qualifier_key": "Keyer",
-                        "qualifier_value": "1",
-                        "qualifier_value_type": "integer"
-                    },
-                    "2": {
-                        "enabled": true,
-                        "type": "device",
-                        "device": "carbonite",
-                        "command": "KeyOnPreview",
-                        "value": "Off",
-                        "qualifier_key": "Keyer",
-                        "qualifier_value": "2",
-                        "qualifier_value_type": "integer"
-                    },
-                    "3": {
-                        "enabled": true,
-                        "type": "device",
-                        "device": "carbonite",
-                        "command": "MLEPresetSource",
-                        "value": "HDMI 2",
-                        "qualifier_key": "None",
-                        "qualifier_value": "None",
-                        "qualifier_value_type": ""
-                    }
-                },
-                "activate": {
-                    "1": {
-                        "enabled": true,
-                        "type": "device",
-                        "device": "smd101",
-                        "command": "Playback",
-                        "value": "Play",
-                        "qualifier_key": "None",
-                        "qualifier_value": "None",
-                        "qualifier_value_type": ""
-                    },
-                    "2": {
-                        "enabled": true,
-                        "type": "device",
-                        "device": "carbonite",
-                        "command": "Auto",
-                        "value": "None",
-                        "qualifier_key": "None",
-                        "qualifier_value": "None",
-                        "qualifier_value_type": ""
-                    }
-                }
-            },
-            "preset_2_enabled": true,
-            "preset_2_name": "Podium Close-Up (CAM1/IMMEDIATE)",
-            "preset_2_steps": {
-                "prepare": {
-                    "1_enabled": true,
-                    "1_data": "device:cam1:Preset:3:Type:string:Recall",
-                    "2_enabled": true,
-                    "2_data": "device:carbonite:KeyOnPreview:Off:Keyer:int:2",
-                    "3_enabled": true,
-                    "3_data": "device:carbonite:KeyOnPreview:Off:Keyer:int:1",
-                    "4_enabled": true,
-                    "4_data": "device:carbonite:MLEPresetSource:Cam 1:None",
-                    "5_enabled": false,
-                    "5_data": "device:playback:Playback:Stop:None"
-                },
-                "activate": {
-                    "1_enabled": true,
-                    "1_data": "device:carbonite:Cut:None:None"
-                }
-            },
-            "preset_4_enabled": true,
-            "preset_4_name": "Flowers",
-            "preset_4_steps": {
-                "1_enabled": true,
-                "1_data": "device:carbonite:KeyOnPreview:Off:Keyer:int:2",
-                "2_enabled": true,
-                "2_data": "device:carbonite:KeyOnPreview:Off:Keyer:int:1",
-                "3_enabled": true,
-                "3_data": "device:carbonite:MLEPresetSource:M4:None",
-                "4_enabled": true,
-                "4_data": "device:carbonite:Auto:None:None"
-            },
-            "preset_5_enabled": true,
-            "preset_5_name": "Readings/PiP",
-            "preset_5_steps": {
-                "1_enabled": false,
-                "1_data": "device:cam1:PresetRecall:1:None",
-                "2_enabled": true,
-                "2_data": "device:carbonite:MLEPresetSource:HDMI 1:None",
-                "3_enabled": true,
-                "3_data": "device:carbonite:KeySource:Cam 1:Keyer:int:1",
-                "4_enabled": true,
-                "4_data": "device:carbonite:KeyOnPreview:Off:Keyer:int:2",
-                "5_enabled": true,
-                "5_data": "device:carbonite:KeyOnPreview:On:Keyer:int:1",
-                "6_enabled": false,
-                "6_data": "device:carbonite:Auto:None:None"
-            },
-            "preset_6_enabled": true,
-            "preset_6_name": "Altar",
-            "preset_6_steps": {
-                "1_enabled": true,
-                "1_data": "device:carbonite:KeyOnPreview:Off:Keyer:int:1",
-                "2_enabled": true,
-                "2_data": "device:carbonite:KeyOnPreview:Off:Keyer:int:2",
-                "3_enabled": true,
-                "3_data": "device:carbonite:MLEPresetSource:Cam 1:None",
-                "4_enabled": false,
-                "4_data": "device:carbonite:Auto:None:None"
-            },
-            "preset_7_enabled": true,
-            "preset_7_name": "Altar /w Graphics",
-            "preset_7_steps": {
-                "1_enabled": true,
-                "1_data": "device:carbonite:KeyOnPreview:Off:Keyer:int:1",
-                "2_enabled": true,
-                "2_data": "device:carbonite:KeyOnPreview:On:Keyer:int:2",
-                "3_enabled": true,
-                "3_data": "device:carbonite:MLEPresetSource:Cam 1:None",
-                "4_enabled": false,
-                "4_data": "device:carbonite:Auto:None:None"
-            },
-            "preset_8_enabled": true,
-            "preset_8_name": "Full-screen Graphics",
-            "preset_8_steps": {
-                "1_enabled": true,
-                "1_data": "device:carbonite:KeyOnPreview:Off:Keyer:int:1",
-                "2_enabled": true,
-                "2_data": "device:carbonite:KeyOnPreview:Off:Keyer:int:2",
-                "3_enabled": true,
-                "3_data": "device:carbonite:MLEPresetSource:HDMI 1:None",
-                "4_enabled": false,
-                "4_data": "device:carbonite:Auto:None:None"
-            }
+  "data": {
+    "presets": {
+      "1": {
+        "enabled": true,
+        "name": "Playback (START)",
+        "prepare": {
+          "1": {
+            "enabled": true,
+            "type": "device",
+            "device": "carbonite",
+            "command": "KeyOnPreview",
+            "value": "Off",
+            "qualifier_key": "Keyer",
+            "qualifier_value": "1",
+            "qualifier_value_type": "integer"
+          },
+          "2": {
+            "enabled": true,
+            "type": "device",
+            "device": "carbonite",
+            "command": "KeyOnPreview",
+            "value": "Off",
+            "qualifier_key": "Keyer",
+            "qualifier_value": "2",
+            "qualifier_value_type": "integer"
+          },
+          "3": {
+            "enabled": true,
+            "type": "device",
+            "device": "carbonite",
+            "command": "MLEPresetSource",
+            "value": "HDMI 2",
+            "qualifier_key": "None",
+            "qualifier_value": "None",
+            "qualifier_value_type": ""
+          }
         },
-        "interface": {
-            "quickbuttons": {
-                "button_1_enabled": true,
-                "button_1_name": "Service Presets",
-                "button_1_function": "ui:popup:POP - Service Presets",
-                "button_1_color": "blue",
-                "button_2_enabled": true,
-                "button_2_name": "Preset 1 -> Activate",
-                "button_2_function": "preset:1:activate",
-                "button_2_color": "red",
-                "button_3_enabled": false,
-                "button_3_name": "Key1 OFF",
-                "button_3_function": "device:carbonite:KeyOnPreview:Off:Keyer:int:1",
-                "button_3_color": "purple",
-                "button_4_enabled": true,
-                "button_4_name": "Preset 1 -> Prepare",
-                "button_4_function": "preset:1:prepare",
-                "button_4_color": "green"
-            },
-            "mainmenu": {
-                "r1c1_enabled": true,
-                "r1c1_name": "CUT",
-                "r1c1_function": "device:carbonite:Cut:None:None",
-                "r1c1_color": "yellow"
-            }
-        },
-        "devices": {
-            "switcher": {
-                "enabled": true,
-                "ipaddress": "172.16.200.220",
-                "port": "5253",
-                "tally_enabled": true,
-                "tally_port": "5728"
-            },
-            "matrix": {
-                "enabled": false,
-                "ipaddress": "172.16.200.254",
-                "port": "23"
-            },
-            "soundboard": {
-                "enabled": false,
-                "ipaddress": "172.16.200.5",
-                "port": "49280"
-            },
-            "playback": {
-                "enabled": true,
-                "ipaddress": "172.16.200.50",
-                "ipaddress-original": "172.16.200.253",
-                "port": "22023",
-                "username": "admin",
-                "password": "extron",
-                "playlist_1_name": "INTRO",
-                "playlist_1_filename": "intro.m3u",
-                "playlist_2_name": "Playlist #2",
-                "playlist_2_filename": "music2.m3u",
-                "playlist_3_name": "Playlist #3",
-                "playlist_3_filename": "music3.m3u",
-                "playlist_4_name": "Playlist #4",
-                "playlist_4_filename": "music4.m3u",
-                "playlist_5_name": "Playlist #5",
-                "playlist_5_filename": "music5.m3u",
-                "playlist_6_name": "OUTRO",
-                "playlist_6_filename": "outro.m3u"
-            },
-            "smp351": {
-                "enabled": false,
-                "ipaddress": "None",
-                "port": "None",
-                "serial_port": "COM1",
-                "serial_baud": "38400"
-            },
-            "midi": {
-                "enabled": true,
-                "serial_port": "COM3",
-                "midi_channel": 1,
-                "preset_mapping": {
-                    "c4": 1,
-                    "c#4": 2,
-                    "d4": 3,
-                    "e4": 4
-                }
-            },
-            "cam1": {
-                "enabled": true,
-                "ipaddress": "172.16.200.103",
-                "port": "80",
-                "username": "admin",
-                "password": "12345",
-                "preset_1_name": "Extreme Wide",
-                "preset_2_name": "Podium A",
-                "preset_3_name": "Podium B",
-                "preset_4_name": "Altar",
-                "preset_5_name": "Readings",
-                "preset_6_name": "Cross",
-                "preset_7_name": "",
-                "preset_8_name": "",
-                "default_speed": "Fast",
-                "speed_pan_slow": "12",
-                "speed_pan_medium": "18",
-                "speed_pan_fast": "49",
-                "speed_tilt_slow": "12",
-                "speed_tilt_medium": "18",
-                "speed_tilt_fast": "49",
-                "speed_zoom_slow": "15",
-                "speed_zoom_medium": "25",
-                "speed_zoom_fast": "49"
-            },
-            "cam2": {
-                "enabled": true,
-                "ipaddress": "172.16.200.103",
-                "port": "80",
-                "username": "admin",
-                "password": "12345",
-                "preset_1_name": "Extreme Wide",
-                "preset_2_name": "Podium A",
-                "preset_3_name": "Podium B",
-                "preset_4_name": "Altar",
-                "preset_5_name": "Flowers",
-                "preset_6_name": "Readings",
-                "preset_7_name": "",
-                "preset_8_name": "",
-                "default_speed": "Medium",
-                "speed_pan_slow": "12",
-                "speed_pan_medium": "18",
-                "speed_pan_fast": "49",
-                "speed_tilt_slow": "12",
-                "speed_tilt_medium": "18",
-                "speed_tilt_fast": "49",
-                "speed_zoom_slow": "15",
-                "speed_zoom_medium": "25",
-                "speed_zoom_fast": "49"
-            },
-            "cam3": {
-                "enabled": true,
-                "ipaddress": "172.16.200.103",
-                "port": "80",
-                "username": "admin",
-                "password": "12345",
-                "preset_1_name": "Preset A",
-                "preset_2_name": "Preset B",
-                "preset_3_name": "Preset C",
-                "preset_4_name": "Preset D",
-                "preset_5_name": "Preset E",
-                "preset_6_name": "Preset F",
-                "preset_7_name": "Preset G",
-                "preset_8_name": "Preset H",
-                "default_speed": "Medium",
-                "speed_pan_slow": "12",
-                "speed_pan_medium": "18",
-                "speed_pan_fast": "49",
-                "speed_tilt_slow": "12",
-                "speed_tilt_medium": "18",
-                "speed_tilt_fast": "49",
-                "speed_zoom_slow": "15",
-                "speed_zoom_medium": "25",
-                "speed_zoom_fast": "49"
-            },
-            "cam4": {
-                "enabled": true,
-                "ipaddress": "172.16.200.103",
-                "port": "80",
-                "username": "admin",
-                "password": "12345",
-                "preset_1_name": "Preset A",
-                "preset_2_name": "Preset B",
-                "preset_3_name": "Preset C",
-                "preset_4_name": "Preset D",
-                "preset_5_name": "Preset E",
-                "preset_6_name": "Preset F",
-                "preset_7_name": "Preset G",
-                "preset_8_name": "Preset H",
-                "default_speed": "Medium",
-                "speed_pan_slow": "12",
-                "speed_pan_medium": "18",
-                "speed_pan_fast": "49",
-                "speed_tilt_slow": "12",
-                "speed_tilt_medium": "18",
-                "speed_tilt_fast": "49",
-                "speed_zoom_slow": "15",
-                "speed_zoom_medium": "25",
-                "speed_zoom_fast": "49"
-            }
-
+        "activate": {
+          "1": {
+            "enabled": true,
+            "type": "device",
+            "device": "smd101",
+            "command": "Playback",
+            "value": "Play",
+            "qualifier_key": "None",
+            "qualifier_value": "None",
+            "qualifier_value_type": ""
+          },
+          "2": {
+            "enabled": true,
+            "type": "device",
+            "device": "carbonite",
+            "command": "Auto",
+            "value": "None",
+            "qualifier_key": "None",
+            "qualifier_value": "None",
+            "qualifier_value_type": ""
+          }
         }
+      },
+      "2": {
+        "enabled": true,
+        "name": "Podium Close-Up (CUT/CAM3)",
+        "prepare": {
+          "1": {
+            "enabled": true,
+            "type": "device",
+            "device": "cam3",
+            "command": "Preset",
+            "value": "3",
+            "qualifier_key": "Type",
+            "qualifier_value": "Recall",
+            "qualifier_value_type": "string"
+          },
+          "2": {
+            "enabled": true,
+            "type": "device",
+            "device": "carbonite",
+            "command": "KeyOnPreview",
+            "value": "Off",
+            "qualifier_key": "Keyer",
+            "qualifier_value": "1",
+            "qualifier_value_type": "integer"
+          },
+          "3": {
+            "enabled": true,
+            "type": "device",
+            "device": "carbonite",
+            "command": "KeyOnPreview",
+            "value": "Off",
+            "qualifier_key": "Keyer",
+            "qualifier_value": "2",
+            "qualifier_value_type": "integer"
+          },
+          "4": {
+            "enabled": true,
+            "type": "device",
+            "device": "carbonite",
+            "command": "MLEPresetSource",
+            "value": "Cam 3",
+            "qualifier_key": "None",
+            "qualifier_value": "None",
+            "qualifier_value_type": ""
+          }
+        },
+        "activate": {
+          "1": {
+            "enabled": false,
+            "type": "device",
+            "device": "soundboard",
+            "command": "InputMute",
+            "value": "On",
+            "qualifier_key": "None",
+            "qualifier_value": "None",
+            "qualifier_value_type": ""
+          },
+          "2": {
+            "enabled": false,
+            "type": "device",
+            "device": "soundboard",
+            "command": "InputMute",
+            "value": "Off",
+            "qualifier_key": "None",
+            "qualifier_value": "None",
+            "qualifier_value_type": ""
+          },
+          "3": {
+            "enabled": true,
+            "type": "device",
+            "device": "smd101",
+            "command": "Playback",
+            "value": "Stop",
+            "qualifier_key": "None",
+            "qualifier_value": "None",
+            "qualifier_value_type": ""
+          },
+          "4": {
+            "enabled": true,
+            "type": "device",
+            "device": "carbonite",
+            "command": "Cut",
+            "value": "None",
+            "qualifier_key": "None",
+            "qualifier_value": "None",
+            "qualifier_value_type": ""
+          }
+        }
+      },
+      "3": {
+        "enabled": true,
+        "name": "Flowers (DISSOLVE)",
+        "prepare": {
+          "1": {
+            "enabled": true,
+            "type": "device",
+            "device": "carbonite",
+            "command": "KeyOnPreview",
+            "value": "Off",
+            "qualifier_key": "Keyer",
+            "qualifier_value": "1",
+            "qualifier_value_type": "integer"
+          },
+          "2": {
+            "enabled": true,
+            "type": "device",
+            "device": "carbonite",
+            "command": "KeyOnPreview",
+            "value": "Off",
+            "qualifier_key": "Keyer",
+            "qualifier_value": "2",
+            "qualifier_value_type": "integer"
+          },
+          "3": {
+            "enabled": true,
+            "type": "device",
+            "device": "carbonite",
+            "command": "MLEPresetSource",
+            "value": "M4",
+            "qualifier_key": "None",
+            "qualifier_value": "None",
+            "qualifier_value_type": ""
+          }
+        },
+        "activate": {
+          "1": {
+            "enabled": true,
+            "type": "device",
+            "device": "carbonite",
+            "command": "Auto",
+            "value": "None",
+            "qualifier_key": "None",
+            "qualifier_value": "None",
+            "qualifier_value_type": ""
+          }
+        }
+      },
+      "4": {
+        "enabled": true,
+        "name": "Readings/PiP (CAM3, DISSOLVE)",
+        "prepare": {
+          "1": {
+            "enabled": true,
+            "type": "device",
+            "device": "cam3",
+            "command": "Preset",
+            "value": "2",
+            "qualifier_key": "Type",
+            "qualifier_value": "Recall",
+            "qualifier_value_type": "string"
+          },
+          "2": {
+            "enabled": true,
+            "type": "device",
+            "device": "carbonite",
+            "command": "KeySource",
+            "value": "Cam 3",
+            "qualifier_key": "Keyer",
+            "qualifier_value": "1",
+            "qualifier_value_type": "integer"
+          },
+          "3": {
+            "enabled": true,
+            "type": "device",
+            "device": "carbonite",
+            "command": "KeyOnPreview",
+            "value": "On",
+            "qualifier_key": "Keyer",
+            "qualifier_value": "1",
+            "qualifier_value_type": "integer"
+          },
+          "4": {
+            "enabled": true,
+            "type": "device",
+            "device": "carbonite",
+            "command": "KeyOnPreview",
+            "value": "Off",
+            "qualifier_key": "Keyer",
+            "qualifier_value": "2",
+            "qualifier_value_type": "integer"
+          },
+          "5": {
+            "enabled": true,
+            "type": "device",
+            "device": "carbonite",
+            "command": "MLEPresetSource",
+            "value": "HDMI 1",
+            "qualifier_key": "None",
+            "qualifier_value": "None",
+            "qualifier_value_type": ""
+          }
+        },
+        "activate": {
+          "1": {
+            "enabled": true,
+            "type": "device",
+            "device": "carbonite",
+            "command": "Auto",
+            "value": "None",
+            "qualifier_key": "None",
+            "qualifier_value": "None",
+            "qualifier_value_type": ""
+          }
+        }
+      },
+      "5": {
+        "enabled": true,
+        "name": "Altar (CAM3, CUT)",
+        "prepare": {
+          "1": {
+            "enabled": true,
+            "type": "device",
+            "device": "cam3",
+            "command": "Preset",
+            "value": "3",
+            "qualifier_key": "Type",
+            "qualifier_value": "Recall",
+            "qualifier_value_type": "string"
+          },
+          "2": {
+            "enabled": true,
+            "type": "device",
+            "device": "carbonite",
+            "command": "KeyOnPreview",
+            "value": "Off",
+            "qualifier_key": "Keyer",
+            "qualifier_value": "1",
+            "qualifier_value_type": "integer"
+          },
+          "3": {
+            "enabled": true,
+            "type": "device",
+            "device": "carbonite",
+            "command": "KeyOnPreview",
+            "value": "Off",
+            "qualifier_key": "Keyer",
+            "qualifier_value": "2",
+            "qualifier_value_type": "integer"
+          },
+          "4": {
+            "enabled": true,
+            "type": "device",
+            "device": "carbonite",
+            "command": "MLEPresetSource",
+            "value": "Cam 3",
+            "qualifier_key": "None",
+            "qualifier_value": "None",
+            "qualifier_value_type": ""
+          }
+        },
+        "activate": {
+          "1": {
+            "enabled": true,
+            "type": "device",
+            "device": "carbonite",
+            "command": "Cut",
+            "value": "None",
+            "qualifier_key": "None",
+            "qualifier_value": "None",
+            "qualifier_value_type": ""
+          }
+        }
+      },
+      "6": {
+        "enabled": true,
+        "name": "Altar /w Graphics (MIX)",
+        "prepare": {
+          "1": {
+            "enabled": true,
+            "type": "device",
+            "device": "cam3",
+            "command": "Preset",
+            "value": "3",
+            "qualifier_key": "Type",
+            "qualifier_value": "Recall",
+            "qualifier_value_type": "string"
+          },
+          "2": {
+            "enabled": true,
+            "type": "device",
+            "device": "carbonite",
+            "command": "KeyOnPreview",
+            "value": "Off",
+            "qualifier_key": "Keyer",
+            "qualifier_value": "1",
+            "qualifier_value_type": "integer"
+          },
+          "3": {
+            "enabled": true,
+            "type": "device",
+            "device": "carbonite",
+            "command": "KeyOnPreview",
+            "value": "On",
+            "qualifier_key": "Keyer",
+            "qualifier_value": "2",
+            "qualifier_value_type": "integer"
+          },
+          "4": {
+            "enabled": true,
+            "type": "device",
+            "device": "carbonite",
+            "command": "MLEPresetSource",
+            "value": "Cam 3",
+            "qualifier_key": "None",
+            "qualifier_value": "None",
+            "qualifier_value_type": ""
+          }
+        },
+        "activate": {
+          "1": {
+            "enabled": true,
+            "type": "device",
+            "device": "carbonite",
+            "command": "Auto",
+            "value": "None",
+            "qualifier_key": "None",
+            "qualifier_value": "None",
+            "qualifier_value_type": ""
+          }
+        }
+      },
+      "7": {
+        "enabled": true,
+        "name": "Full Screen Graphics (MIX)",
+        "prepare": {
+          "1": {
+            "enabled": true,
+            "type": "device",
+            "device": "carbonite",
+            "command": "KeyOnPreview",
+            "value": "Off",
+            "qualifier_key": "Keyer",
+            "qualifier_value": "1",
+            "qualifier_value_type": "integer"
+          },
+          "2": {
+            "enabled": true,
+            "type": "device",
+            "device": "carbonite",
+            "command": "KeyOnPreview",
+            "value": "Off",
+            "qualifier_key": "Keyer",
+            "qualifier_value": "2",
+            "qualifier_value_type": "integer"
+          },
+          "3": {
+            "enabled": true,
+            "type": "device",
+            "device": "carbonite",
+            "command": "MLEPresetSource",
+            "value": "HDMI 1",
+            "qualifier_key": "None",
+            "qualifier_value": "None",
+            "qualifier_value_type": ""
+          }
+        },
+        "activate": {
+          "1": {
+            "enabled": true,
+            "type": "device",
+            "device": "carbonite",
+            "command": "Auto",
+            "value": "None",
+            "qualifier_key": "None",
+            "qualifier_value": "None",
+            "qualifier_value_type": ""
+          }
+        }
+      }
+
+    },
+    "interface": {
+      "quickbuttons": {
+        "button_1_enabled": true,
+        "button_1_name": "Service Presets",
+        "button_1_function": "ui:popup:POP - Service Presets",
+        "button_1_color": "blue",
+        "button_2_enabled": true,
+        "button_2_name": "Preset 1 -> Activate",
+        "button_2_function": "preset:1:activate",
+        "button_2_color": "red",
+        "button_3_enabled": false,
+        "button_3_name": "Key1 OFF",
+        "button_3_function": "device:carbonite:KeyOnPreview:Off:Keyer:int:1",
+        "button_3_color": "purple",
+        "button_4_enabled": true,
+        "button_4_name": "Preset 1 -> Prepare",
+        "button_4_function": "preset:1:prepare",
+        "button_4_color": "green"
+      },
+      "mainmenu": {
+        "r1c1_enabled": true,
+        "r1c1_name": "CUT",
+        "r1c1_function": "device:carbonite:Cut:None:None",
+        "r1c1_color": "yellow"
+      }
+    },
+    "devices": {
+      "switcher": {
+        "enabled": true,
+        "ipaddress": "172.16.200.220",
+        "port": "5253",
+        "tally_enabled": true,
+        "tally_port": "5728"
+      },
+      "matrix": {
+        "enabled": false,
+        "ipaddress": "172.16.200.254",
+        "port": "23",
+        "username": "admin",
+        "password": "extron"
+      },
+      "soundboard": {
+        "enabled": false,
+        "ipaddress": "172.16.200.5",
+        "port": "49280"
+      },
+      "playback": {
+        "enabled": true,
+        "ipaddress": "172.16.200.50",
+        "ipaddress-original": "172.16.200.253",
+        "port": "22023",
+        "username": "admin",
+        "password": "extron",
+        "playlist_1_name": "INTRO",
+        "playlist_1_filename": "intro.m3u",
+        "playlist_2_name": "Playlist #2",
+        "playlist_2_filename": "music2.m3u",
+        "playlist_3_name": "Playlist #3",
+        "playlist_3_filename": "music3.m3u",
+        "playlist_4_name": "Playlist #4",
+        "playlist_4_filename": "music4.m3u",
+        "playlist_5_name": "Playlist #5",
+        "playlist_5_filename": "music5.m3u",
+        "playlist_6_name": "OUTRO",
+        "playlist_6_filename": "outro.m3u"
+      },
+      "smp351": {
+        "enabled": false,
+        "ipaddress": "None",
+        "port": "None",
+        "serial_port": "COM1",
+        "serial_baud": "38400"
+      },
+      "midi": {
+        "enabled": true,
+        "serial_port": "COM3",
+        "midi_channel": 1,
+        "preset_mapping": {
+          "c4": "4:P",
+          "c#4": "4:A",
+          "d4": "5:P",
+          "d#4": "5:A",
+          "f4": "6:P",
+          "f#4": "6:A",
+          "g4": "7:P",
+          "g#4": "7:A",
+          "a4": "1:P",
+          "a#4": "1:A"
+        }
+      },
+      "cam1": {
+        "enabled": false,
+        "ipaddress": "172.16.200.101",
+        "port": "80",
+        "username": "admin",
+        "password": "12345",
+        "preset_1_name": "Preset A",
+        "preset_2_name": "Preset B",
+        "preset_3_name": "Preset C",
+        "preset_4_name": "Preset D",
+        "preset_5_name": "Preset E",
+        "preset_6_name": "Preset F",
+        "preset_7_name": "Preset G",
+        "preset_8_name": "Preset H",
+        "default_speed": "Fast",
+        "speed_pan_slow": "12",
+        "speed_pan_medium": "18",
+        "speed_pan_fast": "49",
+        "speed_tilt_slow": "12",
+        "speed_tilt_medium": "18",
+        "speed_tilt_fast": "49",
+        "speed_zoom_slow": "15",
+        "speed_zoom_medium": "25",
+        "speed_zoom_fast": "49"
+      },
+      "cam2": {
+        "enabled": true,
+        "ipaddress": "172.16.200.102",
+        "port": "80",
+        "username": "admin",
+        "password": "12345",
+        "preset_1_name": "Extreme Wide",
+        "preset_2_name": "Podium A",
+        "preset_3_name": "Podium B",
+        "preset_4_name": "Altar",
+        "preset_5_name": "Readings",
+        "preset_6_name": "Cross",
+        "preset_7_name": "Preset #7",
+        "preset_8_name": "Preset #8",
+        "default_speed": "Medium",
+        "speed_pan_slow": "12",
+        "speed_pan_medium": "18",
+        "speed_pan_fast": "49",
+        "speed_tilt_slow": "12",
+        "speed_tilt_medium": "18",
+        "speed_tilt_fast": "49",
+        "speed_zoom_slow": "15",
+        "speed_zoom_medium": "25",
+        "speed_zoom_fast": "49"
+      },
+      "cam3": {
+        "enabled": true,
+        "ipaddress": "172.16.200.103",
+        "port": "80",
+        "username": "admin",
+        "password": "12345",
+        "preset_1_name": "Extreme Wide",
+        "preset_2_name": "Podium A",
+        "preset_3_name": "Podium B",
+        "preset_4_name": "Altar",
+        "preset_5_name": "Flowers",
+        "preset_6_name": "Readings",
+        "preset_7_name": "Preset #7",
+        "preset_8_name": "Preset #8",
+        "default_speed": "Medium",
+        "speed_pan_slow": "12",
+        "speed_pan_medium": "18",
+        "speed_pan_fast": "49",
+        "speed_tilt_slow": "12",
+        "speed_tilt_medium": "18",
+        "speed_tilt_fast": "49",
+        "speed_zoom_slow": "15",
+        "speed_zoom_medium": "25",
+        "speed_zoom_fast": "49"
+      },
+      "cam4": {
+        "enabled": false,
+        "ipaddress": "172.16.200.104",
+        "port": "80",
+        "username": "admin",
+        "password": "12345",
+        "preset_1_name": "Preset A",
+        "preset_2_name": "Preset B",
+        "preset_3_name": "Preset C",
+        "preset_4_name": "Preset D",
+        "preset_5_name": "Preset E",
+        "preset_6_name": "Preset F",
+        "preset_7_name": "Preset G",
+        "preset_8_name": "Preset H",
+        "default_speed": "Medium",
+        "speed_pan_slow": "12",
+        "speed_pan_medium": "18",
+        "speed_pan_fast": "49",
+        "speed_tilt_slow": "12",
+        "speed_tilt_medium": "18",
+        "speed_tilt_fast": "49",
+        "speed_zoom_slow": "15",
+        "speed_zoom_medium": "25",
+        "speed_zoom_fast": "49"
+      }
     }
+  }
 }

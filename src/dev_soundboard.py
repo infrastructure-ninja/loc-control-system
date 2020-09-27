@@ -57,6 +57,12 @@ def soundboard_receive_data_handler(command, value, qualifier):
                    'Soundboard Unhandled data driver data received: [{}] [{}] [{}]'.
                    format(command, value, qualifier), 'Trace')
 
+        #interface.mainscreen.btnMainSoundMicsActive.SetText('')
+        #interface.mainscreen.btnMainSoundMicsActive.SetState(0)
+
+        #interface.mainscreen.btnMainSoundPlaybackActive.SetText('')
+        #interface.mainscreen.btnMainSoundPlaybackActive.SetState(0)
+
 # end function (soundboard_receive_data_handler)
 
 soundboard.SubscribeStatus('ConnectionStatus', None, soundboard_receive_data_handler)

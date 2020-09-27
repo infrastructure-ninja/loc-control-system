@@ -299,8 +299,8 @@ def execute_preset(preset_number, stage = 'prepare'):
 
         # end while loop
 
-        #FIXME - we really should convert this to a system state
-        interface.mainscreen.lblNextPreset.SetText(preset_name)
+        # Update our system state of "NextPreset" so we can keep our UI in sync
+        devices.system_states.Set('NextPreset', preset_number, None)
 
 
 

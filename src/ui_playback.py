@@ -24,6 +24,7 @@ from utilities import DebugPrint
 
 # PLAYBACK BUTTONS, LABELS and LEVELS
 btnPlayback_TallyPresetsLockout      = Button(devices.TouchPanel, 99)
+btnPlayback_TallyTransportLockout    = Button(devices.TouchPanel, 49)
 
 lblPlayback_CurrentClipLength = Label(devices.TouchPanel, 127)
 lblPlayback_CurrentTimeCode   = Label(devices.TouchPanel, 128)

@@ -71,6 +71,16 @@ def system_states_callback_handler(command, value, qualifier):
             else:
                 interface.mainscreen.btnPreview_Key2.SetState(0)
 
+    elif command == 'NextPreset':
+        if value == 0 or value is None: # We don't have a preset loaded
+            preset_name = 'n/a'
+
+        else:
+            preset_name = utilities.config.get_value('presets/{}/name'.format(value),
+                                                     default_value='n/a', cast_as='string')
+
+        interface.mainscreen.lblNextPreset.SetText(preset_name)
+
     # FIXME - this could be more compact and pythonic, when you get bored of everything else
     elif command == 'CameraSpeed' and qualifier['Camera Number'] == 1:
         button_map = {
@@ -135,6 +145,7 @@ def system_states_callback_handler(command, value, qualifier):
 system_states.SubscribeStatus('ActivePopup', None, system_states_callback_handler)
 system_states.SubscribeStatus('CameraSpeed', None, system_states_callback_handler)
 system_states.SubscribeStatus('KeyOnPreview', None, system_states_callback_handler)
+system_states.SubscribeStatus('NextPreset', None, system_states_callback_handler)
 
 
 def initialize_all():

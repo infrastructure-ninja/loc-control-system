@@ -45,10 +45,13 @@ btnMainMenuR3C4 = Button(devices.TouchPanel, 1014)
 btnMainMenuR4C4 = Button(devices.TouchPanel, 1015)
 
 btnMainMenuR1C5 = Button(devices.TouchPanel, 1016)
+btnMainMenuR1C5.SetText('Recording Control')
+
 btnMainMenuR2C5 = Button(devices.TouchPanel, 1017)
+btnMainMenuR2C5.SetText('Audio Control')
 
 btnMainMenuR3C5 = Button(devices.TouchPanel, 1018)
-btnMainMenuR3C5.SetText('System Options')
+btnMainMenuR3C5.SetText('System\nOptions')
 
 btnMainMenuR4C5 = Button(devices.TouchPanel, 1019)
 btnMainMenuR4C5.SetText('Refresh Configuration')
@@ -63,7 +66,7 @@ lstMainPopupButtons = [
 
 
 @event(lstMainPopupButtons, 'Pressed')
-def main_menu_buttons_pressed(button,state):
+def main_menu_buttons_pressed(button, state):
     DebugPrint('interface/main_menu_buttons_pressed', 'Button was pressed: [{}]'.format(button.Name), 'Debug')
 
 #                    btnMainMenuR1C1, btnMainMenuR2C1, btnMainMenuR3C1, btnMainMenuR4C1,
@@ -72,8 +75,15 @@ def main_menu_buttons_pressed(button,state):
 #                    btnMainMenuR1C4, btnMainMenuR2C4, btnMainMenuR3C4, btnMainMenuR4C4,
 #                    btnMainMenuR1C5, btnMainMenuR2C5, btnMainMenuR3C5, btnMainMenuR4C5
 
-    if button is btnMainMenuR3C5:   # System Options
-        DebugPrint('interface/main_menu_buttons_pressed', 'Running a refresh of the configuration file', 'Info')
+    if button is btnMainMenuR1C5:   # Recording Control
+        devices.TouchPanel.ShowPopup('POP - Recording Control')
+        devices.system_states.Set('ActivePopup', 'POP - Recording Control')
+
+    elif button is btnMainMenuR2C5:   # Audio Control
+        devices.TouchPanel.ShowPopup('POP - Audio Control')
+        devices.system_states.Set('ActivePopup', 'POP - Audio Control')
+
+    elif button is btnMainMenuR3C5:   # System Options
         devices.TouchPanel.ShowPopup('POP - Options - Main')
         devices.system_states.Set('ActivePopup', 'POP - Options - Main')
 

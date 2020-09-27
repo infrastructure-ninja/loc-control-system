@@ -85,7 +85,9 @@ def carbonite_received_data_handler(command, value, qualifier):
         }
 
         # Set all buttons to normal state, except the one we just set to its "selected" state
-        mle_preset_source_map[value].SetState(2)
+        # Be careful, as we can get a whole bunch of other values from this callback, so make sure it's one we expect
+        if value in mle_preset_source_map:
+            mle_preset_source_map[value].SetState(2)
 
         for input_name, button in mle_preset_source_map.items():
             if button is not mle_preset_source_map[value]:
@@ -214,11 +216,12 @@ def tally_received_data_handler(command, value, qualifier):
         if (value == 'Off') or (value == 'Green'):
             interface.playback.btnPlayback_OnAir.SetState(0)
             interface.playback.btnPlayback_OnAir.SetVisible(False)
+            interface.playback.btnPlayback_TallyTransportLockout.SetVisible(False)
 
         elif (value == 'Red') or (value == 'Red & Green'):
             interface.playback.btnPlayback_OnAir.SetBlinking('Fast', [0, 1])
             interface.playback.btnPlayback_OnAir.SetVisible(True)
-
+            interface.playback.btnPlayback_TallyTransportLockout.SetVisible(True)
 
 # end function (tally_received_data_handler)
 

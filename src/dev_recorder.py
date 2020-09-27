@@ -55,6 +55,9 @@ def smp351_received_data_handler(command, value, qualifier):
                    'SMP351 Unhandled data driver data received: [{}] [{}] [{}]'.
                    format(command, value, qualifier), 'Trace')
 
+        #interface.mainscreen.btnMainStreamingStatus.SetText('')
+        #interface.mainscreen.btnMainStreamingStatus.SetState(0)
+
 # end function (smp351_received_data_handler)
 
 

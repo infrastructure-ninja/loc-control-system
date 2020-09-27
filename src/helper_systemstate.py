@@ -37,7 +37,8 @@ class DeviceClass:
             #'ConnectionStatus': {'Status': {}},
             'ActivePopup': {'Status': {}},
             'CameraSpeed': {'Parameters': ['Camera Number'], 'Status': {}},
-            'KeyOnPreview': {'Parameters': ['Keyer'], 'Status': {}}
+            'KeyOnPreview': {'Parameters': ['Keyer'], 'Status': {}},
+            'NextPreset': {'Status': {}}
         }
 
 
@@ -49,6 +50,9 @@ class DeviceClass:
 
     def SetKeyOnPreview(self, value, qualifier):
         self.WriteStatus('KeyOnPreview', value, qualifier)
+
+    def SetNextPreset(self, value, qualifier):
+        self.WriteStatus('NextPreset', value, qualifier)
 
 
 ###################################################################
