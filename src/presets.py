@@ -302,31 +302,5 @@ def execute_preset(preset_number, stage = 'prepare'):
         # Update our system state of "NextPreset" so we can keep our UI in sync
         devices.system_states.Set('NextPreset', preset_number, None)
 
-
-
-            #            current_step_data = utilities.config.get_value(
-#                'presets/preset_{}_steps/{}_data'.format(preset_number, preset_index),
-#                default_value='None', cast_as='string')
-
-#            if ((current_step_enabled is False) and (current_step_data == 'None')):
-#                DebugPrint('execute_preset/{}/{}'.format(preset_number, preset_name),
-#                           'Step #{} is not present, so we are done. Execution completed!'.
-#                           format(preset_index), 'Info')
-
-#                break
-
-#            elif current_step_enabled is False:
-#                DebugPrint('execute_preset/{}/{}'.format(preset_number, preset_name),
-#                           'Skipping step #{} as it is disabled: [{}]'.
-#                           format(preset_index, current_step_data), 'Debug')
-#                continue
-
-#            # If we get here then we've got valid preset data, AND we're set as enabled. Let's execute!
-#            else:
-#                DebugPrint('execute_preset/{}/{}'.format(preset_number, preset_name),
-#                           'Execute step #{}'.format(preset_index), 'Debug')
-#
-#                execute_command(current_step_data)
-
 #end function (execute_preset)
 

@@ -1,6 +1,5 @@
 from extronlib.interface import SerialInterface, EthernetClientInterface
 import re
-from extronlib.system import Wait, ProgramLog
 
 class DeviceClass:    
     def __init__(self):
@@ -24,25 +23,59 @@ class DeviceClass:
 
         self.Commands = {
             'ConnectionStatus': {'Status': {}},
-            'Firmware': { 'Status': {}},
-            'InputLevel': {'Parameters':['Channel'], 'Status': {}},
-            'InputMute': {'Parameters':['Channel'], 'Status': {}},
-            'OutputLevel': {'Parameters':['Channel'], 'Status': {}},
-            'OutputMute': {'Parameters':['Channel'], 'Status': {}},
-            'Preset': {'Parameters':['Scene','Action'], 'Status': {}},
-            }                   
+            'Firmware': {'Status': {}},
+            'Preset': {'Parameters': ['Scene', 'Action'], 'Status': {}},
+            'InputLevel': {'Parameters': ['Channel'], 'Status': {}},
+            'InputMute': {'Parameters': ['Channel'], 'Status': {}},
+            'OutputLevel': {'Parameters': ['Channel'], 'Status': {}},
+            'OutputMute': {'Parameters': ['Channel'], 'Status': {}},
+            'AuxMute': {'Parameters': ['Input Channel', 'Aux Channel'], 'Status': {}},
+            'AuxLevel': {'Parameters': ['Input Channel', 'Aux Channel'], 'Status': {}},
+            'StereoInLevel' : {'Parameters': ['Channel'], 'Status': {}},
+            'StereoInMute': {'Parameters': ['Channel'], 'Status': {}}
+        }
 
-        
         if self.Unidirectional == 'False':
-            self.AddMatchString(re.compile(b'OK devinfo version \"(V[\.\d]+)\"\n'), self.__MatchFirmware, None)
-            self.AddMatchString(re.compile(b'(?:OK|NOTIFY|OKm) (?:setn|getn|set|get) MIXER:Current/InCh/Fader/Level ([0-9]{1,2}) 0 ([\-\d]{1,4}) \"[\-\.\d]+\"\n'), self.__MatchInputLevel, None)
-            self.AddMatchString(re.compile(b'(?:OK|Notify|OKm) (?:setn|getn) MIXER:Current/Mix/Fader/Level ([0-9]{1,2}) 0 (\d{1,4})\n'), self.__MatchOutputLevel, None)
-            self.AddMatchString(re.compile(b'(?:OK|NOTIFY) (?:set|get) MIXER:Current/InCh/Fader/On ([0-9]{1,2}) 0 (1|0) \"(ON|OFF)\"\n'), self.__MatchInputMute, None)
-            self.AddMatchString(re.compile(b'(?:OK|Notify) (?:set|get) MIXER:Current/Mix/Fader/On ([0-9]{1,2}) 0 (1|0)\n'), self.__MatchOutputMute, None)
+            self.AddMatchString(re.compile(b'OK devinfo version "?(V[\.\d]+)"?\n'), self.__MatchFirmware, None)
+
+
+            # b'NOTIFY set MIXER:Current/InCh/Fader/On 24 0 0 "OFF"\n'
+            # b'NOTIFY set MIXER:Current/InCh/Fader/On 24 0 1 "ON"\n'
+            self.AddMatchString(re.compile(b'(?:OK|NOTIFY) (?:set|get) MIXER:Current/InCh/Fader/On ([0-9]{1,2}) 0 (1|0)(?: \"(ON|OFF)\"){0,1}\n'), self.__MatchInputMute, None)
+            self.AddMatchString(re.compile(b'(?:OK|NOTIFY|OKm) (?:setn|getn|set|get) MIXER:Current/InCh/Fader/Level ([0-9]{1,2}) 0 ([\-\d]{1,6}) \"[\-\.\d]+\"\n'), self.__MatchInputLevel, None)
+
+
+            #'NOTIFY set MIXER:Current/Mix/Fader/On 2 0 1 "ON"\n'
+            self.AddMatchString(re.compile(b'(?:OK|NOTIFY|Notify) (?:set|get) MIXER:Current/Mix/Fader/On ([0-9]{1,2}) 0 (1|0) \"(ON|OFF)\"\n'), self.__MatchOutputMute, None)
+
+            # NOTIFY set MIXER:Current/Mix/Fader/Level 2 0 -7340 "-73.40"\n
+            # NOTIFY set MIXER:Current/Mix/Fader/Level 2 0 -10800 "-108.0"\n
+            # NOTIFY set MIXER:Current/Mix/Fader/Level 2 0 -32768 "-?"\n
+            self.AddMatchString(re.compile(b'(?:OK|NOTIFY|Notify|OKm) (?:setn|getn|set|get) MIXER:Current/Mix/Fader/Level ([0-9]{1,2}) 0 ([\-\d]{1,6}) \"[\?\-\.\d]+\"\n'), self.__MatchOutputLevel, None)
+
+
+            # NOTIFY set MIXER:Current/InCh/ToMix/On 24 2 1 "ON"\n
+            self.AddMatchString(re.compile(b'(?:OK|NOTIFY|Notify) (?:set|get) MIXER:Current/InCh/ToMix/On ([0-9]{1,2}) ([0-9]{1,2}) (0|1) \"(?:ON|OFF)\"\n'), self.__MatchAuxMute, None)
+
+            # NOTIFY set MIXER:Current/InCh/ToMix/Level 24 2 -2180 "-21.80"\n
+            self.AddMatchString(re.compile(b'(?:OK|NOTIFY|Notify|OKm) (?:set|get|setn|getn) MIXER:Current/InCh/ToMix/Level ([0-9]{1,2}) ([0-9]{1,2}) ([\-\d]{1,6})(?: \"[\?\-\.\d]+\"){0,1}\n'), self.__MatchAuxLevel, None)
+
+            # NOTIFY set MIXER:Current/StInCh/Fader/Level 3 0 -1835 "-18.35"\n
+            self.AddMatchString(re.compile(b'(?:OK|Notify|NOTIFY|OKm) (?:set|get|setn|getn) MIXER:Current/StInCh/Fader/Level ([0-3]) 0 ([\-\d]{1,6}) \"[\?\-\.\d]+\"\n'), self.__MatchStereoInLevel, None)
+
+            # NOTIFY set MIXER:Current/StInCh/Fader/On 2 0 0 "OFF"\n
+            self.AddMatchString(re.compile(b'(?:OK|Notify|NOTIFY) (?:set|get) MIXER:Current/StInCh/Fader/On ([0-3]) 0 ([01]) \"(?:ON|OFF)\"\n'), self.__MatchStereoInMute, None)
+
+
+            # NOTIFY mtr MIXER:Current/InCh/PostOn level 14 00 00 00
+            #NOTIFY)mtr MIXER:Current/Mix/PostOn level
+            #self.AddMatchString(re.compile(b'(?:OK|Notify|NOTIFY) (?:set|get) MIXER:Current/StInCh/Fader/On ([0-3]) 0 ([01]) \"(?:ON|OFF)\"\n'), self.__MatchLevelResponse, None)
+
+
             self.AddMatchString(re.compile(b'(ERROR get InvalidArgument|ERROR unknown UnknownCommand)'), self.__MatchError, None)
 
-    def UpdateFirmware(self, value, qualifier):
 
+    def UpdateFirmware(self, value, qualifier):
         CmdString = 'devinfo version\n'
         self.__UpdateHelper('Firmware', CmdString, value, qualifier)
 
@@ -140,11 +173,16 @@ class DeviceClass:
 
     def UpdateOutputMute(self, value, qualifier):
 
-        Channel = int(qualifier['Channel'])
-        if 1 <= Channel <= 40:
-            CmdString = 'get MIXER:Current/Mix/Fader/On {0} 0\n'.format(Channel-1)
-            self.__UpdateHelper('OutputMute', CmdString, value, qualifier)
-        else:
+        try:
+            Channel = int(qualifier['Channel'])
+
+            if 1 <= Channel <= 40:
+                CmdString = 'get MIXER:Current/Mix/Fader/On {0} 0\n'.format(Channel-1)
+                self.__UpdateHelper('OutputMute', CmdString, value, qualifier)
+            else:
+                self.Discard('Invalid Command for UpdateOutputMute')
+
+        except TypeError:
             self.Discard('Invalid Command for UpdateOutputMute')
 
     def __MatchOutputMute(self, match, tag):
@@ -173,6 +211,224 @@ class DeviceClass:
         if action in ActionStates and scene in SceneStates and 0 <= int(value) <= 99:
             CmdString = 'ss{0}_ex scene_{1} {2}\x0A'.format(ActionStates[action],SceneStates[scene],value)
             self.__SetHelper('Preset', CmdString, value, qualifier)
+
+
+#### AUX Mute ####
+    def SetAuxMute(self, value, qualifier):
+        """Set AUX Mute
+        value: Enum
+        qualifier: {'Input Channel' : Enum, 'AUX Channel' : Enum}
+        """
+        ValueStateValues = {
+            'On'  : '1',
+            'Off' : '0'
+        }
+
+        input_channel = int(qualifier['Input Channel'])
+        aux_channel = int(qualifier['Aux Channel'])
+
+        if 1 <= input_channel <= self.MaxInputChannels and 1 <= aux_channel <= 20:
+            AuxMuteCmdString = 'set MIXER:Current/InCh/ToMix/On {0} {1} {2}\n'.format(input_channel - 1, aux_channel - 1, ValueStateValues[value])
+            self.__SetHelper('AuxMute', AuxMuteCmdString, value, qualifier)
+        else:
+            self.Discard('Invalid Command')
+
+    def UpdateAuxMute(self, value, qualifier):
+        """Update AUX Mute
+        value: Enum
+        qualifier: {'Input Channel' : Enum, 'AUX Channel' : Enum}
+        """
+        input_channel = int(qualifier['Input Channel'])
+        aux_channel = int(qualifier['Aux Channel'])
+
+        if 1 <= input_channel <= self.MaxInputChannels and 1 <= aux_channel <= 20:
+            AuxMuteCmdString = 'get MIXER:Current/InCh/ToMix/On {0} {1}\n'.format(input_channel - 1, aux_channel - 1)
+            self.__UpdateHelper('AuxMute', AuxMuteCmdString, value, qualifier)
+        else:
+            self.Discard('Invalid Command')
+
+    def __MatchAuxMute(self, match, tag):
+        ValueStateValues = {
+            '1' : 'On',
+            '0' : 'Off'
+        }
+
+        qualifier = {}
+        qualifier['Input Channel'] = str(int(match.group(1).decode())+1)
+        qualifier['Aux Channel'] = str(int(match.group(2).decode())+1)
+        value = ValueStateValues[match.group(3).decode()]
+
+        self.WriteStatus('AuxMute', value, qualifier)
+
+
+### Aux Level ###
+    def SetAuxLevel(self, value, qualifier):
+        """Set AUX Level
+        value: Decimal
+        qualifier: {'Input Channel' : Enum, 'AUX Channel' : Enum}
+        """
+        ValueConstraints = {
+            'Min': 0,
+            'Max': 1000
+            }
+        input_channel = int(qualifier['Input Channel'])
+        aux_channel = int(qualifier['Aux Channel'])
+
+        if ValueConstraints['Min'] <= value <= ValueConstraints['Max'] and 1 <= input_channel <= self.MaxInputChannels and 1 <= aux_channel <= 20:
+            AuxLevelCmdString = 'setn MIXER:Current/InCh/ToMix/Level {0} {1} {2}\n'.format(input_channel - 1, aux_channel - 1, value)
+            self.__SetHelper('AuxLevel', AuxLevelCmdString, value, qualifier)
+        else:
+            self.Discard('Invalid Command')
+
+    def UpdateAuxLevel(self, value, qualifier):
+        """Update AUX Level
+        value: Decimal
+        qualifier: {'Input Channel' : Enum, 'AUX Channel' : Enum}
+        """
+        input_channel = int(qualifier['Input Channel'])
+        aux_channel = int(qualifier['Aux Channel'])
+        if 1 <= input_channel <= self.MaxInputChannels and 1 <= aux_channel <= 20:
+            AuxLevelCmdString = 'get MIXER:Current/InCh/ToMix/Level {0} {1}\n'.format(input_channel - 1, aux_channel - 1)
+            self.__UpdateHelper('AuxLevel', AuxLevelCmdString, value, qualifier)
+        else:
+            self.Discard('Invalid Command')
+
+    def __MatchAuxLevel(self, match, tag):
+        """AUX Level MatchString Handler
+        """
+        qualifier = {}
+        qualifier['Input Channel'] = str(int(match.group(1).decode())+1)
+        qualifier['Aux Channel'] = str(int(match.group(2).decode())+1)
+        value = int(match.group(3).decode())
+
+        self.WriteStatus('AuxLevel', value, qualifier)
+
+### Stereo In Level ###
+    def SetStereoInLevel(self, value, qualifier):
+        """Set Stereo In Level
+        value: Decimal
+        qualifier: {'Channel' : Enum}
+        """
+        ChannelStates = {
+            '1L': '0',
+            '1R': '1',
+            '2L': '2',
+            '2R': '3'
+        }
+
+        channel = qualifier['Channel']
+        if channel in ChannelStates and 0 <= value <= 1000:
+            StereoInLevelCmdString = 'setn MIXER:Current/StInCh/Fader/Level {0} 0 {1}\n'.format(ChannelStates[channel], value)
+            self.__SetHelper('StereoInLevel', StereoInLevelCmdString, value, qualifier)
+        else:
+            self.Discard('Invalid Command')
+
+    def UpdateStereoInLevel(self, value, qualifier):
+        """Update Stereo In Level
+        value: Decimal
+        qualifier: {'Channel' : Enum}
+        """
+        ChannelStates = {
+            '1L': '0',
+            '1R': '1',
+            '2L': '2',
+            '2R': '3'
+        }
+
+        channel = qualifier['Channel']
+        if channel in ChannelStates:
+            StereoInLevelCmdString = 'getn MIXER:Current/StInCh/Fader/Level {0} 0\n'.format(ChannelStates[channel])
+            self.__UpdateHelper('StereoInLevel', StereoInLevelCmdString, value, qualifier)
+        else:
+            self.Discard('Invalid Command')
+
+    def __MatchStereoInLevel(self, match, tag):
+        """Stereo In Level MatchString Handler
+        """
+        ChannelStates = {
+            '0': '1L',
+            '1': '1R',
+            '2': '2L',
+            '3': '2R'
+        }
+
+        qualifier = {
+            'Channel': ChannelStates[match.group(1).decode()]
+        }
+        value = int(match.group(2).decode())
+        self.WriteStatus('StereoInLevel', value, qualifier)
+
+### Stereo In Mute ###
+    def SetStereoInMute(self, value, qualifier):
+        """Set Stereo In Mute
+        value: Enum
+        qualifier: {'Channel' : Enum}
+        """
+        ChannelStates = {
+            '1L': '0',
+            '1R': '1',
+            '2L': '2',
+            '2R': '3'
+        }
+
+        channel = qualifier['Channel']
+
+        ValueStateValues = {
+            'On':   '1',
+            'Off':  '0'
+        }
+
+        if channel in ChannelStates and value in ValueStateValues:
+            StereoInMuteCmdString = 'set MIXER:Current/StInCh/Fader/On {0} 0 {1}\n'.format(ChannelStates[channel], ValueStateValues[value])
+            self.__SetHelper('StereoInMute', StereoInMuteCmdString, value, qualifier)
+
+        else:
+            self.Discard('Invalid Command')
+
+    def UpdateStereoInMute(self, value, qualifier):
+        """Update Stereo In Mute
+        value: Enum
+        qualifier: {'Channel' : Enum}
+        """
+        ChannelStates = {
+            '1L': '0',
+            '1R': '1',
+            '2L': '2',
+            '2R': '3'
+        }
+
+        channel = qualifier['Channel']
+
+        if channel in ChannelStates:
+            StereoInMuteCmdString = 'get MIXER:Current/StInCh/Fader/On {0} 0\n'.format(ChannelStates[channel])
+            self.__UpdateHelper('StereoInMute', StereoInMuteCmdString, value, qualifier)
+        else:
+            self.Discard('Invalid Command')
+
+    def __MatchStereoInMute(self, match, tag):
+        """Stereo In Mute MatchString Handler
+        """
+        ChannelStates = {
+            '0': '1L',
+            '1': '1R',
+            '2': '2L',
+            '3': '2R'
+        }
+
+        ValueStateValues = {
+            '1': 'On',
+            '0': 'Off'
+        }
+
+        qualifier = {
+            'Channel': ChannelStates[match.group(1).decode()]
+        }
+
+        value = ValueStateValues[match.group(2).decode()]
+
+        self.WriteStatus('StereoInMute', value, qualifier)
+
+
 
     def __SetHelper(self, command, commandstring, value, qualifier):
         self.Debug = True

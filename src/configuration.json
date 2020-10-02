@@ -439,13 +439,13 @@
         "button_2_name": "Preset 1 -> Activate",
         "button_2_function": "preset:1:activate",
         "button_2_color": "red",
-        "button_3_enabled": false,
-        "button_3_name": "Key1 OFF",
-        "button_3_function": "device:carbonite:KeyOnPreview:Off:Keyer:int:1",
+        "button_3_enabled": true,
+        "button_3_name": "Soundboard MUTE",
+        "button_3_function": "device:soundboard:AuxMute:Off:Channel:int:1",
         "button_3_color": "purple",
         "button_4_enabled": true,
-        "button_4_name": "Preset 1 -> Prepare",
-        "button_4_function": "preset:1:prepare",
+        "button_4_name": "Soundboard UN-MUTE",
+        "button_4_function": "device:soundboard:AuxMute:On:Channel:int:1",
         "button_4_color": "green"
       },
       "mainmenu": {
@@ -471,14 +471,14 @@
         "password": "extron"
       },
       "soundboard": {
-        "enabled": false,
+        "enabled": true,
         "ipaddress": "172.16.200.5",
         "port": "49280"
       },
       "playback": {
         "enabled": true,
-        "ipaddress": "172.16.200.50",
-        "ipaddress-original": "172.16.200.253",
+        "ipaddress-lab": "172.16.200.50",
+        "ipaddress": "172.16.200.253",
         "port": "22023",
         "username": "admin",
         "password": "extron",

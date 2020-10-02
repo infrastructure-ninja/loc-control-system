@@ -13,6 +13,7 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this code.  If not, see <https://www.gnu.org/licenses/>.
+from extronlib.system import Wait
 
 from helper_connectionhandler import GetConnectionHandler
 
@@ -47,10 +48,39 @@ def soundboard_receive_data_handler(command, value, qualifier):
             DebugPrint('devices.py/soundboard_receive_data_handler',
                        'Yamaha TF5 soundboard has been successfully connected', 'Info')
 
+            @Wait(1)
+            def update_status():
+                update_all_soundboard_status()
+
         elif value == 'Disconnected':
             DebugPrint('devices.py/soundboard_receive_data_handler',
                        'Yamaha TF5 soundboard has been disconnected from the system. Will attempt reconnection..',
                        'Error')
+
+    elif command == 'AuxLevel':
+        DebugPrint('devices.py/soundboard_receive_data_handler',
+                   'Received Yamaha TF5 Driver Update: [{0}] [{1}] [{2}]'.format(command, value, qualifier), 'Trace')
+
+        if qualifier['Input Channel'] == '5' and qualifier['Aux Channel'] == '13':
+            interface.audio.sliderChannel1.SetFill(int(value))
+
+        elif qualifier['Input Channel'] == '6' and qualifier['Aux Channel'] == '13':
+            interface.audio.sliderChannel2.SetFill(int(value))
+
+        elif qualifier['Input Channel'] == '15' and qualifier['Aux Channel'] == '13':
+            interface.audio.sliderChannel3.SetFill(int(value))
+
+    elif command == 'InputMute':
+        DebugPrint('devices.py/soundboard_receive_data_handler',
+                   'Received Yamaha TF5 Driver Update: [{0}] [{1}] [{2}]'.format(command, value, qualifier), 'Trace')
+
+        if qualifier['Channel'] == '5':
+            if value == 'On':
+                interface.audio.btnAudio_Channel1.SetState(1)
+
+            else:
+                interface.audio.btnAudio_Channel1.SetState(0)
+
 
     else:
         DebugPrint('devices.py/soundboard_receive_data_handler',
@@ -65,7 +95,29 @@ def soundboard_receive_data_handler(command, value, qualifier):
 
 # end function (soundboard_receive_data_handler)
 
-soundboard.SubscribeStatus('ConnectionStatus', None, soundboard_receive_data_handler)
-soundboard.SubscribeStatus('InputMute', None, soundboard_receive_data_handler)
-soundboard.SubscribeStatus('OutputLevel', None, soundboard_receive_data_handler)
-soundboard.SubscribeStatus('InputLevel', None, soundboard_receive_data_handler)
+
+lstSoundboardStatusSubscriptions = ['ConnectionStatus','Firmware', 'OutputMute',
+                                    'OutputLevel','InputMute', 'InputLevel',
+                                    'AuxMute', 'AuxLevel', 'StereoInLevel',
+                                    'StereoInMute']
+
+for status in lstSoundboardStatusSubscriptions:
+    soundboard.SubscribeStatus(status, None, soundboard_receive_data_handler)
+
+
+def update_all_soundboard_status():
+    print('UPDATING ALL SOUND BOARD STATUS ..')
+
+    # Primary beltpack
+    soundboard.Update('InputMute', {'Channel': 5})
+    soundboard.Update('AuxLevel', {'Input Channel': 5, 'Aux Channel': 13})
+
+    # Secondary beltpack
+    soundboard.Update('InputMute', {'Channel': 6})
+    soundboard.Update('AuxLevel', {'Input Channel': 6, 'Aux Channel': 13})
+
+    # Playback System
+    soundboard.Update('InputMute', {'Channel': 15})
+    soundboard.Update('AuxLevel', {'Input Channel': 15, 'Aux Channel': 13})
+    soundboard.Update('InputMute', {'Channel': 16})
+    soundboard.Update('AuxLevel', {'Input Channel': 16, 'Aux Channel': 13})

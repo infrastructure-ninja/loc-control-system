@@ -26,6 +26,15 @@ from utilities import DebugPrint
 # The background button
 btnBackground = Button(devices.TouchPanel, 9)
 
+# Buttons that cover the entire thumbnail image on the multiview display
+btnCAM1_TileButton      = Button(devices.TouchPanel, 4)
+btnCAM2_TileButton      = Button(devices.TouchPanel, 56)
+btnCAM3_TileButton      = Button(devices.TouchPanel,  57)
+btnCAM4_TileButton      = Button(devices.TouchPanel,  58)
+btnPlayback_TileButton  = Button(devices.TouchPanel, 117)
+lstTileButtons = [btnCAM1_TileButton, btnCAM2_TileButton, btnCAM3_TileButton,
+                  btnCAM4_TileButton, btnPlayback_TileButton]
+
 # The audio and stream status widgets
 btnMainSoundMicsActive = Button(devices.TouchPanel, 53)
 btnMainSoundPlaybackActive = Button(devices.TouchPanel, 54)
@@ -204,8 +213,24 @@ def btn_activate_preset_pressed(button, state):
         devices.system_states.Set('NextPreset', None, None)
 
 
+@event(lstTileButtons, 'Pressed')
+def btn_tile_buttons_pressed(button, state):
 
+    ButtonMap = {btnCAM1_TileButton: ('Cam 1', 'POP - CAM1-Control'),
+                 btnCAM2_TileButton: ('Cam 2', 'POP - CAM2-Control'),
+                 btnCAM3_TileButton: ('Cam 3', 'POP - CAM3-Control'),
+                 btnCAM4_TileButton: ('Cam 4', 'POP - CAM4-Control'),
+                 btnPlayback_TileButton:('HDMI 2', 'POP - Playback Control')
+                }
 
+    preset_source = ButtonMap[button][0]
+    popup_name = ButtonMap[button][1]
+
+    ShowPopup(popup_name)
+    devices.switcher.carbonite.Set('MLEPresetSource', preset_source)
+
+    DebugPrint('interface/TileButtonsPressed', 'Tile button pressed for input: [{}]'.
+               format(preset_source), 'Trace')
 
 
 #FIXME - this needs to become a system state (inside devices)

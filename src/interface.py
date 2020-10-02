@@ -66,7 +66,11 @@ def initialize_all():
     playback.lvlPlayback_ClipPosition.SetVisible(False)
     playback.lblPlaybackTimeCodeRemaining.SetVisible(False)
 
-    playback.lblPlayback_CurrentState.SetText('Playing [-00:00:02]')
+    playback.lblPlayback_CurrentState.SetText('')
+
+    audio.sliderChannel1.SetRange(-9000, 1000)
+    audio.sliderChannel2.SetRange(-9000, 1000)
+    audio.sliderChannel3.SetRange(-9000, 1000)
 
     # Initialize a bunch of buttons using text pulled from our configuration file
     # This dictionary stores the button object we want to "SetText' on, and the configuration
@@ -160,23 +164,23 @@ def initialize_all():
 
     # Show/Hide our Camera UI buttons based on whether the camera is disabled in the configuration
     cam1_is_enabled = utilities.config.get_value('devices/cam1/enabled', default_value=False, cast_as='boolean')
-    for i in [mainscreen.btnCAM1_PTZ, mainscreen.btnCAM1_Preview, mainscreen.btnCAM1_AUX]:
+    for i in [mainscreen.btnCAM1_PTZ, mainscreen.btnCAM1_Preview,
+              mainscreen.btnCAM1_AUX, mainscreen.btnCAM1_TileButton]:
         i.SetVisible(cam1_is_enabled)
 
-    cam2_is_enabled = utilities.config.get_value('devices/cam2/enabled', default_value=False,cast_as='boolean')
-    for i in [mainscreen.btnCAM2_PTZ, mainscreen.btnCAM2_Preview, mainscreen.btnCAM2_AUX]:
+    cam2_is_enabled = utilities.config.get_value('devices/cam2/enabled', default_value=False, cast_as='boolean')
+    for i in [mainscreen.btnCAM2_PTZ, mainscreen.btnCAM2_Preview,
+              mainscreen.btnCAM2_AUX, mainscreen.btnCAM2_TileButton]:
         i.SetVisible(cam2_is_enabled)
 
     cam3_is_enabled = utilities.config.get_value('devices/cam3/enabled', default_value=False, cast_as='boolean')
-    for i in [mainscreen.btnCAM3_PTZ, mainscreen.btnCAM3_Preview, mainscreen.btnCAM3_AUX]:
-        i.SetVisible(cam3_is_enabled)
-
-    cam3_is_enabled = utilities.config.get_value('devices/cam3/enabled', default_value=False, cast_as='boolean')
-    for i in [mainscreen.btnCAM3_PTZ, mainscreen.btnCAM3_Preview, mainscreen.btnCAM3_AUX]:
+    for i in [mainscreen.btnCAM3_PTZ, mainscreen.btnCAM3_Preview,
+              mainscreen.btnCAM3_AUX, mainscreen.btnCAM3_TileButton]:
         i.SetVisible(cam3_is_enabled)
 
     cam4_is_enabled = utilities.config.get_value('devices/cam4/enabled', default_value=False, cast_as='boolean')
-    for i in [mainscreen.btnCAM4_PTZ, mainscreen.btnCAM4_Preview, mainscreen.btnCAM4_AUX]:
+    for i in [mainscreen.btnCAM4_PTZ, mainscreen.btnCAM4_Preview,
+              mainscreen.btnCAM4_AUX, mainscreen.btnCAM4_TileButton]:
         i.SetVisible(cam4_is_enabled)
 
     # Hide the CAM1 window on the multiview of the Carbonite switcher
@@ -200,13 +204,13 @@ def initialize_all():
     if not cam2_is_enabled:
         # HIDE
         devices.switcher.carbonite.Send(b'\xba\xd2\xac\xe5\x00\x10\x4a\x00\x08\x00\x0c\x80\x04\x00\x00\x00\x00') #MV Box2 Label (0xc80)
-        devices.switcher.carbonite.Send(b'\xba\xd2\xac\xe5\x00\x10\x4a\x00\x08\x00\x0c\x84\x04\x00\x00\x00\x00') #MV Box2 Source (0xc84)
+        devices.switcher.carbonite.Send(b'\xba\xd2\xac\xe5\x00\x10\x4a\x00\x08\x00\x0c\x7d\x04\x00\x00\x00\x00') #MV Box2 Source (0xc7d)
         devices.switcher.carbonite.Send(b'\xba\xd2\xac\xe5\x00\x10\x4a\x00\x08\x00\x19\x19\x04\x00\x00\x00\x00') #MV Box2 Border (0x1919)
 
     else:
         # SHOW
         devices.switcher.carbonite.Send(b'\xba\xd2\xac\xe5\x00\x10\x4a\x00\x08\x00\x0c\x80\x04\x00\x00\x00\x01') #MV Box2 Label (0xc80)
-        devices.switcher.carbonite.Send(b'\xba\xd2\xac\xe5\x00\x10\x4a\x00\x08\x00\x0c\x84\x04\x00\x00\x03\xe9') #MV Box2 Source (0xc84)
+        devices.switcher.carbonite.Send(b'\xba\xd2\xac\xe5\x00\x10\x4a\x00\x08\x00\x0c\x7d\x04\x00\x00\x03\xe9') #MV Box2 Source (0xc7d)
         devices.switcher.carbonite.Send(b'\xba\xd2\xac\xe5\x00\x10\x4a\x00\x08\x00\x19\x19\x04\x00\x00\x00\x01') #MV Box2 Border (0x1919)
 
     # Hide the CAM3 window on the multiview of the Carbonite switcher

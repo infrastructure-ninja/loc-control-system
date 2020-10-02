@@ -41,7 +41,8 @@ if utilities.config.get_value('devices/cam3/enabled', default_value=False, cast_
             utilities.config.get_value('devices/cam3/ipaddress'),
             utilities.config.get_value('devices/cam3/port', default_value=80, cast_as='integer'),
             utilities.config.get_value('devices/cam3/username', default_value='admin', cast_as='string'),
-            utilities.config.get_value('devices/cam3/password', default_value='password', cast_as='string'))
+            utilities.config.get_value('devices/cam3/password', default_value='password', cast_as='string'),
+            Model='AW-HE40SWP')  #FIXME - this should come out of config file
 
 else:
     cam3 = DummyDriver('Panasonic AW-HE40 Camera (CAM#3)')
