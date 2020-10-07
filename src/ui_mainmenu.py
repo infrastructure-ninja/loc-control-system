@@ -27,41 +27,36 @@ from utilities import DebugPrint
 btnMainMenuR1C1 = Button(devices.TouchPanel, 1000)
 btnMainMenuR2C1 = Button(devices.TouchPanel, 1001)
 btnMainMenuR3C1 = Button(devices.TouchPanel, 1002)
-btnMainMenuR4C1 = Button(devices.TouchPanel, 1003)
 
-btnMainMenuR1C2 = Button(devices.TouchPanel, 1004)
-btnMainMenuR2C2 = Button(devices.TouchPanel, 1005)
-btnMainMenuR3C2 = Button(devices.TouchPanel, 1006)
-btnMainMenuR4C2 = Button(devices.TouchPanel, 1007)
+btnMainMenuR1C2 = Button(devices.TouchPanel, 1003)
+btnMainMenuR2C2 = Button(devices.TouchPanel, 1004)
+btnMainMenuR3C2 = Button(devices.TouchPanel, 1005)
 
-btnMainMenuR1C3 = Button(devices.TouchPanel, 1008)
-btnMainMenuR2C3 = Button(devices.TouchPanel, 1009)
-btnMainMenuR3C3 = Button(devices.TouchPanel, 1010)
-btnMainMenuR4C3 = Button(devices.TouchPanel, 1011)
+btnMainMenuR1C3 = Button(devices.TouchPanel, 1006)
+btnMainMenuR2C3 = Button(devices.TouchPanel, 1007)
+btnMainMenuR3C3 = Button(devices.TouchPanel, 1008)
 
-btnMainMenuR1C4 = Button(devices.TouchPanel, 1012)
-btnMainMenuR2C4 = Button(devices.TouchPanel, 1013)
-btnMainMenuR3C4 = Button(devices.TouchPanel, 1014)
-btnMainMenuR4C4 = Button(devices.TouchPanel, 1015)
+btnMainMenuR1C4 = Button(devices.TouchPanel, 1009)
+btnMainMenuR2C4 = Button(devices.TouchPanel, 1010)
 
-btnMainMenuR1C5 = Button(devices.TouchPanel, 1016)
-btnMainMenuR1C5.SetText('Recording Control')
+btnMainMenuR3C4 = Button(devices.TouchPanel, 1011)
+btnMainMenuR3C4.SetText('Recording\nControl')
 
-btnMainMenuR2C5 = Button(devices.TouchPanel, 1017)
-btnMainMenuR2C5.SetText('Audio Control')
+btnMainMenuR1C5 = Button(devices.TouchPanel, 1012)
+btnMainMenuR1C5.SetText('Audio Control')
 
-btnMainMenuR3C5 = Button(devices.TouchPanel, 1018)
-btnMainMenuR3C5.SetText('System\nOptions')
+btnMainMenuR2C5 = Button(devices.TouchPanel, 1013)
+btnMainMenuR2C5.SetText('System\nOptions')
 
-btnMainMenuR4C5 = Button(devices.TouchPanel, 1019)
-btnMainMenuR4C5.SetText('Refresh Configuration')
+btnMainMenuR3C5 = Button(devices.TouchPanel, 1014)
+btnMainMenuR3C5.SetText('Refresh Configuration')
 
 lstMainPopupButtons = [
-                    btnMainMenuR1C1, btnMainMenuR2C1, btnMainMenuR3C1, btnMainMenuR4C1,
-                    btnMainMenuR1C2, btnMainMenuR2C2, btnMainMenuR3C2, btnMainMenuR4C2,
-                    btnMainMenuR1C3, btnMainMenuR2C3, btnMainMenuR3C3, btnMainMenuR4C3,
-                    btnMainMenuR1C4, btnMainMenuR2C4, btnMainMenuR3C4, btnMainMenuR4C4,
-                    btnMainMenuR1C5, btnMainMenuR2C5, btnMainMenuR3C5, btnMainMenuR4C5
+                    btnMainMenuR1C1, btnMainMenuR2C1, btnMainMenuR3C1,
+                    btnMainMenuR1C2, btnMainMenuR2C2, btnMainMenuR3C2,
+                    btnMainMenuR1C3, btnMainMenuR2C3, btnMainMenuR3C3,
+                    btnMainMenuR1C4, btnMainMenuR2C4, btnMainMenuR3C4,
+                    btnMainMenuR1C5, btnMainMenuR2C5, btnMainMenuR3C5
                     ]
 
 
@@ -69,25 +64,19 @@ lstMainPopupButtons = [
 def main_menu_buttons_pressed(button, state):
     DebugPrint('interface/main_menu_buttons_pressed', 'Button was pressed: [{}]'.format(button.Name), 'Debug')
 
-#                    btnMainMenuR1C1, btnMainMenuR2C1, btnMainMenuR3C1, btnMainMenuR4C1,
-#                    btnMainMenuR1C2, btnMainMenuR2C2, btnMainMenuR3C2, btnMainMenuR4C2,
-#                    btnMainMenuR1C3, btnMainMenuR2C3, btnMainMenuR3C3, btnMainMenuR4C3,
-#                    btnMainMenuR1C4, btnMainMenuR2C4, btnMainMenuR3C4, btnMainMenuR4C4,
-#                    btnMainMenuR1C5, btnMainMenuR2C5, btnMainMenuR3C5, btnMainMenuR4C5
-
-    if button is btnMainMenuR1C5:   # Recording Control
+    if button is btnMainMenuR3C4:   # Recording Control
         devices.TouchPanel.ShowPopup('POP - Recording Control')
         devices.system_states.Set('ActivePopup', 'POP - Recording Control')
 
-    elif button is btnMainMenuR2C5:   # Audio Control
+    elif button is btnMainMenuR1C5:   # Audio Control
         devices.TouchPanel.ShowPopup('POP - Audio Control')
         devices.system_states.Set('ActivePopup', 'POP - Audio Control')
 
-    elif button is btnMainMenuR3C5:   # System Options
+    elif button is btnMainMenuR2C5:   # System Options
         devices.TouchPanel.ShowPopup('POP - Options - Main')
         devices.system_states.Set('ActivePopup', 'POP - Options - Main')
 
-    elif button is btnMainMenuR4C5:   # Refresh Configuration
+    elif button is btnMainMenuR3C5:   # Refresh Configuration
         DebugPrint('interface/main_menu_buttons_pressed', 'Running a refresh of the configuration file', 'Info')
         utilities.config.reload()
         interface.initialize_all()

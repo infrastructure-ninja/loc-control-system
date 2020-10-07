@@ -13,6 +13,7 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this code.  If not, see <https://www.gnu.org/licenses/>.
+from extronlib.system import Wait
 
 import re
 
@@ -21,8 +22,11 @@ import interface
 import utilities
 from utilities import DebugPrint
 
+# This dictionary will hold all of our Wait objects for any time we trigger a delay
+preset_wait_dictionary = {}
 
-def execute_command(macro_string, button = None):
+
+def execute_command(macro_string, button=None):
 
     #    device:<object>:<command>:<value>
     #    ui:popup:<name>
@@ -31,17 +35,18 @@ def execute_command(macro_string, button = None):
     regex_device = re.compile(r"^(device):(.*?):(.*?):(.*?):(.*?)(?::(int|integer|str|string):(.*?)){0,1}$")
     regex_preset = re.compile(r"^(preset):(.*):(.*)$")
 
-    #ui:popup:POP - CAM1 - Control
+    # ui:popup:POP - CAM1 - Control
     if regex_ui.match(macro_string):
         p = regex_ui.match(macro_string)
         if p.group(2):
             devices.TouchPanel.ShowPopup(p.group(2))
         else:
-            DebugPrint('execute_button_macro/regex_ui', 'Attempted to handle a malformed command statement: [{}]'.format(macro_string),
+            DebugPrint('execute_button_macro/regex_ui', 'Attempted to handle a malformed command statement: [{}]'.
+                       format(macro_string),
                        'Error')
 
-    #device:carbonite:Cut:None:None
-    #device:carbonite:KeyOnPreview:On:Keyer:int:1
+    # device:carbonite:Cut:None:None
+    # device:carbonite:KeyOnPreview:On:Keyer:int:1
     elif regex_device.match(macro_string):
         p = regex_device.match(macro_string)
 
@@ -57,7 +62,6 @@ def execute_command(macro_string, button = None):
                 else:
                     driver_value = p.group(4)
 
-
                 if p.group(5) and p.group(5).lower() != 'none':
                     if p.group(6) and p.group(7):
                         if p.group(6) == 'int' or p.group(6) == 'integer':
@@ -70,11 +74,11 @@ def execute_command(macro_string, button = None):
                             qualifier = None
 
                 else:
-                        qualifier = None
+                    qualifier = None
 
                 DebugPrint('interface.py/execute_command',
-                           'Sending Device Driver Command: [{}] [{}] [{}]'.format(driver_command, driver_value, qualifier),
-                           'Trace')
+                           'Sending Device Driver Command: [{}] [{}] [{}]'.
+                           format(driver_command, driver_value, qualifier), 'Trace')
 
                 # Run our driver_command
                 driver_object.Set(driver_command, driver_value, qualifier)
@@ -106,7 +110,7 @@ def execute_command(macro_string, button = None):
             DebugPrint('execute_button_macro', 'UNRECOGNIZED MACRO STRING! Attempted to parse: [{}]'.
                        format(macro_string), 'Error')
 
-#end function (execute_button_macro)
+# end function (execute_button_macro)
 
 
 def execute_preset_old(preset_number):
@@ -114,7 +118,7 @@ def execute_preset_old(preset_number):
                                   default_value=False, cast_as='boolean') is True:
 
         preset_name = utilities.config.get_value('presets/preset_{}_name'.format(preset_number),
-                                  default_value='Un-named', cast_as='string')
+                                                 default_value='Un-named', cast_as='string')
 
         DebugPrint('execute_preset/{}/{}'.format(preset_number, preset_name),
                    'Preset starting execution..', 'Info')
@@ -127,12 +131,11 @@ def execute_preset_old(preset_number):
                 'presets/preset_{}_steps/{}_enabled'.format(preset_number, preset_index),
                 default_value=False, cast_as='boolean')
 
-
             current_step_data = utilities.config.get_value(
                 'presets/preset_{}_steps/{}_data'.format(preset_number, preset_index),
                 default_value='None', cast_as='string')
 
-            if ((current_step_enabled is False) and (current_step_data == 'None')):
+            if (current_step_enabled is False) and (current_step_data == 'None'):
                 DebugPrint('execute_preset/{}/{}'.format(preset_number, preset_name),
                            'Step #{} is not present, so we are done. Execution completed!'.
                            format(preset_index), 'Info')
@@ -152,24 +155,25 @@ def execute_preset_old(preset_number):
 
                 execute_command(current_step_data)
 
-        #FIXME - we really should convert this to a system state
+        # FIXME - we really should convert this to a system state
         interface.mainscreen.lblNextPreset.SetText(preset_name)
-#end function (execute_preset_old)
+# end function (execute_preset_old)
 
-def execute_preset(preset_number, stage = 'prepare'):
+
+def execute_preset(preset_number, stage='prepare', starting_step=1):
     if utilities.config.get_value('presets/{}/enabled'.format(preset_number),
                                   default_value=False, cast_as='boolean') is True:
 
         preset_name = utilities.config.get_value('presets/{}/name'.format(preset_number),
-                                  default_value='Un-named', cast_as='string')
+                                                 default_value='Un-named', cast_as='string')
 
         if stage == 'prepare':
             DebugPrint('execute_preset/{}/{}'.format(preset_number, preset_name),
-                       'Preset preparation stage starting..', 'Info')
+                       'Preset preparation stage starting at step #{}..'.format(starting_step), 'Info')
 
         elif stage == 'activate':
             DebugPrint('execute_preset/{}/{}'.format(preset_number, preset_name),
-                       'Preset activation stage starting..', 'Info')
+                       'Preset activation stage starting at step #{}..'.format(starting_step), 'Info')
 
         else:
             DebugPrint('execute_preset/{}/{}'.format(preset_number, preset_name),
@@ -177,10 +181,8 @@ def execute_preset(preset_number, stage = 'prepare'):
 
             return False
 
-
-        preset_index = 0
+        preset_index = starting_step
         while preset_index < 50:   # We don't want this loop to run away - 50 steps should be enough
-            preset_index += 1
 
             current_step_enabled = utilities.config.get_value(
                 'presets/{}/{}/{}/enabled'.format(preset_number, stage, preset_index),
@@ -207,6 +209,32 @@ def execute_preset(preset_number, stage = 'prepare'):
 
             # If we get here, we're going to [attempt] to pull in the rest of the data for this preset #,
             # then validate it one-by-one so we can provide good error messages.
+
+            # This lets us put a delay into our presets
+            elif current_step_type.lower() == 'delay':
+                delay_in_seconds = utilities.config.get_value('presets/{}/{}/{}/seconds'.
+                                                              format(preset_number, stage, preset_index),
+                                                              default_value='1', cast_as='string')
+
+                DebugPrint('execute_preset/{}/{}'.format(preset_number, preset_name),
+                           'Processing a delay in preset #{} for {} second(s)'.
+                           format(preset_number, delay_in_seconds), 'Trace')
+
+                # We're going to stick a Wait object into this dictionary. The key for it will be
+                # 1) the preset number, 2) the preset stage .. We are deliberately designing this
+                # to not support multiple concurrent executions of the same preset.
+                try:
+                    preset_wait_dictionary.update({(preset_number, stage):
+                                                  Wait(float(delay_in_seconds),
+                                                       lambda: execute_preset(preset_number, stage, preset_index+1)
+                                                       )})
+
+                except:
+                    pass
+
+                break
+
+            # The ever important DEVICE command. It is imagined that this will be 99% of the presets.
             elif current_step_type.lower() == 'device':
 
                 current_step_device = utilities.config.get_value('presets/{}/{}/{}/device'.
@@ -229,9 +257,9 @@ def execute_preset(preset_number, stage = 'prepare'):
                                                                           format(preset_number, stage, preset_index),
                                                                           default_value='None', cast_as='string')
 
-                current_step_qualifier_value_type = utilities.config.get_value('presets/{}/{}/{}/qualifier_value_type'.
-                                                                               format(preset_number, stage, preset_index),
-                                                                               default_value='None', cast_as='string')
+                current_step_qualifier_value_type = utilities.config.get_value(
+                    'presets/{}/{}/{}/qualifier_value_type'.format(preset_number, stage, preset_index),
+                    default_value='None', cast_as='string')
 
                 # Now let's validate all of our data, and fail gracefully with descriptive error messages along the way
                 # If we make it to the bottom if this if/elif struction, then we'll be ready to use all of these
@@ -246,8 +274,8 @@ def execute_preset(preset_number, stage = 'prepare'):
                     continue
 
                 # Check if the command is in the driver's "Commands" dictionary
-                elif current_step_command == 'None' or \
-                    current_step_command not in devices.device_objects[current_step_device].Commands:
+                elif (current_step_command == 'None') or \
+                        (current_step_command not in devices.device_objects[current_step_device].Commands):
 
                     DebugPrint('execute_preset/{}/{}'.format(preset_number, preset_name),
                                'Skipping step #{} as it specifies an invalid command for the driver: [{}]'.
@@ -264,17 +292,17 @@ def execute_preset(preset_number, stage = 'prepare'):
                 # Finally, check to see if the data provided can successfully be casted as an integer
                 if current_step_qualifier_key != 'None' and current_step_qualifier_value != 'None':
                     if current_step_qualifier_value_type.lower() in ['int', 'integer']:
-                            if not current_step_qualifier_value.isdigit():
-                                DebugPrint('execute_preset/{}/{}'.format(preset_number, preset_name),
-                                           'Skipping step #{} as it specifies an invalid qualifier value [{}] \
-                                           (called for integer but non-integer data was found)'.
-                                           format(preset_index, current_step_qualifier_value), 'Error')
+                        if not current_step_qualifier_value.isdigit():
+                            DebugPrint('execute_preset/{}/{}'.format(preset_number, preset_name),
+                                       'Skipping step #{} as it specifies an invalid qualifier value [{}] \
+                                       (called for integer but non-integer data was found)'.
+                                       format(preset_index, current_step_qualifier_value), 'Error')
 
-                                continue
+                            continue
 
-                            # We'll cast our qualifier value as an integer
-                            else:
-                                qualifier = {current_step_qualifier_key: int(current_step_qualifier_value)}
+                        # We'll cast our qualifier value as an integer
+                        else:
+                            qualifier = {current_step_qualifier_key: int(current_step_qualifier_value)}
 
                     # We'll cast our qualifier value as a string
                     else:
@@ -292,15 +320,17 @@ def execute_preset(preset_number, stage = 'prepare'):
                 try:
                     devices.device_objects[current_step_device].Set(current_step_command, current_step_value, qualifier)
 
-                except:
+                except KeyError:
                     DebugPrint('execute_preset/{}/{}'.format(preset_number, preset_name),
                                'An unknown error occurred executing the following driver command: [{}] [{}] [{}] [{}]'.
-                               format(current_step_device, current_step_command, current_step_value, qualifier), 'Error')
+                               format(current_step_device, current_step_command, current_step_value, qualifier),
+                               'Error')
+
+            preset_index += 1
 
         # end while loop
 
         # Update our system state of "NextPreset" so we can keep our UI in sync
         devices.system_states.Set('NextPreset', preset_number, None)
 
-#end function (execute_preset)
-
+# end function (execute_preset)

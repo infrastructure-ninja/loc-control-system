@@ -62,24 +62,49 @@ def soundboard_receive_data_handler(command, value, qualifier):
                    'Received Yamaha TF5 Driver Update: [{0}] [{1}] [{2}]'.format(command, value, qualifier), 'Trace')
 
         if qualifier['Input Channel'] == '5' and qualifier['Aux Channel'] == '13':
-            interface.audio.sliderChannel1.SetFill(int(value))
+            pass
 
         elif qualifier['Input Channel'] == '6' and qualifier['Aux Channel'] == '13':
-            interface.audio.sliderChannel2.SetFill(int(value))
+            pass
 
         elif qualifier['Input Channel'] == '15' and qualifier['Aux Channel'] == '13':
-            interface.audio.sliderChannel3.SetFill(int(value))
+            pass
 
     elif command == 'InputMute':
         DebugPrint('devices.py/soundboard_receive_data_handler',
                    'Received Yamaha TF5 Driver Update: [{0}] [{1}] [{2}]'.format(command, value, qualifier), 'Trace')
 
-        if qualifier['Channel'] == '5':
+        if qualifier['Channel'] == utilities.config.get_value(
+                'devices/soundboard/number1_channel', default_value='5', cast_as='string'):
+
             if value == 'On':
                 interface.audio.btnAudio_Channel1.SetState(1)
+                interface.audio.lblChannel1State.SetText('ON')
 
             else:
                 interface.audio.btnAudio_Channel1.SetState(0)
+                interface.audio.lblChannel1State.SetText('MUTED')
+
+        elif qualifier['Channel'] == utilities.config.get_value(
+                'devices/soundboard/number2_channel', default_value='6', cast_as='string'):
+
+            if value == 'On':
+                interface.audio.btnAudio_Channel2.SetState(1)
+                interface.audio.lblChannel2State.SetText('ON')
+            else:
+                interface.audio.btnAudio_Channel2.SetState(0)
+                interface.audio.lblChannel2State.SetText('MUTED')
+
+        elif qualifier['Channel'] == utilities.config.get_value(
+                'devices/soundboard/number3_channel', default_value='15', cast_as='string'):
+
+            if value == 'On':
+                interface.audio.btnAudio_Channel3.SetState(1)
+                interface.audio.lblChannel3State.SetText('ON')
+
+            else:
+                interface.audio.btnAudio_Channel3.SetState(0)
+                interface.audio.lblChannel3State.SetText('MUTED')
 
 
     else:
@@ -109,15 +134,29 @@ def update_all_soundboard_status():
     print('UPDATING ALL SOUND BOARD STATUS ..')
 
     # Primary beltpack
-    soundboard.Update('InputMute', {'Channel': 5})
-    soundboard.Update('AuxLevel', {'Input Channel': 5, 'Aux Channel': 13})
+    input1 = utilities.config.get_value('devices/soundboard/number1_channel',
+                                        default_value='5', cast_as='integer')
+
+    soundboard.Update('InputMute', {'Channel': input1})
+    soundboard.Update('AuxLevel', {'Input Channel': input1, 'Aux Channel': 13})
+
 
     # Secondary beltpack
-    soundboard.Update('InputMute', {'Channel': 6})
-    soundboard.Update('AuxLevel', {'Input Channel': 6, 'Aux Channel': 13})
+    input2 = utilities.config.get_value('devices/soundboard/number2_channel',
+                                        default_value='6', cast_as='integer')
+
+    soundboard.Update('InputMute', {'Channel': input2})
+    soundboard.Update('AuxLevel', {'Input Channel': input2, 'Aux Channel': 13})
 
     # Playback System
-    soundboard.Update('InputMute', {'Channel': 15})
-    soundboard.Update('AuxLevel', {'Input Channel': 15, 'Aux Channel': 13})
-    soundboard.Update('InputMute', {'Channel': 16})
-    soundboard.Update('AuxLevel', {'Input Channel': 16, 'Aux Channel': 13})
+    input3 = utilities.config.get_value('devices/soundboard/number3_channel',
+                                        default_value='15', cast_as='integer')
+
+    soundboard.Update('InputMute', {'Channel': input3})
+    soundboard.Update('AuxLevel', {'Input Channel': input3, 'Aux Channel': 13})
+
+    try:
+        soundboard.Update('InputMute', {'Channel': input3 + 1})
+        soundboard.Update('AuxLevel', {'Input Channel': input3 + 1, 'Aux Channel': 13})
+    except:
+        pass

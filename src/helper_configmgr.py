@@ -2,7 +2,7 @@
 # ensures that no matter where we run this (our local PC, or an Extron processor),
 # the "File" object contains the proper mechanism to successfully engage in file I/O
 try:
-    from extronlib.system import File, ProgramLog
+    from extronlib.system import File
 except ModuleNotFoundError:
     print('INFO: Not running on Extron ControlScript, so using native Python file commands.')
     File = open
@@ -10,7 +10,6 @@ except ModuleNotFoundError:
 import json
 
 # TODO:
-#  - (DONE) add "data" section
 #  - add "metadata" section
 #  - add "descriptions" section
 #  - add "types" section

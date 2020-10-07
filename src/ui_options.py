@@ -24,14 +24,4 @@ from utilities import DebugPrint
 
 
 # Main Menu Buttons
-btnOptionsMain_Back = Button(devices.TouchPanel, 217)
 
-@event(btnOptionsMain_Back, 'Pressed')
-def options_main_buttons_pressed(button,state):
-    DebugPrint('ui_options.py/options_main_buttons_pressed', 'Button was pressed: [{}]'.format(button.Name), 'Debug')
-
-    if button is btnOptionsMain_Back:
-        devices.TouchPanel.ShowPopup('POP - Main Menu')
-        devices.system_states.Set('ActivePopup', 'POP - Main Menu')
-
-# end function (options_main_buttons_pressed)

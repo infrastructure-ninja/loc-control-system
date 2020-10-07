@@ -95,7 +95,7 @@ class DeviceClass:
         # "friendly name" of the video source from its ID number.
         self.VideoSourceNamesByID = {}
         for key, value in self.VideoSourceIDsByName.items():
-            self.VideoSourceNamesByID.update ({value : key })
+            self.VideoSourceNamesByID.update({value: key})
 
 
         self.Commands = {

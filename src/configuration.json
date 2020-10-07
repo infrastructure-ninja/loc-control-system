@@ -50,6 +50,51 @@
           "2": {
             "enabled": true,
             "type": "device",
+            "device": "soundboard",
+            "command": "InputMute",
+            "value": "Off",
+            "qualifier_key": "Channel",
+            "qualifier_value": "5",
+            "qualifier_value_type": "string"
+          },
+          "3": {
+            "enabled": true,
+            "type": "delay",
+            "seconds": ".5"
+          },
+          "4": {
+            "enabled": true,
+            "type": "device",
+            "device": "soundboard",
+            "command": "InputMute",
+            "value": "Off",
+            "qualifier_key": "Channel",
+            "qualifier_value": "6",
+            "qualifier_value_type": "string"
+          },
+          "5": {
+            "enabled": true,
+            "type": "delay",
+            "seconds": ".75"
+          },
+          "6": {
+            "enabled": true,
+            "type": "device",
+            "device": "soundboard",
+            "command": "InputMute",
+            "value": "On",
+            "qualifier_key": "Channel",
+            "qualifier_value": "15",
+            "qualifier_value_type": "string"
+          },
+          "7": {
+            "enabled": true,
+            "type": "delay",
+            "seconds": "1.5"
+          },
+          "8": {
+            "enabled": true,
+            "type": "device",
             "device": "carbonite",
             "command": "Auto",
             "value": "None",
@@ -432,19 +477,19 @@
     "interface": {
       "quickbuttons": {
         "button_1_enabled": true,
-        "button_1_name": "Service Presets",
+        "button_1_name": "Service\nPresets",
         "button_1_function": "ui:popup:POP - Service Presets",
         "button_1_color": "blue",
         "button_2_enabled": true,
-        "button_2_name": "Preset 1 -> Activate",
+        "button_2_name": "Preset 1\n(Activate)",
         "button_2_function": "preset:1:activate",
         "button_2_color": "red",
-        "button_3_enabled": true,
-        "button_3_name": "Soundboard MUTE",
+        "button_3_enabled": false,
+        "button_3_name": "Soundboard\nMUTE",
         "button_3_function": "device:soundboard:AuxMute:Off:Channel:int:1",
-        "button_3_color": "purple",
-        "button_4_enabled": true,
-        "button_4_name": "Soundboard UN-MUTE",
+        "button_3_color": "bronze",
+        "button_4_enabled": false,
+        "button_4_name": "Soundboard\nUN-MUTE",
         "button_4_function": "device:soundboard:AuxMute:On:Channel:int:1",
         "button_4_color": "green"
       },
@@ -473,7 +518,13 @@
       "soundboard": {
         "enabled": true,
         "ipaddress": "172.16.200.5",
-        "port": "49280"
+        "port": "49280",
+        "number1_channel": "5",
+        "number1_name": "Pastor's Headset",
+        "number2_channel": "6",
+        "number2_name": "Wireless Lavalier Beltback",
+        "number3_channel": "15",
+        "number3_name": "Playback Unit"
       },
       "playback": {
         "enabled": true,
@@ -525,6 +576,7 @@
         "port": "80",
         "username": "admin",
         "password": "12345",
+        "model": "AW-HE40SWP",
         "preset_1_name": "Preset A",
         "preset_2_name": "Preset B",
         "preset_3_name": "Preset C",
@@ -550,6 +602,7 @@
         "port": "80",
         "username": "admin",
         "password": "12345",
+        "model": "AW-HE40SWP",
         "preset_1_name": "Extreme Wide",
         "preset_2_name": "Podium A",
         "preset_3_name": "Podium B",
@@ -575,6 +628,7 @@
         "port": "80",
         "username": "admin",
         "password": "12345",
+        "model": "AW-HE40SWP",
         "preset_1_name": "Extreme Wide",
         "preset_2_name": "Podium A",
         "preset_3_name": "Podium B",
@@ -600,6 +654,7 @@
         "port": "80",
         "username": "admin",
         "password": "12345",
+        "model": "AW-HE40SWP",
         "preset_1_name": "Preset A",
         "preset_2_name": "Preset B",
         "preset_3_name": "Preset C",

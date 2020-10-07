@@ -68,9 +68,19 @@ def initialize_all():
 
     playback.lblPlayback_CurrentState.SetText('')
 
-    audio.sliderChannel1.SetRange(-9000, 1000)
-    audio.sliderChannel2.SetRange(-9000, 1000)
-    audio.sliderChannel3.SetRange(-9000, 1000)
+    # Audio Control Labels
+    audio.lblChannel1.SetText(utilities.config.get_value('devices/soundboard/number1_name',
+                                                         default_value='Input #1',
+                                                         cast_as='string'))
+
+    audio.lblChannel2.SetText(utilities.config.get_value('devices/soundboard/number2_name',
+                                                         default_value='Input #2',
+                                                         cast_as='string'))
+
+    audio.lblChannel3.SetText(utilities.config.get_value('devices/soundboard/number3_name',
+                                                         default_value='Input #3',
+                                                         cast_as='string'))
+
 
     # Initialize a bunch of buttons using text pulled from our configuration file
     # This dictionary stores the button object we want to "SetText' on, and the configuration
@@ -141,7 +151,8 @@ def initialize_all():
 
 
     # Set our "quick sidebar buttons" color based on how they are defined in the configuration
-    button_color_map = {'blue': 0, 'green': 2, 'red': 3, 'white': 4, 'yellow': 5, 'gray': 6, 'grey': 6}
+    button_color_map = {'black': 0, 'blue': 2, 'bronze': 3, 'grey': 4, 'gray': 4,
+                        'green': 5, 'orange': 6, 'red': 7}
     init_button_color_dict = {
         mainscreen.btnQuickButton1: 'interface/quickbuttons/button_1_color',
         mainscreen.btnQuickButton2: 'interface/quickbuttons/button_2_color',
@@ -154,10 +165,10 @@ def initialize_all():
 
         if button_color not in button_color_map:
             DebugPrint('interface.py/initialize_all',
-                       'Invalid color specified in config file: [{}]. Defaulting to blue!'.format(config_key),
+                       'Invalid color specified in config file: [{}]. Defaulting to black!'.format(config_key),
                        'Warn')
 
-            button_color = 'blue'
+            button_color = 'black'
 
         button.SetState(button_color_map[button_color])
 
@@ -244,7 +255,7 @@ def initialize_all():
         devices.switcher.carbonite.Send(b'\xba\xd2\xac\xe5\x00\x10\x4a\x00\x08\x00\x19\x1b\x04\x00\x00\x00\x01') #MV Box4 Border (0x191b)
 
     # PRESET BUTTON INITIALIZATION
-    for preset_id in range(1, 13):
+    for preset_id in range(1, len(presets.lstPresetButtons) + 1):
         if utilities.config.get_value('presets/{}/enabled'.
                                               format(preset_id), default_value=False, cast_as='boolean') is True:
 

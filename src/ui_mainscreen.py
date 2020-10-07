@@ -32,18 +32,19 @@ btnCAM2_TileButton      = Button(devices.TouchPanel, 56)
 btnCAM3_TileButton      = Button(devices.TouchPanel,  57)
 btnCAM4_TileButton      = Button(devices.TouchPanel,  58)
 btnPlayback_TileButton  = Button(devices.TouchPanel, 117)
+btnComputer_TileButton  = Button(devices.TouchPanel, 53)
 lstTileButtons = [btnCAM1_TileButton, btnCAM2_TileButton, btnCAM3_TileButton,
-                  btnCAM4_TileButton, btnPlayback_TileButton]
+                  btnCAM4_TileButton, btnPlayback_TileButton, btnComputer_TileButton]
 
 # The audio and stream status widgets
-btnMainSoundMicsActive = Button(devices.TouchPanel, 53)
-btnMainSoundPlaybackActive = Button(devices.TouchPanel, 54)
 btnMainStreamingStatus = Button(devices.TouchPanel, 55)
-
 
 # The "Next Preset" label
 lblNextPreset = Label(devices.TouchPanel, 109)
 btnMainScreen_ActivatePreset = Button(devices.TouchPanel, 183)
+
+# Audio button
+btnMainAudioControl = Button(devices.TouchPanel, 204)
 
 # MENU and QuickButtons
 btnMainMenu = Button(devices.TouchPanel, 16)
@@ -94,6 +95,12 @@ def BackgroundButtonPressed(button, state):
     button.SetEnable(False)
 #end function (BackgroundButtonPressed)
 
+
+@event(btnMainAudioControl, 'Pressed')
+def main_audio_control_button_pressed(button, state):
+    devices.TouchPanel.ShowPopup('POP - Audio Control')
+    devices.system_states.Set('ActivePopup', 'POP - Audio Control')
+# end function (main_audio_control_button_pressed)
 
 @event(lstMainMenuButtons, 'Pressed')
 def main_screen_buttons_pressed(button, state):
@@ -220,14 +227,19 @@ def btn_tile_buttons_pressed(button, state):
                  btnCAM2_TileButton: ('Cam 2', 'POP - CAM2-Control'),
                  btnCAM3_TileButton: ('Cam 3', 'POP - CAM3-Control'),
                  btnCAM4_TileButton: ('Cam 4', 'POP - CAM4-Control'),
-                 btnPlayback_TileButton:('HDMI 2', 'POP - Playback Control')
+                 btnPlayback_TileButton:('HDMI 2', 'POP - Playback Control'),
+                 btnComputer_TileButton: ('HDMI 1', None)
                 }
 
     preset_source = ButtonMap[button][0]
     popup_name = ButtonMap[button][1]
 
-    ShowPopup(popup_name)
-    devices.switcher.carbonite.Set('MLEPresetSource', preset_source)
+    if popup_name is not None:
+        ShowPopup(popup_name)
+
+    if preset_source is not None:
+        devices.switcher.carbonite.Set('MLEPresetSource', preset_source)
+
 
     DebugPrint('interface/TileButtonsPressed', 'Tile button pressed for input: [{}]'.
                format(preset_source), 'Trace')

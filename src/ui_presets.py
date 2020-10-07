@@ -26,7 +26,7 @@ from utilities import DebugPrint
 
 lstPresetButtons = []
 
-lstPresetButtonIDs = [153, 154, 155, 156, 157, 158, 159, 160, 213, 214, 215, 216]
+lstPresetButtonIDs = [153, 154, 155, 156, 157, 158, 159, 160, 213]
 for button_id in lstPresetButtonIDs:
     lstPresetButtons.append(Button(devices.TouchPanel, button_id))
 
