@@ -33,6 +33,7 @@ import ui_mainmenu as mainmenu
 import ui_options as options
 import ui_audio as audio
 
+
 def initialize_all():
 
     # FIXME - we really should convert this to a system state
@@ -80,6 +81,15 @@ def initialize_all():
     audio.lblChannel3.SetText(utilities.config.get_value('devices/soundboard/number3_name',
                                                          default_value='Input #3',
                                                          cast_as='string'))
+
+
+    # Set some system states based on options that are saved into the config file
+    if utilities.config.get_value('options/ignore_midi', default_value=False,
+                                  cast_as='boolean') is True:
+        devices.system_states.Set('IgnoreMIDI', 'On')
+
+    else:
+        devices.system_states.Set('IgnoreMIDI', 'Off')
 
 
     # Initialize a bunch of buttons using text pulled from our configuration file
@@ -199,105 +209,97 @@ def initialize_all():
     # seem worth implementing this in the driver.
     if not cam1_is_enabled:
         # HIDE
-        devices.switcher.carbonite.Send(b'\xba\xd2\xac\xe5\x00\x10\x4a\x00\x08\x00\x0c\x79\x04\x00\x00\x00\x00') #MV Box1 Label (0xc79)
-        devices.switcher.carbonite.Send(b'\xba\xd2\xac\xe5\x00\x10\x4a\x00\x08\x00\x0c\x76\x04\x00\x00\x00\x00') #MV Box1 Source (0xc76)
-        devices.switcher.carbonite.Send(b'\xba\xd2\xac\xe5\x00\x10\x4a\x00\x08\x00\x19\x18\x04\x00\x00\x00\x00') #MV Box1 Border (0x1918)
+        devices.switcher.carbonite.Send(b'\xba\xd2\xac\xe5\x00\x10\x4a\x00\x08\x00\x0c\x79\x04\x00\x00\x00\x00')  # MV Box1 Label (0xc79)
+        devices.switcher.carbonite.Send(b'\xba\xd2\xac\xe5\x00\x10\x4a\x00\x08\x00\x0c\x76\x04\x00\x00\x00\x00')  # MV Box1 Source (0xc76)
+        devices.switcher.carbonite.Send(b'\xba\xd2\xac\xe5\x00\x10\x4a\x00\x08\x00\x19\x18\x04\x00\x00\x00\x00')  # MV Box1 Border (0x1918)
 
     else:
         # SHOW
-        devices.switcher.carbonite.Send(b'\xba\xd2\xac\xe5\x00\x10\x4a\x00\x08\x00\x0c\x79\x04\x00\x00\x00\x01') #MV Box1 Label (0xc79)
-        devices.switcher.carbonite.Send(b'\xba\xd2\xac\xe5\x00\x10\x4a\x00\x08\x00\x0c\x76\x04\x00\x00\x03\xe8') #MV Box1 Source (0xc76)
-        devices.switcher.carbonite.Send(b'\xba\xd2\xac\xe5\x00\x10\x4a\x00\x08\x00\x19\x18\x04\x00\x00\x00\x01') #MV Box1 Border (0x1918)
+        devices.switcher.carbonite.Send(b'\xba\xd2\xac\xe5\x00\x10\x4a\x00\x08\x00\x0c\x79\x04\x00\x00\x00\x01')  # MV Box1 Label (0xc79)
+        devices.switcher.carbonite.Send(b'\xba\xd2\xac\xe5\x00\x10\x4a\x00\x08\x00\x0c\x76\x04\x00\x00\x03\xe8')  # MV Box1 Source (0xc76)
+        devices.switcher.carbonite.Send(b'\xba\xd2\xac\xe5\x00\x10\x4a\x00\x08\x00\x19\x18\x04\x00\x00\x00\x01')  # MV Box1 Border (0x1918)
 
     # Hide the CAM2 window on the multiview of the Carbonite switcher
     # We're just sending raw commands since we don't care about feedback on this, it does not
     # seem worth implementing this in the driver.
     if not cam2_is_enabled:
         # HIDE
-        devices.switcher.carbonite.Send(b'\xba\xd2\xac\xe5\x00\x10\x4a\x00\x08\x00\x0c\x80\x04\x00\x00\x00\x00') #MV Box2 Label (0xc80)
-        devices.switcher.carbonite.Send(b'\xba\xd2\xac\xe5\x00\x10\x4a\x00\x08\x00\x0c\x7d\x04\x00\x00\x00\x00') #MV Box2 Source (0xc7d)
-        devices.switcher.carbonite.Send(b'\xba\xd2\xac\xe5\x00\x10\x4a\x00\x08\x00\x19\x19\x04\x00\x00\x00\x00') #MV Box2 Border (0x1919)
+        devices.switcher.carbonite.Send(b'\xba\xd2\xac\xe5\x00\x10\x4a\x00\x08\x00\x0c\x80\x04\x00\x00\x00\x00')  # MV Box2 Label (0xc80)
+        devices.switcher.carbonite.Send(b'\xba\xd2\xac\xe5\x00\x10\x4a\x00\x08\x00\x0c\x7d\x04\x00\x00\x00\x00')  # MV Box2 Source (0xc7d)
+        devices.switcher.carbonite.Send(b'\xba\xd2\xac\xe5\x00\x10\x4a\x00\x08\x00\x19\x19\x04\x00\x00\x00\x00')  # MV Box2 Border (0x1919)
 
     else:
         # SHOW
-        devices.switcher.carbonite.Send(b'\xba\xd2\xac\xe5\x00\x10\x4a\x00\x08\x00\x0c\x80\x04\x00\x00\x00\x01') #MV Box2 Label (0xc80)
-        devices.switcher.carbonite.Send(b'\xba\xd2\xac\xe5\x00\x10\x4a\x00\x08\x00\x0c\x7d\x04\x00\x00\x03\xe9') #MV Box2 Source (0xc7d)
-        devices.switcher.carbonite.Send(b'\xba\xd2\xac\xe5\x00\x10\x4a\x00\x08\x00\x19\x19\x04\x00\x00\x00\x01') #MV Box2 Border (0x1919)
+        devices.switcher.carbonite.Send(b'\xba\xd2\xac\xe5\x00\x10\x4a\x00\x08\x00\x0c\x80\x04\x00\x00\x00\x01')  # MV Box2 Label (0xc80)
+        devices.switcher.carbonite.Send(b'\xba\xd2\xac\xe5\x00\x10\x4a\x00\x08\x00\x0c\x7d\x04\x00\x00\x03\xe9')  # MV Box2 Source (0xc7d)
+        devices.switcher.carbonite.Send(b'\xba\xd2\xac\xe5\x00\x10\x4a\x00\x08\x00\x19\x19\x04\x00\x00\x00\x01')  # MV Box2 Border (0x1919)
 
     # Hide the CAM3 window on the multiview of the Carbonite switcher
     # We're just sending raw commands since we don't care about feedback on this, it does not
     # seem worth implementing this in the driver.
     if not cam3_is_enabled:
         # HIDE
-        devices.switcher.carbonite.Send(b'\xba\xd2\xac\xe5\x00\x10\x4a\x00\x08\x00\x0c\x87\x04\x00\x00\x00\x00') #MV Box3 Label (0xc87)
-        devices.switcher.carbonite.Send(b'\xba\xd2\xac\xe5\x00\x10\x4a\x00\x08\x00\x0c\x84\x04\x00\x00\x00\x00') #MV Box3 Source (0xc84)
-        devices.switcher.carbonite.Send(b'\xba\xd2\xac\xe5\x00\x10\x4a\x00\x08\x00\x19\x1a\x04\x00\x00\x00\x00') #MV Box3 Border (0x191a)
+        devices.switcher.carbonite.Send(b'\xba\xd2\xac\xe5\x00\x10\x4a\x00\x08\x00\x0c\x87\x04\x00\x00\x00\x00')  # MV Box3 Label (0xc87)
+        devices.switcher.carbonite.Send(b'\xba\xd2\xac\xe5\x00\x10\x4a\x00\x08\x00\x0c\x84\x04\x00\x00\x00\x00')  # MV Box3 Source (0xc84)
+        devices.switcher.carbonite.Send(b'\xba\xd2\xac\xe5\x00\x10\x4a\x00\x08\x00\x19\x1a\x04\x00\x00\x00\x00')  # MV Box3 Border (0x191a)
 
     else:
         # SHOW
-        devices.switcher.carbonite.Send(b'\xba\xd2\xac\xe5\x00\x10\x4a\x00\x08\x00\x0c\x87\x04\x00\x00\x00\x01') #MV Box3 Label (0xc87)
-        devices.switcher.carbonite.Send(b'\xba\xd2\xac\xe5\x00\x10\x4a\x00\x08\x00\x0c\x84\x04\x00\x00\x03\xea') #MV Box3 Source (0xc84)
-        devices.switcher.carbonite.Send(b'\xba\xd2\xac\xe5\x00\x10\x4a\x00\x08\x00\x19\x1a\x04\x00\x00\x00\x01') #MV Box3 Border (0x191a)
+        devices.switcher.carbonite.Send(b'\xba\xd2\xac\xe5\x00\x10\x4a\x00\x08\x00\x0c\x87\x04\x00\x00\x00\x01')  # MV Box3 Label (0xc87)
+        devices.switcher.carbonite.Send(b'\xba\xd2\xac\xe5\x00\x10\x4a\x00\x08\x00\x0c\x84\x04\x00\x00\x03\xea')  # MV Box3 Source (0xc84)
+        devices.switcher.carbonite.Send(b'\xba\xd2\xac\xe5\x00\x10\x4a\x00\x08\x00\x19\x1a\x04\x00\x00\x00\x01')  # MV Box3 Border (0x191a)
 
     # Hide the CAM4 window on the multiview of the Carbonite switcher
     # We're just sending raw commands since we don't care about feedback on this, it does not
     # seem worth implementing this in the driver.
     if not cam4_is_enabled:
         # HIDE
-        devices.switcher.carbonite.Send(b'\xba\xd2\xac\xe5\x00\x10\x4a\x00\x08\x00\x0c\x8e\x04\x00\x00\x00\x00') #MV Box4 Label (0xc8e)
-        devices.switcher.carbonite.Send(b'\xba\xd2\xac\xe5\x00\x10\x4a\x00\x08\x00\x0c\x8b\x04\x00\x00\x00\x00') #MV Box4 Source (0xc8b)
-        devices.switcher.carbonite.Send(b'\xba\xd2\xac\xe5\x00\x10\x4a\x00\x08\x00\x19\x1b\x04\x00\x00\x00\x00') #MV Box4 Border (0x191b)
+        devices.switcher.carbonite.Send(b'\xba\xd2\xac\xe5\x00\x10\x4a\x00\x08\x00\x0c\x8e\x04\x00\x00\x00\x00')  # MV Box4 Label (0xc8e)
+        devices.switcher.carbonite.Send(b'\xba\xd2\xac\xe5\x00\x10\x4a\x00\x08\x00\x0c\x8b\x04\x00\x00\x00\x00')  # MV Box4 Source (0xc8b)
+        devices.switcher.carbonite.Send(b'\xba\xd2\xac\xe5\x00\x10\x4a\x00\x08\x00\x19\x1b\x04\x00\x00\x00\x00')  # MV Box4 Border (0x191b)
 
     else:
         # SHOW
-        devices.switcher.carbonite.Send(b'\xba\xd2\xac\xe5\x00\x10\x4a\x00\x08\x00\x0c\x8e\x04\x00\x00\x00\x01') #MV Box4 Label (0xc8e)
-        devices.switcher.carbonite.Send(b'\xba\xd2\xac\xe5\x00\x10\x4a\x00\x08\x00\x0c\x8b\x04\x00\x00\x03\xeb') #MV Box4 Source (0xc8b)
-        devices.switcher.carbonite.Send(b'\xba\xd2\xac\xe5\x00\x10\x4a\x00\x08\x00\x19\x1b\x04\x00\x00\x00\x01') #MV Box4 Border (0x191b)
+        devices.switcher.carbonite.Send(b'\xba\xd2\xac\xe5\x00\x10\x4a\x00\x08\x00\x0c\x8e\x04\x00\x00\x00\x01')  # MV Box4 Label (0xc8e)
+        devices.switcher.carbonite.Send(b'\xba\xd2\xac\xe5\x00\x10\x4a\x00\x08\x00\x0c\x8b\x04\x00\x00\x03\xeb')  # MV Box4 Source (0xc8b)
+        devices.switcher.carbonite.Send(b'\xba\xd2\xac\xe5\x00\x10\x4a\x00\x08\x00\x19\x1b\x04\x00\x00\x00\x01')  # MV Box4 Border (0x191b)
 
     # PRESET BUTTON INITIALIZATION
     for preset_id in range(1, len(presets.lstPresetButtons) + 1):
         if utilities.config.get_value('presets/{}/enabled'.
-                                              format(preset_id), default_value=False, cast_as='boolean') is True:
+                                      format(preset_id), default_value=False, cast_as='boolean') is True:
 
-            presets.lstPresetButtons[preset_id - 1].SetText(utilities.config.get_value('presets/{}/name'.
-                                              format(preset_id), default_value='Unnamed', cast_as='string'))
+            presets.lstPresetButtons[preset_id - 1].SetText(utilities.config.get_value(
+                'presets/{}/name'.format(preset_id), default_value='Unnamed', cast_as='string'))
 
             presets.lstPresetButtons[preset_id - 1].SetEnable(True)
-            presets.lstPresetButtons[preset_id - 1].SetVisible(True)
+            #presets.lstPresetButtons[preset_id - 1].SetVisible(True)
 
         else:
-            presets.lstPresetButtons[preset_id - 1].SetVisible(False)
+            presets.lstPresetButtons[preset_id - 1].SetText('Undefined')
+            presets.lstPresetButtons[preset_id - 1].SetEnable(False)
+            #presets.lstPresetButtons[preset_id - 1].SetVisible(False)
+
+    # Makes sure our presets are set to "page 1" when we first come up
+    presets.show_page1()
 
     # The last thing we do is to show our actual Main Page and the home popup.
     devices.TouchPanel.ShowPage('Main Page')
     devices.TouchPanel.ShowPopup('POP - Main Menu')
     devices.system_states.Set('ActivePopup', 'POP - Main Menu')
 
-#end function (Initialize)
+# end function (Initialize)
 
 
-#FIXME - this needs to become a system state (inside devices)
+# FIXME - this needs to become a system state (inside devices)
 # DUPLICATED in ui_mainscreen.py
 ActivePopup = None
+
+
 def ShowPopup(PopupName):
     global ActivePopup
     devices.TouchPanel.ShowPopup(PopupName)
     ActivePopup = PopupName
     devices.system_states.Set('ActivePopup', PopupName)
 
-#end function (ShowPopup)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+# end function (ShowPopup)

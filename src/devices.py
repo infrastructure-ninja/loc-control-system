@@ -42,6 +42,7 @@ import dev_switcher as switcher
 import dev_matrix as matrix
 import dev_playback as playback
 import dev_soundboard as soundboard
+import dev_dmp128 as dmp128
 import dev_recorder as recorder
 import dev_midi as midi
 
@@ -80,6 +81,15 @@ def system_states_callback_handler(command, value, qualifier):
                                                      default_value='n/a', cast_as='string')
 
         interface.mainscreen.lblNextPreset.SetText(preset_name)
+
+    elif command == 'IgnoreMIDI':
+        if value == 'On':
+            interface.options.btnSettingIgnoreMIDI.SetState(1)
+            interface.options.lblSettingIgnoreMIDI.SetText('IGNORING')
+
+        else:
+            interface.options.btnSettingIgnoreMIDI.SetState(0)
+            interface.options.lblSettingIgnoreMIDI.SetText('LISTENING')
 
     # FIXME - this could be more compact and pythonic, when you get bored of everything else
     elif command == 'CameraSpeed' and qualifier['Camera Number'] == 1:
@@ -146,6 +156,7 @@ system_states.SubscribeStatus('ActivePopup', None, system_states_callback_handle
 system_states.SubscribeStatus('CameraSpeed', None, system_states_callback_handler)
 system_states.SubscribeStatus('KeyOnPreview', None, system_states_callback_handler)
 system_states.SubscribeStatus('NextPreset', None, system_states_callback_handler)
+system_states.SubscribeStatus('IgnoreMIDI', None, system_states_callback_handler)
 
 
 def initialize_all():
@@ -169,6 +180,9 @@ def initialize_all():
 
     DebugPrint('devices.py/initialize_all', 'Attempting to connect to the Yamaha TF5 audio console..', 'Info')
     soundboard.soundboard.Connect()
+
+    DebugPrint('devices.py/initialize_all', 'Attempting to connect to the Extron DMP128 Plus..', 'Info')
+    dmp128.dmp128.Connect()
 
     #DebugPrint('devices.py/initialize_all', 'Attempting to connect to Camera #1 ..', 'Info')
     #cam1.cam1.Connect()

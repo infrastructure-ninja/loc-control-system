@@ -15,7 +15,7 @@
 # along with this code.  If not, see <https://www.gnu.org/licenses/>.
 
 from extronlib import event
-from extronlib.ui import Button, Label
+from extronlib.ui import Button, Label, Level
 
 import devices
 import utilities
@@ -35,6 +35,13 @@ btnPlayback_TileButton  = Button(devices.TouchPanel, 117)
 btnComputer_TileButton  = Button(devices.TouchPanel, 53)
 lstTileButtons = [btnCAM1_TileButton, btnCAM2_TileButton, btnCAM3_TileButton,
                   btnCAM4_TileButton, btnPlayback_TileButton, btnComputer_TileButton]
+
+# Audio status levels
+lvlMainScreenLevel1 = Level(devices.TouchPanel, 223)
+lvlMainScreenLevel1.SetRange(-850, 0)
+
+lvlMainScreenLevel2 = Level(devices.TouchPanel, 224)
+lvlMainScreenLevel2.SetRange(-850, 0)
 
 # The audio and stream status widgets
 btnMainStreamingStatus = Button(devices.TouchPanel, 55)

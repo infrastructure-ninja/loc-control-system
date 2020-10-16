@@ -38,7 +38,9 @@ class DeviceClass:
             'ActivePopup': {'Status': {}},
             'CameraSpeed': {'Parameters': ['Camera Number'], 'Status': {}},
             'KeyOnPreview': {'Parameters': ['Keyer'], 'Status': {}},
-            'NextPreset': {'Status': {}}
+            'NextPreset': {'Status': {}},
+            'IgnoreMIDI': {'Status': {}}
+
         }
 
 
@@ -54,6 +56,8 @@ class DeviceClass:
     def SetNextPreset(self, value, qualifier):
         self.WriteStatus('NextPreset', value, qualifier)
 
+    def SetIgnoreMIDI(self, value, qualifier):
+        self.WriteStatus('IgnoreMIDI', value, qualifier)
 
 ###################################################################
 

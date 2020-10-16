@@ -15,7 +15,7 @@
 # along with this code.  If not, see <https://www.gnu.org/licenses/>.
 
 from extronlib import event
-from extronlib.ui import Button, Label, Level
+from extronlib.ui import Button
 
 import devices
 import interface
@@ -24,9 +24,13 @@ import utilities
 
 from utilities import DebugPrint
 
-lstPresetButtons = []
+btnServicePresetsPage1 = Button(devices.TouchPanel, 217)
+btnServicePresetsPage2 = Button(devices.TouchPanel, 225)
 
-lstPresetButtonIDs = [153, 154, 155, 156, 157, 158, 159, 160, 213]
+lstPresetButtonIDs = [153, 154, 155, 156, 157, 158, 159, 160, 213,
+                      227, 228, 229, 230, 231, 232, 233, 234, 235]
+
+lstPresetButtons = []
 for button_id in lstPresetButtonIDs:
     lstPresetButtons.append(Button(devices.TouchPanel, button_id))
 
@@ -34,10 +38,44 @@ for button_id in lstPresetButtonIDs:
 @event(lstPresetButtons, 'Pressed')
 def preset_button_pressed(button, state):
     try:
-        DebugPrint('ui_presets.py/preset_button_pressed', 'Trigger Preset #{}'.format(lstPresetButtons.index(button) + 1), 'Trace')
+        DebugPrint('ui_presets.py/preset_button_pressed', 'Trigger Preset #{}'.format(
+            lstPresetButtons.index(button) + 1), 'Trace')
         presets.execute_preset(lstPresetButtons.index(button) + 1)
 
     except ValueError:
         pass
 
 # end function (preset_button_pressed)
+
+@event([btnServicePresetsPage1, btnServicePresetsPage2], 'Pressed')
+def page_button_pressed(button, state):
+    if button is btnServicePresetsPage1:
+        show_page1()
+
+    elif button is btnServicePresetsPage2:
+        show_page2()
+# end function (page_button_pressed)
+
+def show_page1():
+    btnServicePresetsPage1.SetState(1)
+    btnServicePresetsPage2.SetState(0)
+
+    for single_button in lstPresetButtons[9:]:
+        single_button.SetVisible(False)
+
+    for single_button in lstPresetButtons[0:9]:
+        # If the button is enabled then we want it visible, otherwise it'll be set to invisible
+        single_button.SetVisible(single_button.Enabled)
+# end function (show_page1)
+
+def show_page2():
+    btnServicePresetsPage1.SetState(0)
+    btnServicePresetsPage2.SetState(1)
+
+    for single_button in lstPresetButtons[9:]:
+        # If the button is enabled then we want it visible, otherwise it'll be set to invisible
+        single_button.SetVisible(single_button.Enabled)
+
+    for single_button in lstPresetButtons[0:9]:
+        single_button.SetVisible(False)
+# end function (show_page2)

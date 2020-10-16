@@ -23,5 +23,16 @@ import interface
 from utilities import DebugPrint
 
 
-# Main Menu Buttons
+# Options - Ignore MIDI
+btnSettingIgnoreMIDI = Button(devices.TouchPanel, 214)
+lblSettingIgnoreMIDI = Label(devices.TouchPanel, 215)
 
+
+@event(btnSettingIgnoreMIDI, 'Pressed')
+def btn_setting_ignore_midi_pressed(button, state):
+    current_state = devices.system_states.ReadStatus('IgnoreMIDI')
+    if current_state == 'On':
+        devices.system_states.Set('IgnoreMIDI', 'Off')
+
+    else:
+        devices.system_states.Set('IgnoreMIDI', 'On')

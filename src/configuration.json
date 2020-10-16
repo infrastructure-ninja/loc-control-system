@@ -59,11 +59,6 @@
           },
           "3": {
             "enabled": true,
-            "type": "delay",
-            "seconds": ".5"
-          },
-          "4": {
-            "enabled": true,
             "type": "device",
             "device": "soundboard",
             "command": "InputMute",
@@ -72,12 +67,7 @@
             "qualifier_value": "6",
             "qualifier_value_type": "string"
           },
-          "5": {
-            "enabled": true,
-            "type": "delay",
-            "seconds": ".75"
-          },
-          "6": {
+          "4": {
             "enabled": true,
             "type": "device",
             "device": "soundboard",
@@ -87,12 +77,7 @@
             "qualifier_value": "15",
             "qualifier_value_type": "string"
           },
-          "7": {
-            "enabled": true,
-            "type": "delay",
-            "seconds": "1.5"
-          },
-          "8": {
+          "5": {
             "enabled": true,
             "type": "device",
             "device": "carbonite",
@@ -105,6 +90,99 @@
         }
       },
       "2": {
+        "enabled": true,
+        "name": "Playback (STOP) / CAM3",
+        "prepare": {
+          "1": {
+            "enabled": true,
+            "type": "device",
+            "device": "carbonite",
+            "command": "KeyOnPreview",
+            "value": "Off",
+            "qualifier_key": "Keyer",
+            "qualifier_value": "1",
+            "qualifier_value_type": "integer"
+          },
+          "2": {
+            "enabled": true,
+            "type": "device",
+            "device": "carbonite",
+            "command": "KeyOnPreview",
+            "value": "Off",
+            "qualifier_key": "Keyer",
+            "qualifier_value": "2",
+            "qualifier_value_type": "integer"
+          },
+          "3": {
+            "enabled": true,
+            "type": "device",
+            "device": "carbonite",
+            "command": "MLEPresetSource",
+            "value": "Cam 3",
+            "qualifier_key": "None",
+            "qualifier_value": "None",
+            "qualifier_value_type": ""
+          }
+        },
+        "activate": {
+          "1": {
+            "enabled": true,
+            "type": "device",
+            "device": "soundboard",
+            "command": "InputMute",
+            "value": "On",
+            "qualifier_key": "Channel",
+            "qualifier_value": "5",
+            "qualifier_value_type": "string"
+          },
+          "2": {
+            "enabled": true,
+            "type": "device",
+            "device": "soundboard",
+            "command": "InputMute",
+            "value": "On",
+            "qualifier_key": "Channel",
+            "qualifier_value": "6",
+            "qualifier_value_type": "string"
+          },
+          "3": {
+            "enabled": true,
+            "type": "device",
+            "device": "carbonite",
+            "command": "Auto",
+            "value": "None",
+            "qualifier_key": "None",
+            "qualifier_value": "None",
+            "qualifier_value_type": ""
+          },
+          "4": {
+            "enabled": true,
+            "type": "delay",
+            "seconds": "2"
+          },
+          "5": {
+            "enabled": true,
+            "type": "device",
+            "device": "soundboard",
+            "command": "InputMute",
+            "value": "Off",
+            "qualifier_key": "Channel",
+            "qualifier_value": "15",
+            "qualifier_value_type": "string"
+          },
+         "6": {
+            "enabled": true,
+            "type": "device",
+            "device": "smd101",
+            "command": "Playback",
+            "value": "Stop",
+            "qualifier_key": "None",
+            "qualifier_value": "None",
+            "qualifier_value_type": ""
+          }
+        }
+      },
+      "3": {
         "enabled": true,
         "name": "Podium Close-Up (CUT/CAM3)",
         "prepare": {
@@ -192,7 +270,7 @@
           }
         }
       },
-      "3": {
+      "4": {
         "enabled": true,
         "name": "Flowers (DISSOLVE)",
         "prepare": {
@@ -240,7 +318,7 @@
           }
         }
       },
-      "4": {
+      "5": {
         "enabled": true,
         "name": "Readings/PiP (CAM3, DISSOLVE)",
         "prepare": {
@@ -308,7 +386,7 @@
           }
         }
       },
-      "5": {
+      "6": {
         "enabled": true,
         "name": "Altar (CAM3, CUT)",
         "prepare": {
@@ -366,7 +444,7 @@
           }
         }
       },
-      "6": {
+      "7": {
         "enabled": true,
         "name": "Altar /w Graphics (MIX)",
         "prepare": {
@@ -424,7 +502,7 @@
           }
         }
       },
-      "7": {
+      "8": {
         "enabled": true,
         "name": "Full Screen Graphics (MIX)",
         "prepare": {
@@ -509,7 +587,7 @@
         "tally_port": "5728"
       },
       "matrix": {
-        "enabled": false,
+        "enabled": true,
         "ipaddress": "172.16.200.254",
         "port": "23",
         "username": "admin",
@@ -525,6 +603,11 @@
         "number2_name": "Wireless Lavalier Beltback",
         "number3_channel": "15",
         "number3_name": "Playback Unit"
+      },
+      "dmp128": {
+        "enabled": true,
+        "ipaddress": "172.16.200.200",
+        "port": "23"
       },
       "playback": {
         "enabled": true,
@@ -547,7 +630,7 @@
         "playlist_6_filename": "outro.m3u"
       },
       "smp351": {
-        "enabled": false,
+        "enabled": true,
         "ipaddress": "None",
         "port": "None",
         "serial_port": "COM1",
@@ -673,6 +756,15 @@
         "speed_zoom_slow": "15",
         "speed_zoom_medium": "25",
         "speed_zoom_fast": "49"
+      }
+    },
+    "options": {
+      "ignore_midi": true,
+      "debug": {
+        "enabled": true,
+        "level": 0,
+        "trace_host": "172.16.200.50",
+        "trace_port": 31337
       }
     }
   }

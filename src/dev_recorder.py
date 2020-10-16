@@ -65,3 +65,12 @@ smp351.SubscribeStatus('ConnectionStatus', None, smp351_received_data_handler)
 smp351.SubscribeStatus('Alarm', None, smp351_received_data_handler)
 smp351.SubscribeStatus('Record', None, smp351_received_data_handler)
 smp351.SubscribeStatus('RTMPStream', None, smp351_received_data_handler)
+
+# When streaming starts and stops (but no record)
+# [RTMPStream] [Enable] [{'Stream': 'Archive A'}]]
+# [RTMPStream] [Disable] [{'Stream': 'Archive A'}]]
+
+
+# When recording starts and stops
+# [Record] [Start] [None]]
+# [Record] [Stop] [None]

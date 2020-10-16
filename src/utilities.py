@@ -16,43 +16,51 @@
 from extronlib.interface import EthernetClientInterface
 
 import datetime
+import json
 
 from helper_configmgr import ConfigManager
 
-#DebugLevel = 1
-DebugLevel = 0
-
 config = ConfigManager('configuration.json')
 
-udp_host_ip = '172.16.200.50'
-udp_host_port = 514
-udp_client = EthernetClientInterface(udp_host_ip, udp_host_port, Protocol='UDP')
+host_ip = config.get_value('options/debug/trace_host', default_value='None', cast_as='string')
+host_port = config.get_value('options/debug/trace_port', default_value=31337, cast_as='integer')
+
+if host_ip != 'None':
+    udp_client = EthernetClientInterface(host_ip, host_port, Protocol='UDP')
+
+else:
+    udp_client = None
 
 
 def DebugPrint(strFunctionName, strMessage, strMessageLevel='Debug'):
 
     try:
-        intMessageLevel = {'Trace': 0, 'Debug': 1, 'Info': 2, 'Warn': 3, 'Warning': 3, 'Error': 4}[strMessageLevel]
+        intMessageLevel = {'Trace': 0, 'Debug': 1, 'Info': 2,
+                           'Warn': 3, 'Warning': 3, 'Error': 4}[strMessageLevel]
 
-        if DebugLevel <= intMessageLevel:
+        if config.get_value('options/debug/level',
+                            default_value=3, cast_as='integer') <= intMessageLevel:
+
             print('[{}] [{}] {}'.format(strMessageLevel, strFunctionName, strMessage))
 
-        SendSyslog(strFunctionName, strMessage, strMessageLevel)
+            if config.get_value('options/debug/enabled',
+                                default_value=False, cast_as='boolean') is True:
+
+                SendTrace(strFunctionName, strMessage, strMessageLevel)
 
     except KeyError:
         return False
 #end function (DebugPrint)
 
 
-def SendSyslog(strFunctionName, strMessage, strMessageLevel='Debug'):
+def SendTrace(function, message, level='Debug'):
 
-    level = 2
-    facility = 1
+    trace_data = {'level'   : level,
+                  'function': function,
+                  'message' : message}
 
-    syslog_data = '<{}>[{}] [{}] [{}]'.format( level + facility * 8,
-                                               strMessageLevel, strFunctionName, strMessage)
-
-    udp_client.Send(syslog_data)
+    if udp_client:
+        udp_client.Send(json.dumps(trace_data))
 
 
 def ConvertTimecodeToSeconds(timecode):
