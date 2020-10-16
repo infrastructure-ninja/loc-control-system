@@ -81,9 +81,16 @@ def soundboard_receive_data_handler(command, value, qualifier):
                 interface.audio.btnAudio_Channel1.SetState(1)
                 interface.audio.lblChannel1State.SetText('ON')
 
+                interface.mainscreen.stateChannel1State.SetText('ON')
+                interface.mainscreen.stateChannel1State.SetState(0)
+
             else:
                 interface.audio.btnAudio_Channel1.SetState(0)
                 interface.audio.lblChannel1State.SetText('MUTED')
+
+                interface.mainscreen.stateChannel1State.SetText('MUTED')
+                interface.mainscreen.stateChannel1State.SetState(1)
+                interface.mainscreen.stateChannel1State.SetBlinking('Fast', [0, 2, 1, 2, 1, 2, 1, 2, 0, 0])
 
         elif qualifier['Channel'] == utilities.config.get_value(
                 'devices/soundboard/number2_channel', default_value='6', cast_as='string'):
@@ -91,9 +98,17 @@ def soundboard_receive_data_handler(command, value, qualifier):
             if value == 'On':
                 interface.audio.btnAudio_Channel2.SetState(1)
                 interface.audio.lblChannel2State.SetText('ON')
+
+                interface.mainscreen.stateChannel2State.SetText('ON')
+                interface.mainscreen.stateChannel2State.SetState(0)
+
             else:
                 interface.audio.btnAudio_Channel2.SetState(0)
                 interface.audio.lblChannel2State.SetText('MUTED')
+
+                interface.mainscreen.stateChannel2State.SetText('MUTED')
+                interface.mainscreen.stateChannel2State.SetState(1)
+                interface.mainscreen.stateChannel2State.SetBlinking('Fast', [0, 2, 1, 2, 1, 2, 1, 2, 0, 0])
 
         elif qualifier['Channel'] == utilities.config.get_value(
                 'devices/soundboard/number3_channel', default_value='15', cast_as='string'):
@@ -102,9 +117,16 @@ def soundboard_receive_data_handler(command, value, qualifier):
                 interface.audio.btnAudio_Channel3.SetState(1)
                 interface.audio.lblChannel3State.SetText('ON')
 
+                interface.mainscreen.stateChannel3State.SetText('ON')
+                interface.mainscreen.stateChannel3State.SetState(0)
+
             else:
                 interface.audio.btnAudio_Channel3.SetState(0)
                 interface.audio.lblChannel3State.SetText('MUTED')
+
+                interface.mainscreen.stateChannel3State.SetText('MUTED')
+                interface.mainscreen.stateChannel3State.SetState(1)
+                interface.mainscreen.stateChannel3State.SetBlinking('Fast', [0, 2, 1, 2, 1, 2, 1, 2, 0, 0])
 
 
     else:

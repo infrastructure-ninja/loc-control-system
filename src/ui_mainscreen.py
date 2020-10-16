@@ -53,6 +53,20 @@ btnMainScreen_ActivatePreset = Button(devices.TouchPanel, 183)
 # Audio button
 btnMainAudioControl = Button(devices.TouchPanel, 204)
 
+# Soundboard Audio Input Status Widgets
+stateChannel1State = Button(devices.TouchPanel, 226)
+stateChannel1State.SetState(0)
+stateChannel1State.SetEnable(False)
+
+stateChannel2State = Button(devices.TouchPanel, 236)
+stateChannel2State.SetState(0)
+stateChannel2State.SetEnable(False)
+
+stateChannel3State = Button(devices.TouchPanel, 237)
+stateChannel3State.SetState(0)
+stateChannel3State.SetEnable(False)
+
+
 # MENU and QuickButtons
 btnMainMenu = Button(devices.TouchPanel, 16)
 btnQuickButton1 = Button(devices.TouchPanel, 111)

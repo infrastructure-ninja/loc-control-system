@@ -90,8 +90,13 @@ def carbonite_received_data_handler(command, value, qualifier):
             mle_preset_source_map[value].SetState(2)
 
         for input_name, button in mle_preset_source_map.items():
-            if button is not mle_preset_source_map[value]:
-                button.SetState(0)
+            try:
+                if button is not mle_preset_source_map[value]:
+                    button.SetState(0)
+
+            # If any other inputs come in that we're not expecting, we'll just silently ignore
+            except KeyError:
+                pass
 
     elif (command == 'KeySource') and qualifier['Keyer'] == 1:
         DebugPrint('devices.py/carbonite_received_data_handler',
@@ -105,8 +110,13 @@ def carbonite_received_data_handler(command, value, qualifier):
 
         # Set all "AUX" buttons to normal state, except the one we just set to its "selected" state
         for input_name, button in keyer1_source_map.items():
-            if button is not keyer1_source_map[value]:
-                button.SetState(0)
+            try:
+                if button is not keyer1_source_map[value]:
+                    button.SetState(0)
+
+            # If any other inputs come in that we're not expecting, we'll just silently ignore
+            except KeyError:
+                pass
 
     elif command == 'NextTransitionLayers':
         DebugPrint('devices.py/carbonite_received_data_handler',
