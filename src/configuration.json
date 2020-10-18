@@ -40,6 +40,16 @@
           "1": {
             "enabled": true,
             "type": "device",
+            "device": "carbonite",
+            "command": "AuxSource",
+            "value": "PGM",
+            "qualifier_key": "Aux Bus",
+            "qualifier_value": "1",
+            "qualifier_value_type": "integer"
+          },
+          "2": {
+            "enabled": true,
+            "type": "device",
             "device": "smd101",
             "command": "Playback",
             "value": "Play",
@@ -47,7 +57,7 @@
             "qualifier_value": "None",
             "qualifier_value_type": ""
           },
-          "2": {
+          "3": {
             "enabled": true,
             "type": "device",
             "device": "soundboard",
@@ -57,7 +67,7 @@
             "qualifier_value": "5",
             "qualifier_value_type": "string"
           },
-          "3": {
+          "4": {
             "enabled": true,
             "type": "device",
             "device": "soundboard",
@@ -67,7 +77,7 @@
             "qualifier_value": "6",
             "qualifier_value_type": "string"
           },
-          "4": {
+          "5": {
             "enabled": true,
             "type": "device",
             "device": "soundboard",
@@ -77,7 +87,7 @@
             "qualifier_value": "15",
             "qualifier_value_type": "string"
           },
-          "5": {
+          "6": {
             "enabled": true,
             "type": "device",
             "device": "carbonite",
@@ -91,7 +101,7 @@
       },
       "2": {
         "enabled": true,
-        "name": "Playback (STOP)\nCAM2/Podium",
+        "name": "Playback (STOP)\nCAM2/Podium B",
         "prepare": {
           "1": {
             "enabled": true,
@@ -128,7 +138,7 @@
             "type": "device",
             "device": "cam2",
             "command": "Preset",
-            "value": "2",
+            "value": "3",
             "qualifier_key": "Type",
             "qualifier_value": "Recall",
             "qualifier_value_type": "string"
@@ -180,7 +190,7 @@
             "qualifier_value": "15",
             "qualifier_value_type": "string"
           },
-         "6": {
+          "6": {
             "enabled": true,
             "type": "device",
             "device": "smd101",
@@ -283,7 +293,7 @@
             "qualifier_value": "15",
             "qualifier_value_type": "string"
           },
-         "6": {
+          "6": {
             "enabled": true,
             "type": "device",
             "device": "smd101",
@@ -339,7 +349,6 @@
             "qualifier_value": "Recall",
             "qualifier_value_type": "string"
           }
-
         },
         "activate": {
           "1": {
@@ -520,6 +529,16 @@
             "enabled": true,
             "type": "device",
             "device": "carbonite",
+            "command": "AuxSource",
+            "value": "PGM",
+            "qualifier_key": "Aux Bus",
+            "qualifier_value": "1",
+            "qualifier_value_type": "integer"
+          },
+          "2": {
+            "enabled": true,
+            "type": "device",
+            "device": "carbonite",
             "command": "Auto",
             "value": "None",
             "qualifier_key": "None",
@@ -644,57 +663,9 @@
           }
         }
       },
-      "11": {
-        "enabled": true,
-        "name": "Full Screen Graphics (MIX)",
-        "prepare": {
-          "1": {
-            "enabled": true,
-            "type": "device",
-            "device": "carbonite",
-            "command": "KeyOnPreview",
-            "value": "Off",
-            "qualifier_key": "Keyer",
-            "qualifier_value": "1",
-            "qualifier_value_type": "integer"
-          },
-          "2": {
-            "enabled": true,
-            "type": "device",
-            "device": "carbonite",
-            "command": "KeyOnPreview",
-            "value": "Off",
-            "qualifier_key": "Keyer",
-            "qualifier_value": "2",
-            "qualifier_value_type": "integer"
-          },
-          "3": {
-            "enabled": true,
-            "type": "device",
-            "device": "carbonite",
-            "command": "MLEPresetSource",
-            "value": "HDMI 1",
-            "qualifier_key": "None",
-            "qualifier_value": "None",
-            "qualifier_value_type": ""
-          }
-        },
-        "activate": {
-          "1": {
-            "enabled": true,
-            "type": "device",
-            "device": "carbonite",
-            "command": "Auto",
-            "value": "None",
-            "qualifier_key": "None",
-            "qualifier_value": "None",
-            "qualifier_value_type": ""
-          }
-        }
-      },
       "10": {
         "enabled": true,
-        "name": "Emergency Wide Shot)",
+        "name": "Safe Wide Shot)",
         "prepare": {
           "1": {
             "enabled": true,
@@ -780,6 +751,11 @@
           },
           "5": {
             "enabled": true,
+            "type": "delay",
+            "seconds": "1"
+          },
+          "6": {
+            "enabled": true,
             "type": "device",
             "device": "carbonite",
             "command": "Cut",
@@ -787,6 +763,110 @@
             "qualifier_key": "None",
             "qualifier_value": "None",
             "qualifier_value_type": ""
+          }
+        }
+      },
+      "11": {
+        "enabled": true,
+        "name": "Full Screen Graphics (MIX)",
+        "prepare": {
+          "1": {
+            "enabled": true,
+            "type": "device",
+            "device": "carbonite",
+            "command": "KeyOnPreview",
+            "value": "Off",
+            "qualifier_key": "Keyer",
+            "qualifier_value": "1",
+            "qualifier_value_type": "integer"
+          },
+          "2": {
+            "enabled": true,
+            "type": "device",
+            "device": "carbonite",
+            "command": "KeyOnPreview",
+            "value": "Off",
+            "qualifier_key": "Keyer",
+            "qualifier_value": "2",
+            "qualifier_value_type": "integer"
+          },
+          "3": {
+            "enabled": true,
+            "type": "device",
+            "device": "carbonite",
+            "command": "MLEPresetSource",
+            "value": "HDMI 1",
+            "qualifier_key": "None",
+            "qualifier_value": "None",
+            "qualifier_value_type": ""
+          }
+        },
+        "activate": {
+          "1": {
+            "enabled": true,
+            "type": "device",
+            "device": "carbonite",
+            "command": "Auto",
+            "value": "None",
+            "qualifier_key": "None",
+            "qualifier_value": "None",
+            "qualifier_value_type": ""
+          }
+        }
+      },
+      "13": {
+        "enabled": true,
+        "name": "Computer on Screens",
+        "prepare": {
+          "1": {
+            "enabled": true,
+            "type": "device",
+            "device": "carbonite",
+            "command": "AuxSource",
+            "value": "HDMI 1",
+            "qualifier_key": "Aux Bus",
+            "qualifier_value": "1",
+            "qualifier_value_type": "integer"
+          }
+        },
+        "activate": {
+          "1": {
+            "enabled": true,
+            "type": "device",
+            "device": "carbonite",
+            "command": "AuxSource",
+            "value": "HDMI 1",
+            "qualifier_key": "Aux Bus",
+            "qualifier_value": "1",
+            "qualifier_value_type": "integer"
+          }
+        }
+      },
+      "14": {
+        "enabled": true,
+        "name": "Program on Screens",
+        "prepare": {
+          "1": {
+            "enabled": true,
+            "type": "device",
+            "device": "carbonite",
+            "command": "AuxSource",
+            "value": "PGM",
+            "qualifier_key": "Aux Bus",
+            "qualifier_value": "1",
+            "qualifier_value_type": "integer"
+          }
+        },
+        "activate": {
+          "1": {
+            "enabled": true,
+            "type": "device",
+            "device": "carbonite",
+            "command": "AuxSource",
+            "value": "PGM",
+            "qualifier_key": "Aux Bus",
+            "qualifier_value": "1",
+            "qualifier_value_type": "integer"
           }
         }
       }
@@ -802,9 +882,9 @@
         "button_2_function": "device:soundboard:AuxMute:Off:Channel:int:1",
         "button_2_color": "bronze",
         "button_3_enabled": true,
-        "button_3_name": "Emergency\nWide Shot",
+        "button_3_name": "Safe Wide Shot\n(IMMEDIATE)",
         "button_3_function": "preset:10:activate",
-        "button_3_color": "red",
+        "button_3_color": "green",
         "button_4_enabled": false,
         "button_4_name": "Soundboard\nUN-MUTE",
         "button_4_function": "device:soundboard:AuxMute:On:Channel:int:1",
