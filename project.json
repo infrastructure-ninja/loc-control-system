@@ -27,6 +27,29 @@
           }
         ]
       }
+    },
+    {
+      "name": "TLI Pro 101 : 192.168.254.252",
+      "part_number": "60-1083-01",
+      "alias": "ExtronPanel",
+      "network": {
+        "host_network_type": "LAN",
+        "interfaces": [
+          {
+            "lab-address": "192.168.254.252",
+            "address": "172.16.200.240",
+            "type": "LAN"
+          }
+        ]
+      },
+      "ui": {
+        "layout_file": "24in - TLI Pro 101-ross-video-layout.gdl",
+        "enable_click_sound": true,
+        "click_sound_file": "touch.wav",
+        "press_feedback": "none",
+        "thumb_change_report_interval": 0.1,
+        "thumb_to_fill_sync_time": 0.5
+      }
     }
   ]
 }
