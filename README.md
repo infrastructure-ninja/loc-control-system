@@ -16,13 +16,45 @@ Therefore, activating a preset in the "prepare" phase should ***never*** make ch
 
 It is subsequently the job of the "activate" phase to move that over to the program bus, and do whatever things are called for during this intentional transition.
 
-Currently there are a number of different primitives for a preset step:
+There are currently three supported primitives for a preset step:
 
  - delay
  - device
  - ui
 
 Work is still in progress to develop additional preset primitives - including one that will allow a preset to know that performing this step of a preset is not 'safe' (if a camera is on-air for example).
+
+#### Example 1 - Set the "MLEPresetSource" to "HDMI 2" on the "carbonite" device
+          "1": {
+            "enabled": true,
+            "type": "device",
+            "device": "carbonite",
+            "command": "MLEPresetSource",
+            "value": "HDMI 2",
+            "qualifier_key": "None",
+            "qualifier_value": "None",
+            "qualifier_value_type": ""
+          }
+
+#### Example 2 - Set the "InputMute" to "On" on the "soundboard" device for channel "5"
+          "1": {
+            "enabled": true,
+            "type": "device",
+            "device": "soundboard",
+            "command": "InputMute",
+            "value": "On",
+            "qualifier_key": "Channel",
+            "qualifier_value": "5",
+            "qualifier_value_type": "string"
+          },
+
+#### Example 3 - Delay for 2 seconds before continuing with preset stage execution
+         "4": {
+            "enabled": true,
+            "type": "delay",
+            "seconds": "2"
+          },
+
 
 ## Devices Used
  - Extron DMP 128 Plus
