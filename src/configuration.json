@@ -471,7 +471,7 @@
       },
       "7": {
         "enabled": true,
-        "name": "Readings/PiP\n(CAM3, DISSOLVE)",
+        "name": "Readings/PiP (PASTOR)\n(CAM3, DISSOLVE)",
         "prepare": {
           "1": {
             "enabled": true,
@@ -528,6 +528,26 @@
           "1": {
             "enabled": true,
             "type": "device",
+            "device": "soundboard",
+            "command": "InputMute",
+            "value": "On",
+            "qualifier_key": "Channel",
+            "qualifier_value": "5",
+            "qualifier_value_type": "string"
+          },
+          "2": {
+            "enabled": true,
+            "type": "device",
+            "device": "soundboard",
+            "command": "InputMute",
+            "value": "Off",
+            "qualifier_key": "Channel",
+            "qualifier_value": "6",
+            "qualifier_value_type": "string"
+          },
+          "3": {
+            "enabled": true,
+            "type": "device",
             "device": "carbonite",
             "command": "AuxSource",
             "value": "PGM",
@@ -535,7 +555,7 @@
             "qualifier_value": "1",
             "qualifier_value_type": "integer"
           },
-          "2": {
+          "4": {
             "enabled": true,
             "type": "device",
             "device": "carbonite",
@@ -869,6 +889,672 @@
             "qualifier_value_type": "integer"
           }
         }
+      },
+      "15": {
+        "enabled": true,
+        "name": "Wide Shot\n(DISSOLVE/CAM2/Extreme Wide)",
+        "prepare": {
+          "1": {
+            "enabled": true,
+            "type": "device",
+            "device": "cam2",
+            "command": "Preset",
+            "value": "1",
+            "qualifier_key": "Type",
+            "qualifier_value": "Recall",
+            "qualifier_value_type": "string"
+          },
+          "2": {
+            "enabled": true,
+            "type": "device",
+            "device": "carbonite",
+            "command": "KeyOnPreview",
+            "value": "Off",
+            "qualifier_key": "Keyer",
+            "qualifier_value": "1",
+            "qualifier_value_type": "integer"
+          },
+          "3": {
+            "enabled": true,
+            "type": "device",
+            "device": "carbonite",
+            "command": "KeyOnPreview",
+            "value": "Off",
+            "qualifier_key": "Keyer",
+            "qualifier_value": "2",
+            "qualifier_value_type": "integer"
+          },
+          "4": {
+            "enabled": true,
+            "type": "device",
+            "device": "carbonite",
+            "command": "MLEPresetSource",
+            "value": "Cam 2",
+            "qualifier_key": "None",
+            "qualifier_value": "None",
+            "qualifier_value_type": ""
+          }
+        },
+        "activate": {
+          "1": {
+            "enabled": true,
+            "type": "device",
+            "device": "carbonite",
+            "command": "Auto",
+            "value": "None",
+            "qualifier_key": "None",
+            "qualifier_value": "None",
+            "qualifier_value_type": ""
+          }
+        }
+      },
+      "16": {
+        "enabled": true,
+        "name": "Podium Close-Up - (DISSOLVE/CAM2/Podium A)",
+        "prepare": {
+          "1": {
+            "enabled": true,
+            "type": "device",
+            "device": "cam2",
+            "command": "Preset",
+            "value": "2",
+            "qualifier_key": "Type",
+            "qualifier_value": "Recall",
+            "qualifier_value_type": "string"
+          },
+          "2": {
+            "enabled": true,
+            "type": "device",
+            "device": "carbonite",
+            "command": "KeyOnPreview",
+            "value": "Off",
+            "qualifier_key": "Keyer",
+            "qualifier_value": "1",
+            "qualifier_value_type": "integer"
+          },
+          "3": {
+            "enabled": true,
+            "type": "device",
+            "device": "carbonite",
+            "command": "KeyOnPreview",
+            "value": "Off",
+            "qualifier_key": "Keyer",
+            "qualifier_value": "2",
+            "qualifier_value_type": "integer"
+          },
+          "4": {
+            "enabled": true,
+            "type": "device",
+            "device": "carbonite",
+            "command": "MLEPresetSource",
+            "value": "Cam 2",
+            "qualifier_key": "None",
+            "qualifier_value": "None",
+            "qualifier_value_type": ""
+          }
+        },
+        "activate": {
+          "1": {
+            "enabled": true,
+            "type": "device",
+            "device": "carbonite",
+            "command": "Auto",
+            "value": "None",
+            "qualifier_key": "None",
+            "qualifier_value": "None",
+            "qualifier_value_type": ""
+          }
+        }
+      },
+      "17": {
+        "enabled": true,
+        "name": "Readings/PiP (DEACON)\n(CAM3, DISSOLVE)",
+        "prepare": {
+          "1": {
+            "enabled": true,
+            "type": "device",
+            "device": "cam3",
+            "command": "Preset",
+            "value": "7",
+            "qualifier_key": "Type",
+            "qualifier_value": "Recall",
+            "qualifier_value_type": "string"
+          },
+          "2": {
+            "enabled": true,
+            "type": "device",
+            "device": "carbonite",
+            "command": "KeySource",
+            "value": "Cam 3",
+            "qualifier_key": "Keyer",
+            "qualifier_value": "1",
+            "qualifier_value_type": "integer"
+          },
+          "3": {
+            "enabled": true,
+            "type": "device",
+            "device": "carbonite",
+            "command": "KeyOnPreview",
+            "value": "On",
+            "qualifier_key": "Keyer",
+            "qualifier_value": "1",
+            "qualifier_value_type": "integer"
+          },
+          "4": {
+            "enabled": true,
+            "type": "device",
+            "device": "carbonite",
+            "command": "KeyOnPreview",
+            "value": "Off",
+            "qualifier_key": "Keyer",
+            "qualifier_value": "2",
+            "qualifier_value_type": "integer"
+          },
+          "5": {
+            "enabled": true,
+            "type": "device",
+            "device": "carbonite",
+            "command": "MLEPresetSource",
+            "value": "HDMI 1",
+            "qualifier_key": "None",
+            "qualifier_value": "None",
+            "qualifier_value_type": ""
+          }
+        },
+        "activate": {
+          "1": {
+            "enabled": true,
+            "type": "device",
+            "device": "soundboard",
+            "command": "InputMute",
+            "value": "Off",
+            "qualifier_key": "Channel",
+            "qualifier_value": "5",
+            "qualifier_value_type": "string"
+          },
+          "2": {
+            "enabled": true,
+            "type": "device",
+            "device": "soundboard",
+            "command": "InputMute",
+            "value": "On",
+            "qualifier_key": "Channel",
+            "qualifier_value": "6",
+            "qualifier_value_type": "string"
+          },
+          "3": {
+            "enabled": true,
+            "type": "device",
+            "device": "carbonite",
+            "command": "AuxSource",
+            "value": "PGM",
+            "qualifier_key": "Aux Bus",
+            "qualifier_value": "1",
+            "qualifier_value_type": "integer"
+          },
+          "4": {
+            "enabled": true,
+            "type": "device",
+            "device": "carbonite",
+            "command": "Auto",
+            "value": "None",
+            "qualifier_key": "None",
+            "qualifier_value": "None",
+            "qualifier_value_type": ""
+          }
+        }
+      },
+      "19": {
+        "enabled": true,
+        "name": "Playback STOP",
+        "prepare": {
+        },
+        "activate": {
+          "1": {
+            "enabled": true,
+            "type": "device",
+            "device": "soundboard",
+            "command": "InputMute",
+            "value": "On",
+            "qualifier_key": "Channel",
+            "qualifier_value": "5",
+            "qualifier_value_type": "string"
+          },
+          "2": {
+            "enabled": true,
+            "type": "device",
+            "device": "soundboard",
+            "command": "InputMute",
+            "value": "On",
+            "qualifier_key": "Channel",
+            "qualifier_value": "6",
+            "qualifier_value_type": "string"
+          },
+          "3": {
+            "enabled": true,
+            "type": "delay",
+            "seconds": "2"
+          },
+          "4": {
+            "enabled": true,
+            "type": "device",
+            "device": "soundboard",
+            "command": "InputMute",
+            "value": "Off",
+            "qualifier_key": "Channel",
+            "qualifier_value": "15",
+            "qualifier_value_type": "string"
+          },
+          "5": {
+            "enabled": true,
+            "type": "device",
+            "device": "smd101",
+            "command": "Playback",
+            "value": "Pause",
+            "qualifier_key": "None",
+            "qualifier_value": "None",
+            "qualifier_value_type": ""
+          }
+        }
+      },
+      "20": {
+        "enabled": true,
+        "name": "Pastors Mic MUTE",
+        "prepare": {
+        },
+        "activate": {
+          "1": {
+            "enabled": true,
+            "type": "device",
+            "device": "soundboard",
+            "command": "InputMute",
+            "value": "Off",
+            "qualifier_key": "Channel",
+            "qualifier_value": "5",
+            "qualifier_value_type": "string"
+          }
+        }
+      },
+      "21": {
+        "enabled": true,
+        "name": "Pastors Mic UN-MUTE",
+        "prepare": {
+        },
+        "activate": {
+          "1": {
+            "enabled": true,
+            "type": "device",
+            "device": "soundboard",
+            "command": "InputMute",
+            "value": "On",
+            "qualifier_key": "Channel",
+            "qualifier_value": "5",
+            "qualifier_value_type": "string"
+          }
+        }
+      },
+      "22": {
+        "enabled": true,
+        "name": "Lapel Mic MUTE",
+        "prepare": {
+        },
+        "activate": {
+          "1": {
+            "enabled": true,
+            "type": "device",
+            "device": "soundboard",
+            "command": "InputMute",
+            "value": "Off",
+            "qualifier_key": "Channel",
+            "qualifier_value": "6",
+            "qualifier_value_type": "string"
+          }
+        }
+      },
+      "23": {
+        "enabled": true,
+        "name": "Lapel Mic UN-MUTE",
+        "prepare": {
+        },
+        "activate": {
+          "1": {
+            "enabled": true,
+            "type": "device",
+            "device": "soundboard",
+            "command": "InputMute",
+            "value": "On",
+            "qualifier_key": "Channel",
+            "qualifier_value": "6",
+            "qualifier_value_type": "string"
+          }
+        }},
+      "24": {
+      "enabled": true,
+      "name": "CAM2/Podium B (DISSOLVE)",
+      "prepare": {
+        "1": {
+          "enabled": true,
+          "type": "device",
+          "device": "cam2",
+          "command": "Preset",
+          "value": "3",
+          "qualifier_key": "Type",
+          "qualifier_value": "Recall",
+          "qualifier_value_type": "string"
+        },
+        "2": {
+          "enabled": true,
+          "type": "device",
+          "device": "carbonite",
+          "command": "KeyOnPreview",
+          "value": "Off",
+          "qualifier_key": "Keyer",
+          "qualifier_value": "1",
+          "qualifier_value_type": "integer"
+        },
+        "3": {
+          "enabled": true,
+          "type": "device",
+          "device": "carbonite",
+          "command": "KeyOnPreview",
+          "value": "Off",
+          "qualifier_key": "Keyer",
+          "qualifier_value": "2",
+          "qualifier_value_type": "integer"
+        },
+        "4": {
+          "enabled": true,
+          "type": "device",
+          "device": "carbonite",
+          "command": "MLEPresetSource",
+          "value": "Cam 2",
+          "qualifier_key": "None",
+          "qualifier_value": "None",
+          "qualifier_value_type": ""
+        }
+      },
+      "activate": {
+        "1": {
+          "enabled": true,
+          "type": "device",
+          "device": "carbonite",
+          "command": "Auto",
+          "value": "None",
+          "qualifier_key": "None",
+          "qualifier_value": "None",
+          "qualifier_value_type": ""
+        }
+      }
+    },
+      "26": {
+        "enabled": true,
+        "name": "Playback - CUE Playlist #2",
+        "prepare": {
+        },
+        "activate": {
+          "1": {
+            "enabled": true,
+            "type": "device",
+            "device": "smd101",
+            "command": "LoadPlaylistCommand",
+            "value": "music2.m3u",
+            "qualifier_key": "None",
+            "qualifier_value": "None",
+            "qualifier_value_type": ""
+          },
+          "2": {
+            "enabled": true,
+            "type": "device",
+            "device": "soundboard",
+            "command": "InputMute",
+            "value": "Off",
+            "qualifier_key": "Channel",
+            "qualifier_value": "15",
+            "qualifier_value_type": "string"
+          },
+          "3": {
+            "enabled": true,
+            "type": "device",
+            "device": "smd101",
+            "command": "Playback",
+            "value": "Play",
+            "qualifier_key": "None",
+            "qualifier_value": "None",
+            "qualifier_value_type": ""
+          },
+          "4": {
+            "enabled": true,
+            "type": "delay",
+            "seconds": "5"
+          },
+          "5": {
+            "enabled": true,
+            "type": "device",
+            "device": "smd101",
+            "command": "Playback",
+            "value": "Pause",
+            "qualifier_key": "None",
+            "qualifier_value": "None",
+            "qualifier_value_type": ""
+          }
+        }
+      },
+      "27": {
+        "enabled": true,
+        "name": "Playback - CUE Playlist #3",
+        "prepare": {
+        },
+        "activate": {
+          "1": {
+            "enabled": true,
+            "type": "device",
+            "device": "smd101",
+            "command": "LoadPlaylistCommand",
+            "value": "music3.m3u",
+            "qualifier_key": "None",
+            "qualifier_value": "None",
+            "qualifier_value_type": ""
+          },
+          "2": {
+            "enabled": true,
+            "type": "device",
+            "device": "soundboard",
+            "command": "InputMute",
+            "value": "Off",
+            "qualifier_key": "Channel",
+            "qualifier_value": "15",
+            "qualifier_value_type": "string"
+          },
+          "3": {
+            "enabled": true,
+            "type": "device",
+            "device": "smd101",
+            "command": "Playback",
+            "value": "Play",
+            "qualifier_key": "None",
+            "qualifier_value": "None",
+            "qualifier_value_type": ""
+          },
+          "4": {
+            "enabled": true,
+            "type": "delay",
+            "seconds": "5"
+          },
+          "5": {
+            "enabled": true,
+            "type": "device",
+            "device": "smd101",
+            "command": "Playback",
+            "value": "Pause",
+            "qualifier_key": "None",
+            "qualifier_value": "None",
+            "qualifier_value_type": ""
+          }
+        }
+      },
+      "28": {
+        "enabled": true,
+        "name": "Playback - CUE Playlist #4",
+        "prepare": {
+        },
+        "activate": {
+          "1": {
+            "enabled": true,
+            "type": "device",
+            "device": "smd101",
+            "command": "LoadPlaylistCommand",
+            "value": "music4.m3u",
+            "qualifier_key": "None",
+            "qualifier_value": "None",
+            "qualifier_value_type": ""
+          },
+          "2": {
+            "enabled": true,
+            "type": "device",
+            "device": "soundboard",
+            "command": "InputMute",
+            "value": "Off",
+            "qualifier_key": "Channel",
+            "qualifier_value": "15",
+            "qualifier_value_type": "string"
+          },
+          "3": {
+            "enabled": true,
+            "type": "device",
+            "device": "smd101",
+            "command": "Playback",
+            "value": "Play",
+            "qualifier_key": "None",
+            "qualifier_value": "None",
+            "qualifier_value_type": ""
+          },
+          "4": {
+            "enabled": true,
+            "type": "delay",
+            "seconds": "5"
+          },
+          "5": {
+            "enabled": true,
+            "type": "device",
+            "device": "smd101",
+            "command": "Playback",
+            "value": "Pause",
+            "qualifier_key": "None",
+            "qualifier_value": "None",
+            "qualifier_value_type": ""
+          }
+        }
+      },
+      "29": {
+        "enabled": true,
+        "name": "Playback - CUE Playlist OUTRO",
+        "prepare": {
+        },
+        "activate": {
+          "1": {
+            "enabled": true,
+            "type": "device",
+            "device": "smd101",
+            "command": "LoadPlaylistCommand",
+            "value": "outro.m3u",
+            "qualifier_key": "None",
+            "qualifier_value": "None",
+            "qualifier_value_type": ""
+          },
+          "2": {
+            "enabled": true,
+            "type": "device",
+            "device": "soundboard",
+            "command": "InputMute",
+            "value": "Off",
+            "qualifier_key": "Channel",
+            "qualifier_value": "15",
+            "qualifier_value_type": "string"
+          },
+          "3": {
+            "enabled": true,
+            "type": "device",
+            "device": "smd101",
+            "command": "Playback",
+            "value": "Play",
+            "qualifier_key": "None",
+            "qualifier_value": "None",
+            "qualifier_value_type": ""
+          },
+          "4": {
+            "enabled": true,
+            "type": "delay",
+            "seconds": "5"
+          },
+          "5": {
+            "enabled": true,
+            "type": "device",
+            "device": "smd101",
+            "command": "Playback",
+            "value": "Pause",
+            "qualifier_key": "None",
+            "qualifier_value": "None",
+            "qualifier_value_type": ""
+          }
+        }
+      },
+      "30": {
+        "enabled": true,
+        "name": "Wide Shot\n(DISSOLVE/CAM3/Extreme Wide)",
+        "prepare": {
+          "1": {
+            "enabled": true,
+            "type": "device",
+            "device": "cam3",
+            "command": "Preset",
+            "value": "1",
+            "qualifier_key": "Type",
+            "qualifier_value": "Recall",
+            "qualifier_value_type": "string"
+          },
+          "2": {
+            "enabled": true,
+            "type": "device",
+            "device": "carbonite",
+            "command": "KeyOnPreview",
+            "value": "Off",
+            "qualifier_key": "Keyer",
+            "qualifier_value": "1",
+            "qualifier_value_type": "integer"
+          },
+          "3": {
+            "enabled": true,
+            "type": "device",
+            "device": "carbonite",
+            "command": "KeyOnPreview",
+            "value": "Off",
+            "qualifier_key": "Keyer",
+            "qualifier_value": "2",
+            "qualifier_value_type": "integer"
+          },
+          "4": {
+            "enabled": true,
+            "type": "device",
+            "device": "carbonite",
+            "command": "MLEPresetSource",
+            "value": "Cam 3",
+            "qualifier_key": "None",
+            "qualifier_value": "None",
+            "qualifier_value_type": ""
+          }
+        },
+        "activate": {
+          "1": {
+            "enabled": true,
+            "type": "device",
+            "device": "carbonite",
+            "command": "Auto",
+            "value": "None",
+            "qualifier_key": "None",
+            "qualifier_value": "None",
+            "qualifier_value_type": ""
+          }
+        }
       }
     },
     "interface": {
@@ -969,7 +1655,37 @@
           "g4": "7:P",
           "g#4": "7:A",
           "a4": "1:P",
-          "a#4": "1:A"
+          "a#4": "1:A",
+          "c5": "24:P",
+          "c#5": "24:A",
+          "d5": "16:P",
+          "d#5": "16:A",
+          "f5": "3:P",
+          "f#5": "3:A",
+          "g5": "17:P",
+          "g#5": "17:A",
+          "a5": "19:P",
+          "a#5": "19:A",
+          "c6": "13:P",
+          "c#6": "13:A",
+          "d6": "14:P",
+          "d#6": "14:A",
+          "f6": "11:P",
+          "f#6": "11:A",
+          "g6": "9:P",
+          "g#6": "9:A",
+          "a6": "15:P",
+          "a#6": "15:A",
+          "e4": "20:A",
+          "b4": "21:A",
+          "e5": "22:A",
+          "b5": "23:A",
+          "e6": "26:A",
+          "b6": "27:A",
+          "e7": "28:A",
+          "b7": "29:A",
+          "c7": "30:P",
+          "c#7": "30:A"
         }
       },
       "cam1": {
@@ -1036,8 +1752,8 @@
         "preset_3_name": "Podium B",
         "preset_4_name": "Altar",
         "preset_5_name": "Flowers",
-        "preset_6_name": "Readings",
-        "preset_7_name": "Preset #7",
+        "preset_6_name": "Readings\n(Pastor)",
+        "preset_7_name": "Readings\n(Deacon)",
         "preset_8_name": "Preset #8",
         "default_speed": "Medium",
         "speed_pan_slow": "12",
@@ -1078,11 +1794,11 @@
       }
     },
     "options": {
-      "ignore_midi": true,
+      "ignore_midi": false,
       "debug": {
         "enabled": true,
         "level": 0,
-        "trace_host": "172.16.200.50",
+        "trace_host": "172.16.200.104",
         "trace_port": 31337
       }
     }
