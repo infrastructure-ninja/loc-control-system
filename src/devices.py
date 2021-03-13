@@ -149,10 +149,31 @@ def system_states_callback_handler(command, value, qualifier):
             if single_button is not button_map[value]:
                 single_button.SetState(0)
 
+    elif command == 'CameraFramingHelper':
+        DebugPrint('devices.py/system_states_callback_handler',
+                   '[{}] [{}] [{}]'.format(command, value, qualifier), 'Trace')
+
+        if value == 'On':
+            DebugPrint('devices.py/system_states_callback_handler/CameraFramingHelper',
+                       'Setting state to 1', 'Trace')
+            interface.mainscreen.btnCAM1_TileButton.SetState(1)
+            interface.mainscreen.btnCAM2_TileButton.SetState(1)
+            interface.mainscreen.btnCAM3_TileButton.SetState(1)
+            interface.mainscreen.btnCAM4_TileButton.SetState(1)
+
+        else:
+            DebugPrint('devices.py/system_states_callback_handler/CameraFramingHelper',
+                       'Setting state to 0', 'Trace')
+            interface.mainscreen.btnCAM1_TileButton.SetState(0)
+            interface.mainscreen.btnCAM2_TileButton.SetState(0)
+            interface.mainscreen.btnCAM3_TileButton.SetState(0)
+            interface.mainscreen.btnCAM4_TileButton.SetState(0)
+
 # end function (system_states_callback_handler)
 
 
 system_states.SubscribeStatus('ActivePopup', None, system_states_callback_handler)
+system_states.SubscribeStatus('CameraFramingHelper', None, system_states_callback_handler)
 system_states.SubscribeStatus('CameraSpeed', None, system_states_callback_handler)
 system_states.SubscribeStatus('KeyOnPreview', None, system_states_callback_handler)
 system_states.SubscribeStatus('NextPreset', None, system_states_callback_handler)

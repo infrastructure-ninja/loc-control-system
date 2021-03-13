@@ -1,7 +1,7 @@
 {
   "schemaVersion": "0.1.0",
   "system": {
-    "name": "ControlSystem-WIP-2020-09-04",
+    "name": "LoC Control System v1.1",
     "code_folder_path": "src",
     "code_entry_file": "main.py",
     "layout_folder_path": "layout",

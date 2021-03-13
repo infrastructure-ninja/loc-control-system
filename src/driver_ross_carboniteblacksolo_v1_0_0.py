@@ -104,7 +104,8 @@ class DeviceClass:
         self.Commands = {
             'ConnectionStatus': {'Status': {}},
             'ProductName': {'Status': {}},
-            #'RunMacro': {'Status': {}},
+            'RunCC': {'Status': {}},
+            # STATUS: Number of CC's Running: 0x181E
             'Auto': {'Status': {}},
             'Cut': {'Status': {}},
             'KeySource': {'Parameters': ['Keyer'], 'Status': {}},
@@ -125,6 +126,25 @@ class DeviceClass:
             self.AddMatchString(re.compile(b'\xba\xd2\xac\xe5\x10\x00\xcd\x00\x0a\x00\x09\x90(\x00[\x00-\x04])\x04\x00\x00\x00([\x00-\xFF])'), self.__MatchNextTransitionLayers, 'SingleLayer')
             self.AddMatchString(re.compile(b'\xba\xd2\xac\xe5\x10\x00[\xc9\xca]\x00\x18\x00\x09\x90\x14\x00\x00\x00([\x00-x01])\x00\x00\x00([\x00-x01])\x00\x00\x00([\x00-x01])\x00\x00\x00([\x00-x01])\x00\x00\x00([\x00-x01])'), self.__MatchNextTransitionLayers, 'AllLayers')
             self.AddMatchString(re.compile(b'\xba\xd2\xac\xe5\x10\x00[\xc9\xca][\x00-\xFF][\x00-\xFF]\x00\x1e\xe6([\x00-\xFF])([\x20-\x7f]*?)\x00(\xba\xd2){0,1}'), self.__MatchProductName, None)
+
+    def SetRunCC(self, value, qualifier):
+        #ba d2 ac e5 00 10 4a 00  08 00 12 d2 04 00 00 00 01
+        #BANK 1, ROW 1: 0x12d2, 0x12d4, 0x12d6, 0x12d8, 0x12da, 0x12dc, 0x12de, 0x12e0
+        #BANK 1, ROW 4: 0x1302, 0x1304,    .. ,    .. ,    .. ,    .. ,    .. , 0x1310
+        #BANK 2, ROW 1: 0x1312, .., .., .., .., .., .., 0x1320
+        #BANK 3, ROW 1: 0x1352, .., .., .., .., .., .., 0x1360
+        #BANK 4, ROW 1: 0x1392, .., .., .., .., .., .., 0x13a0
+        #BANK 5, ROW 1: 0x13d2, .., .., .., .., .., .., 0x13e0
+        #BANK 6, ROW 1: 0x1412, .., .., .., .., .., .., 0x1420
+        #BANK 7, ROW 1: 0x1412, .., .., .., .., .., .., 0x1460
+        #BANK 8, ROW 1: 0x1492, .., .., .., .., .., .., 0x14a0
+
+        oid_base = 0x12d0
+        if 1 < value < 256:
+            OID = oid_base + value
+            RunCCCmdString = pack('>HHBBBHBHBl', 0xBAD2, 0xACE5, 0x00, 0x10, 0x4A, 0x0008, 0x00, OID, 0x04, 0x1)
+            self.__SetHelper('RunCC', RunCCCmdString, value, qualifier)
+
 
     def SetKeyOnPreview(self, value, qualifier):
         # Incoming value == "On", "Off", or "Toggle"
