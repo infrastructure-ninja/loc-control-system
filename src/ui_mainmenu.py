@@ -37,6 +37,8 @@ btnMainMenuR2C3 = Button(devices.TouchPanel, 1007)
 btnMainMenuR3C3 = Button(devices.TouchPanel, 1008)
 
 btnMainMenuR1C4 = Button(devices.TouchPanel, 1009)
+btnMainMenuR1C4.SetText('Camera\nFrame Guide')
+
 btnMainMenuR2C4 = Button(devices.TouchPanel, 1010)
 
 btnMainMenuR3C4 = Button(devices.TouchPanel, 1011)
@@ -64,7 +66,16 @@ lstMainPopupButtons = [
 def main_menu_buttons_pressed(button, state):
     DebugPrint('interface/main_menu_buttons_pressed', 'Button was pressed: [{}]'.format(button.Name), 'Debug')
 
-    if button is btnMainMenuR3C4:   # Recording Control
+    if button is btnMainMenuR1C4:   # Camera Framing Helper
+        if devices.system_states.ReadStatus('CameraFramingHelper') == 'On':
+            btnMainMenuR1C4.SetState(0)
+            devices.system_states.Set('CameraFramingHelper', 'Off')
+        
+        else:    
+            btnMainMenuR1C4.SetState(1)
+            devices.system_states.Set('CameraFramingHelper', 'On')
+
+    elif button is btnMainMenuR3C4:   # Recording Control
         devices.TouchPanel.ShowPopup('POP - Recording Control')
         devices.system_states.Set('ActivePopup', 'POP - Recording Control')
 

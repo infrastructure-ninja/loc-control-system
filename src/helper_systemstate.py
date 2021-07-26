@@ -37,6 +37,7 @@ class DeviceClass:
             #'ConnectionStatus': {'Status': {}},
             'ActivePopup': {'Status': {}},
             'CameraSpeed': {'Parameters': ['Camera Number'], 'Status': {}},
+            'CameraFramingHelper': {'Status': {}},
             'KeyOnPreview': {'Parameters': ['Keyer'], 'Status': {}},
             'NextPreset': {'Status': {}},
             'IgnoreMIDI': {'Status': {}}
@@ -46,6 +47,9 @@ class DeviceClass:
 
     def SetActivePopup(self, value, qualifier):
         self.WriteStatus('ActivePopup', value)
+
+    def SetCameraFramingHelper(self, value, qualifier):
+        self.WriteStatus('CameraFramingHelper', value, qualifier)
 
     def SetCameraSpeed(self, value, qualifier):
         self.WriteStatus('CameraSpeed', value, qualifier)
