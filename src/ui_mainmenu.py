@@ -70,8 +70,8 @@ def main_menu_buttons_pressed(button, state):
         if devices.system_states.ReadStatus('CameraFramingHelper') == 'On':
             btnMainMenuR1C4.SetState(0)
             devices.system_states.Set('CameraFramingHelper', 'Off')
-        
-        else:    
+
+        else:
             btnMainMenuR1C4.SetState(1)
             devices.system_states.Set('CameraFramingHelper', 'On')
 
@@ -91,5 +91,6 @@ def main_menu_buttons_pressed(button, state):
         DebugPrint('interface/main_menu_buttons_pressed', 'Running a refresh of the configuration file', 'Info')
         utilities.config.reload()
         interface.initialize_all()
+        devices.initialize_all()
 
 
