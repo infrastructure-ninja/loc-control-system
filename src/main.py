@@ -30,7 +30,7 @@ from utilities import DebugPrint
 DebugPrint('main.py',
            '==========================================================================', 'Info')
 DebugPrint('main.py',
-           'Light of Christ Control System v1.1 (MARCH 2021).. (Extron ControlScript v{})'.
+           'Light of Christ Control System v1.2 (NOVEMBER 2022).. (Extron ControlScript v{})'.
            format(Version()), 'Info')
 
 DebugPrint('main.py',

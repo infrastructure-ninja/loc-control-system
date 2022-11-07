@@ -130,14 +130,15 @@ def carbonite_received_data_handler(command, value, qualifier):
 
         carbonite.Update('KeyOnPreview')
 
-    # Set our "Key 1" and "Key 2" buttons to show what keys are active for the next transition
+    # Set our "Key 1", "Key 2" and "Key 3" buttons to show what keys are active for the next transition
     # We use blinking (SetBlinking) to make sure they're noticeable on the screen.
     elif command == 'KeyOnPreview':
         DebugPrint('devices.py/carbonite_received_data_handler',
                    'Received Carbonite Driver Update: [{0}] [{1}] [{2}]'.format(command, value, qualifier), 'Debug')
 
         keyer_button = {1: interface.mainscreen.btnPreview_Key1,
-                        2: interface.mainscreen.btnPreview_Key2}[qualifier['Keyer']]
+                        2: interface.mainscreen.btnPreview_Key2,
+                        3: interface.mainscreen.btnPreview_Key3}[qualifier['Keyer']]
 
         if value == 'On':
             keyer_button.SetState(1)

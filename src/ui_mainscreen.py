@@ -107,6 +107,13 @@ lblPlayback_MainScreenStatus = Label(devices.TouchPanel, 110)
 
 btnPreview_Key1 = Button(devices.TouchPanel, 108)
 btnPreview_Key2 = Button(devices.TouchPanel, 182)
+btnPreview_Key3 = Button(devices.TouchPanel, 238)
+
+
+btnState_Key1 = Button(devices.TouchPanel, 239)
+btnState_Key2 = Button(devices.TouchPanel, 240)
+btnState_Key3 = Button(devices.TouchPanel, 241)
+
 
 btnCloseNoButtonsA = Button(devices.TouchPanel, 11)
 btnCloseNoButtonsB = Button(devices.TouchPanel, 115)
