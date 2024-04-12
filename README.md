@@ -59,8 +59,7 @@ Work is still in progress to develop additional preset primitives - including on
 ## Devices Used
  - Extron DMP 128 Plus
  - Extron DXP 88 HD Plus
- - Extron IPL T Pro S6
- - Extron SMD 101
+ - Extron IPL Pro S3
  - Extron SMP 351
  - Extron TLI 101 Pro
  - Ross Video Carbonite Black Solo 109 Frame
